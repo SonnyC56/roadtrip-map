@@ -89,6 +89,9 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
   // Destinations
   const destinations = ref<Destination[]>([...majorDestinations])
 
+  // Cache for destination proximity (segment startTime -> destination indices)
+  const segmentDestinationCache = ref<Map<string, Set<number>>>(new Map())
+
   // Computed
   const totalPoints = computed(() => {
     return segments.value.reduce((sum, segment) => {
@@ -200,73 +203,29 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     return Math.round(currentDistance.value / 1000)
   })
 
-  // Reached destinations based on timeline position
+  // Reached destinations based on timeline position (OPTIMIZED with cache)
   const reachedDestinations = computed(() => {
     if (!isTimelineModeActive.value || !timelineTimestamp.value) {
       return destinations.value.map(d => ({ ...d, reached: true }))
     }
 
     const currentSegments = timelineSegments.value
-    const reached = destinations.value.map(dest => {
-      // Check if any segment is within 50km of this destination
-      const isReached = currentSegments.some(segment => {
-        // Check visit locations
-        if (segment.visit?.topCandidate?.placeLocation) {
-          const parts = segment.visit.topCandidate.placeLocation.latLng
-            .replace(/°/g, '')
-            .split(', ')
+    const reachedDestIndices = new Set<number>()
 
-          if (parts.length >= 2) {
-            const lat = parseFloat(parts[0] as string)
-            const lng = parseFloat(parts[1] as string)
+    // Use cache for ultra-fast lookup (using startTime as key)
+    currentSegments.forEach(segment => {
+      const nearbyDests = segmentDestinationCache.value.get(segment.startTime)
 
-            if (!isNaN(lat) && !isNaN(lng)) {
-              const distance = getDistanceFromLatLng(
-                dest.location.lat,
-                dest.location.lng,
-                lat,
-                lng
-              )
-
-              if (distance < 50) return true // Within 50km
-            }
-          }
-        }
-
-        // Also check timeline path endpoints (first and last points only for performance)
-        if (segment.timelinePath && segment.timelinePath.length > 0) {
-          const pointsToCheck = [
-            segment.timelinePath[0],
-            segment.timelinePath[segment.timelinePath.length - 1]
-          ].filter(p => p !== undefined)
-
-          for (const point of pointsToCheck) {
-            const parts = point.point.replace(/°/g, '').split(', ')
-            if (parts.length >= 2) {
-              const lat = parseFloat(parts[0] as string)
-              const lng = parseFloat(parts[1] as string)
-
-              if (!isNaN(lat) && !isNaN(lng)) {
-                const distance = getDistanceFromLatLng(
-                  dest.location.lat,
-                  dest.location.lng,
-                  lat,
-                  lng
-                )
-
-                if (distance < 50) return true // Within 50km
-              }
-            }
-          }
-        }
-
-        return false
-      })
-
-      return { ...dest, reached: isReached }
+      if (nearbyDests) {
+        nearbyDests.forEach(destIndex => reachedDestIndices.add(destIndex))
+      }
     })
 
-    return reached
+    // Map to destination objects
+    return destinations.value.map((dest, index) => ({
+      ...dest,
+      reached: reachedDestIndices.has(index)
+    }))
   })
 
   // Helper function to calculate distance between two coordinates
@@ -287,6 +246,81 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     return deg * (Math.PI / 180)
   }
 
+  // Build cache of which segments are near which destinations (for performance)
+  function buildDestinationCache() {
+    const cache = new Map<string, Set<number>>()
+
+    segments.value.forEach((segment) => {
+      const nearbyDests = new Set<number>()
+
+      destinations.value.forEach((dest, destIndex) => {
+        let isNear = false
+
+        // Check visit locations
+        if (segment.visit?.topCandidate?.placeLocation) {
+          const parts = segment.visit.topCandidate.placeLocation.latLng
+            .replace(/°/g, '')
+            .split(', ')
+
+          if (parts.length >= 2) {
+            const lat = parseFloat(parts[0] as string)
+            const lng = parseFloat(parts[1] as string)
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const distance = getDistanceFromLatLng(
+                dest.location.lat,
+                dest.location.lng,
+                lat,
+                lng
+              )
+              if (distance < 50) isNear = true
+            }
+          }
+        }
+
+        // Check timeline path endpoints
+        if (!isNear && segment.timelinePath && segment.timelinePath.length > 0) {
+          const pointsToCheck = [
+            segment.timelinePath[0],
+            segment.timelinePath[segment.timelinePath.length - 1]
+          ].filter(p => p !== undefined)
+
+          for (const point of pointsToCheck) {
+            const parts = point.point.replace(/°/g, '').split(', ')
+            if (parts.length >= 2) {
+              const lat = parseFloat(parts[0] as string)
+              const lng = parseFloat(parts[1] as string)
+
+              if (!isNaN(lat) && !isNaN(lng)) {
+                const distance = getDistanceFromLatLng(
+                  dest.location.lat,
+                  dest.location.lng,
+                  lat,
+                  lng
+                )
+                if (distance < 50) {
+                  isNear = true
+                  break
+                }
+              }
+            }
+          }
+        }
+
+        if (isNear) {
+          nearbyDests.add(destIndex)
+        }
+      })
+
+      if (nearbyDests.size > 0) {
+        cache.set(segment.startTime, nearbyDests)
+      }
+    })
+
+    segmentDestinationCache.value = cache
+    console.log('Built destination cache:', cache.size, 'segments with nearby destinations')
+  }
+
   // Actions
   async function loadData() {
     try {
@@ -303,6 +337,9 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
           new Date(Math.max(...dates.map(d => d.getTime())))
         ]
       }
+
+      // Build destination proximity cache for performance
+      buildDestinationCache()
 
       // Load media and comments from localStorage
       loadMediaFromStorage()

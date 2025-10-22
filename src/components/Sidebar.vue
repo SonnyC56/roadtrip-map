@@ -130,11 +130,29 @@ onUnmounted(() => {
   pause()
 })
 
+// Use RAF for buttery smooth slider updates
+let rafId: number | null = null
+let pendingSliderUpdate = false
+
 function handleSliderInput(event: Event) {
   const target = event.target as HTMLInputElement
   const value = Number(target.value)
   sliderValue.value = value
-  store.setTimelineTimestamp(currentDate.value.getTime())
+
+  // Schedule update with requestAnimationFrame for smooth 60fps
+  if (!pendingSliderUpdate) {
+    pendingSliderUpdate = true
+
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+    }
+
+    rafId = requestAnimationFrame(() => {
+      store.setTimelineTimestamp(currentDate.value.getTime())
+      pendingSliderUpdate = false
+      rafId = null
+    })
+  }
 }
 
 function play() {
