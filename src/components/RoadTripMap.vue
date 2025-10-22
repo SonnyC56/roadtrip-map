@@ -342,24 +342,24 @@ onUnmounted(() => {
     <div ref="mapContainer" class="w-full h-full"></div>
 
     <!-- Legend -->
-    <div class="absolute bottom-48 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-gray-200">
-      <strong class="text-sm text-gray-900 block mb-3">Route Colors</strong>
+    <div class="map-legend absolute bottom-48 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-gray-200">
+      <strong class="legend-title text-sm text-gray-900 block mb-3">Route Colors</strong>
       <div class="space-y-2">
         <div class="flex items-center gap-2">
           <span class="w-6 h-1 bg-[#FF6B6B] rounded"></span>
-          <span class="text-xs text-gray-600">August</span>
+          <span class="legend-text text-xs text-gray-600">August</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-6 h-1 bg-[#4ECDC4] rounded"></span>
-          <span class="text-xs text-gray-600">September</span>
+          <span class="legend-text text-xs text-gray-600">September</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-6 h-1 bg-[#FF8C42] rounded"></span>
-          <span class="text-xs text-gray-600">October</span>
+          <span class="legend-text text-xs text-gray-600">October</span>
         </div>
         <div class="flex items-center gap-2 pt-2 border-t border-gray-200">
           <span class="w-3 h-3 bg-[#2E86AB] border-2 border-white rounded-full"></span>
-          <span class="text-xs text-gray-600">Stops/Visits</span>
+          <span class="legend-text text-xs text-gray-600">Stops/Visits</span>
         </div>
       </div>
     </div>
@@ -436,6 +436,46 @@ onUnmounted(() => {
   }
   50% {
     transform: scale(1.1);
+  }
+}
+
+/* Mobile optimizations for legend */
+@media (max-width: 640px) {
+  .map-legend {
+    bottom: 12rem !important;
+    right: 0.75rem !important;
+    padding: 0.5rem !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .legend-title {
+    font-size: 0.7rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  .legend-text {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-legend {
+    bottom: 10rem !important;
+    right: 0.5rem !important;
+    padding: 0.4rem !important;
+  }
+
+  .legend-title {
+    font-size: 0.65rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .legend-text {
+    font-size: 0.6rem !important;
+  }
+
+  .map-legend .space-y-2 {
+    gap: 0.25rem !important;
   }
 }
 </style>

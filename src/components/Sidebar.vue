@@ -334,42 +334,15 @@ function cycleSpeed() {
                   <span class="status-dot"></span>
                   {{ playbackStatus }}
                 </span>
-                <div class="parks-counter">
-                  <button
-                    @click="toggleParksExpanded"
-                    class="parks-toggle"
-                    :class="{ expanded: isParksExpanded }"
-                  >
-                    <span class="parks-count">
-                      {{ reachedNationalParks.length }} / {{ totalNationalParks }}
-                    </span>
-                    <span class="parks-label-text">National Parks</span>
-                    <svg
-                      class="chevron"
-                      :class="{ rotated: isParksExpanded }"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-                  <Transition name="parks-expand">
-                    <div v-if="isParksExpanded && reachedNationalParks.length > 0" class="parks-details">
-                      <div class="parks-grid">
-                        <span
-                          v-for="(park, index) in reachedNationalParks"
-                          :key="index"
-                          class="park-item"
-                        >
-                          {{ park }}
-                        </span>
-                      </div>
-                    </div>
-                  </Transition>
-                </div>
+                <button
+                  @click="toggleParksExpanded"
+                  class="parks-badge"
+                >
+                  <span class="parks-count">
+                    {{ reachedNationalParks.length }} / {{ totalNationalParks }}
+                  </span>
+                  <span class="parks-label-text">National Parks</span>
+                </button>
               </div>
             </div>
           </div>
@@ -377,6 +350,36 @@ function cycleSpeed() {
       </div>
     </div>
   </div>
+
+  <!-- National Parks Modal -->
+  <Transition name="modal-fade">
+    <div v-if="isParksExpanded" class="modal-overlay" @click="toggleParksExpanded">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">National Parks Visited</h3>
+          <button @click="toggleParksExpanded" class="modal-close">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="parks-count-display">
+            {{ reachedNationalParks.length }} of {{ totalNationalParks }} Visited
+          </div>
+          <div class="parks-modal-grid">
+            <div
+              v-for="(park, index) in reachedNationalParks"
+              :key="index"
+              class="park-modal-item"
+            >
+              {{ park }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
@@ -401,62 +404,62 @@ function cycleSpeed() {
 
 .glass-panel {
   width: 100%;
-  border-radius: 28px;
+  border-radius: 24px;
   background: rgba(248, 250, 252, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
   backdrop-filter: blur(36px);
-  padding: 28px 32px;
+  padding: 22px 26px;
 }
 
 .panel-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .panel-top-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 20px;
   align-items: flex-start;
 }
 
 .summary-block {
-  flex: 1 1 220px;
-  min-width: 220px;
+  flex: 1 1 200px;
+  min-width: 200px;
 }
 
 .summary-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(15, 23, 42, 0.55);
-  margin: 0 0 8px;
+  margin: 0 0 6px;
 }
 
 .summary-day {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 3px;
 }
 
 .day-number {
-  font-size: 2.25rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #111827;
 }
 
 .day-total {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: rgba(15, 23, 42, 0.45);
 }
 
 .summary-date {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: rgba(15, 23, 42, 0.7);
   margin: 0;
@@ -582,30 +585,30 @@ function cycleSpeed() {
 }
 
 .distance-block {
-  min-width: 200px;
+  min-width: 180px;
   text-align: right;
 }
 
 .distance-miles {
-  font-size: 2.25rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1e293b;
-  margin: 4px 0 0;
+  margin: 3px 0 0;
   line-height: 1;
 }
 
 .distance-miles span {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: rgba(15, 23, 42, 0.55);
-  margin-left: 6px;
+  margin-left: 5px;
 }
 
 .distance-km {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: rgba(15, 23, 42, 0.45);
-  margin: 4px 0 0;
+  margin: 3px 0 0;
 }
 
 .panel-bottom-row {
@@ -743,12 +746,7 @@ function cycleSpeed() {
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
-.parks-counter {
-  flex: 1;
-  max-width: 600px;
-}
-
-.parks-toggle {
+.parks-badge {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -759,13 +757,14 @@ function cycleSpeed() {
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 100%;
-  justify-content: space-between;
+  max-width: 600px;
+  flex: 1;
 }
 
-.parks-toggle:hover {
+.parks-badge:hover {
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
 }
 
 .parks-count {
@@ -780,62 +779,118 @@ function cycleSpeed() {
   color: rgba(15, 23, 42, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  flex: 1;
-  text-align: left;
 }
 
-.chevron {
-  transition: transform 0.2s ease;
-  color: rgba(15, 23, 42, 0.5);
-}
-
-.chevron.rotated {
-  transform: rotate(180deg);
-}
-
-.parks-details {
-  margin-top: 8px;
-  padding: 12px;
-  border-radius: 10px;
-  background: rgba(248, 250, 252, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-.parks-grid {
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
 }
 
-.park-item {
-  display: inline-block;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.9);
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(15, 23, 42, 0.5);
+  padding: 4px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(15, 23, 42, 0.05);
+  color: rgba(15, 23, 42, 0.8);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.parks-count-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(15, 23, 42, 0.6);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.parks-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.park-modal-item {
+  padding: 12px 16px;
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(15, 23, 42, 0.75);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  color: rgba(15, 23, 42, 0.8);
+  transition: all 0.2s ease;
 }
 
-.parks-expand-enter-active,
-.parks-expand-leave-active {
-  transition: all 0.3s ease;
-  overflow: hidden;
+.park-modal-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
-.parks-expand-enter-from,
-.parks-expand-leave-to {
+/* Modal Transitions */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.modal-fade-enter-active .modal-content,
+.modal-fade-leave-active .modal-content {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
   opacity: 0;
-  max-height: 0;
-  transform: translateY(-8px);
 }
 
-.parks-expand-enter-to,
-.parks-expand-leave-from {
-  opacity: 1;
-  max-height: 500px;
-  transform: translateY(0);
+.modal-fade-enter-from .modal-content,
+.modal-fade-leave-to .modal-content {
+  transform: scale(0.95);
+  opacity: 0;
 }
 
 .icon-regular {
@@ -856,63 +911,232 @@ function cycleSpeed() {
 
 @media (max-width: 1024px) {
   .toolbar-shell {
-    padding: 0 1.25rem 1.5rem;
+    padding: 0 0.75rem 0.875rem;
+  }
+
+  .glass-panel {
+    padding: 14px 18px;
+    border-radius: 20px;
+  }
+
+  .panel-content {
+    gap: 14px;
+  }
+
+  .panel-top-row {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .summary-block {
+    flex: 0 0 auto;
+  }
+
+  .summary-label,
+  .distance-label {
+    font-size: 0.68rem;
+    margin-bottom: 4px;
+  }
+
+  .day-number {
+    font-size: 1.5rem;
+  }
+
+  .day-total {
+    font-size: 0.75rem;
+  }
+
+  .summary-date {
+    font-size: 0.8rem;
+  }
+
+  .summary-progress {
+    font-size: 0.7rem;
+  }
+
+  .distance-miles {
+    font-size: 1.5rem;
+  }
+
+  .distance-km {
+    font-size: 0.75rem;
   }
 
   .timeline-block {
-    flex: 1 1 100%;
+    flex: 1 1 0;
+    min-width: 140px;
   }
 
   .distance-block {
-    text-align: left;
+    flex: 0 0 auto;
+    text-align: right;
   }
 }
 
 @media (max-width: 768px) {
   .toolbar-shell {
-    padding: 0 1rem 1.25rem;
+    padding: 0 0.625rem 0.75rem;
+  }
+
+  .glass-panel {
+    padding: 13px 16px;
+    border-radius: 18px;
+  }
+
+  .panel-content {
+    gap: 13px;
+  }
+
+  .panel-top-row {
+    flex-wrap: nowrap;
+    gap: 9px;
+  }
+
+  .summary-block {
+    flex: 0 0 auto;
+  }
+
+  .summary-label,
+  .distance-label {
+    font-size: 0.66rem;
+    margin-bottom: 3px;
+  }
+
+  .day-number {
+    font-size: 1.4rem;
+  }
+
+  .day-total {
+    font-size: 0.72rem;
+  }
+
+  .summary-date {
+    font-size: 0.78rem;
+  }
+
+  .summary-progress {
+    font-size: 0.68rem;
+  }
+
+  .distance-miles {
+    font-size: 1.4rem;
+  }
+
+  .distance-km {
+    font-size: 0.72rem;
+  }
+
+  .timeline-block {
+    flex: 1 1 0;
+    min-width: 110px;
+  }
+
+  .distance-block {
+    flex: 0 0 auto;
+    text-align: right;
   }
 
   .panel-bottom-row {
     flex-direction: column;
     align-items: flex-start;
+    gap: 11px;
   }
 
   .controls-group {
     width: 100%;
     justify-content: flex-start;
+    gap: 7px;
   }
 
   .meta-group {
     width: 100%;
     justify-content: flex-start;
+    gap: 7px;
+  }
+
+  .control-button,
+  .control-button-play,
+  .speed-button {
+    height: 42px;
+  }
+
+  .meta-pill,
+  .status-pill {
+    font-size: 0.73rem;
+    padding: 7px 11px;
   }
 }
 
 @media (max-width: 640px) {
   .glass-panel {
-    padding: 22px 20px;
-    border-radius: 24px;
+    padding: 14px 14px;
+    border-radius: 18px;
+  }
+
+  .panel-content {
+    gap: 14px;
   }
 
   .panel-top-row {
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: row;
+    flex-wrap: nowrap; /* Keep on same line */
+    gap: 8px;
+    align-items: flex-start;
   }
 
-  .summary-block,
-  .timeline-block,
-  .distance-block {
-    min-width: 100%;
+  .summary-block {
+    flex: 0 0 auto;
+    min-width: auto;
+  }
+
+  .summary-label {
+    font-size: 0.65rem;
+    margin-bottom: 4px;
+  }
+
+  .day-number {
+    font-size: 1.4rem;
+  }
+
+  .day-total {
+    font-size: 0.7rem;
+  }
+
+  .summary-date {
+    font-size: 0.75rem;
+  }
+
+  .summary-progress {
+    font-size: 0.7rem;
+  }
+
+  .timeline-block {
+    flex: 1 1 0; /* Take available space */
+    min-width: 100px;
   }
 
   .distance-block {
-    text-align: left;
+    flex: 0 0 auto;
+    min-width: auto;
+    text-align: right;
+  }
+
+  .distance-label {
+    font-size: 0.65rem;
+    margin-bottom: 4px;
+  }
+
+  .distance-miles {
+    font-size: 1.4rem;
+  }
+
+  .distance-km {
+    font-size: 0.7rem;
   }
 
   .panel-bottom-row {
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
   }
 
   .controls-group {
@@ -923,15 +1147,17 @@ function cycleSpeed() {
   .control-button,
   .control-button-play {
     flex: 1 1 0;
-    max-width: 48px;
+    max-width: 44px;
+    height: 44px;
   }
 
   .control-button-play {
-    max-width: 60px;
+    max-width: 56px;
   }
 
   .speed-button {
     flex: 1 1 auto;
+    height: 44px;
   }
 
   .meta-group {
@@ -943,44 +1169,142 @@ function cycleSpeed() {
   .status-pill {
     flex: 1 1 calc(50% - 6px);
     justify-content: center;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
+    padding: 8px 12px;
+  }
+
+  .parks-details {
+    max-height: 150px;
   }
 }
 
 @media (max-width: 480px) {
   .toolbar-shell {
-    padding: 0 0.75rem 1rem;
+    padding: 0 0.5rem 0.75rem;
   }
 
   .glass-panel {
-    padding: 20px 16px;
+    padding: 12px 12px;
+    border-radius: 16px;
   }
 
-  .summary-day {
+  .panel-content {
+    gap: 12px;
+  }
+
+  .panel-top-row {
+    flex-wrap: nowrap; /* Force single line */
     gap: 6px;
   }
 
+  .summary-block {
+    min-width: auto;
+    flex: 0 0 auto;
+  }
+
+  .summary-label {
+    display: none; /* Hide "TIMELINE" label on mobile */
+  }
+
+  .summary-day {
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+
   .day-number {
-    font-size: 1.8rem;
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .day-total {
+    font-size: 0.65rem;
+  }
+
+  .summary-date {
+    font-size: 0.7rem;
+    margin-bottom: 1px;
+  }
+
+  .summary-progress {
+    font-size: 0.65rem;
+  }
+
+  .timeline-block {
+    min-width: 80px;
+    flex: 1 1 0;
+  }
+
+  .distance-block {
+    min-width: auto;
+    flex: 0 0 auto;
+    text-align: right;
+  }
+
+  .distance-label {
+    display: none; /* Hide "DISTANCE COVERED" label on mobile */
   }
 
   .distance-miles {
-    font-size: 1.8rem;
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .distance-km {
+    font-size: 0.65rem;
+  }
+
+  .panel-bottom-row {
+    gap: 10px;
   }
 
   .controls-group {
-    gap: 8px;
+    gap: 6px;
   }
 
   .control-button,
   .control-button-play,
   .speed-button {
-    height: 42px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .control-button-play {
+    max-width: 50px;
+  }
+
+  .icon-medium {
+    width: 16px;
+    height: 16px;
+  }
+
+  .icon-large {
+    width: 20px;
+    height: 20px;
   }
 
   .meta-pill,
   .status-pill {
     flex: 1 1 100%;
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .parks-badge {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .parks-grid {
+    gap: 6px;
+  }
+
+  .park-chip {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  .parks-details {
+    max-height: 120px;
   }
 }
 </style>
