@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { majorDestinations, type Destination } from '../data/destinations'
+import { TRIP_START_DATE } from '../constants/trip'
 
 export interface TimelinePoint {
   point: string
@@ -84,6 +86,9 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
   const allMedia = ref<MediaItem[]>([])
   const allComments = ref<Comment[]>([])
 
+  // Destinations
+  const destinations = ref<Destination[]>([...majorDestinations])
+
   // Computed
   const totalPoints = computed(() => {
     return segments.value.reduce((sum, segment) => {
@@ -164,11 +169,129 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     })
   })
 
+  // Real-time stats based on timeline position
+  const currentPoints = computed(() => {
+    if (!isTimelineModeActive.value) return totalPoints.value
+
+    return timelineSegments.value.reduce((sum, segment) => {
+      return sum + (segment.timelinePath?.length || 0)
+    }, 0)
+  })
+
+  const currentVisits = computed(() => {
+    if (!isTimelineModeActive.value) return totalVisits.value
+
+    return timelineSegments.value.filter(s => s.visit).length
+  })
+
+  const currentDistance = computed(() => {
+    if (!isTimelineModeActive.value) return totalDistance.value
+
+    return timelineSegments.value.reduce((sum, segment) => {
+      return sum + (segment.activity?.distanceMeters || 0)
+    }, 0)
+  })
+
+  const currentDistanceMiles = computed(() => {
+    return Math.round(currentDistance.value / 1609.34)
+  })
+
+  const currentDistanceKm = computed(() => {
+    return Math.round(currentDistance.value / 1000)
+  })
+
+  // Reached destinations based on timeline position
+  const reachedDestinations = computed(() => {
+    if (!isTimelineModeActive.value || !timelineTimestamp.value) {
+      return destinations.value.map(d => ({ ...d, reached: true }))
+    }
+
+    const currentSegments = timelineSegments.value
+    const reached = destinations.value.map(dest => {
+      // Check if any segment is within 50km of this destination
+      const isReached = currentSegments.some(segment => {
+        // Check visit locations
+        if (segment.visit?.topCandidate?.placeLocation) {
+          const parts = segment.visit.topCandidate.placeLocation.latLng
+            .replace(/°/g, '')
+            .split(', ')
+
+          if (parts.length >= 2) {
+            const lat = parseFloat(parts[0] as string)
+            const lng = parseFloat(parts[1] as string)
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const distance = getDistanceFromLatLng(
+                dest.location.lat,
+                dest.location.lng,
+                lat,
+                lng
+              )
+
+              if (distance < 50) return true // Within 50km
+            }
+          }
+        }
+
+        // Also check timeline path endpoints (first and last points only for performance)
+        if (segment.timelinePath && segment.timelinePath.length > 0) {
+          const pointsToCheck = [
+            segment.timelinePath[0],
+            segment.timelinePath[segment.timelinePath.length - 1]
+          ].filter(p => p !== undefined)
+
+          for (const point of pointsToCheck) {
+            const parts = point.point.replace(/°/g, '').split(', ')
+            if (parts.length >= 2) {
+              const lat = parseFloat(parts[0] as string)
+              const lng = parseFloat(parts[1] as string)
+
+              if (!isNaN(lat) && !isNaN(lng)) {
+                const distance = getDistanceFromLatLng(
+                  dest.location.lat,
+                  dest.location.lng,
+                  lat,
+                  lng
+                )
+
+                if (distance < 50) return true // Within 50km
+              }
+            }
+          }
+        }
+
+        return false
+      })
+
+      return { ...dest, reached: isReached }
+    })
+
+    return reached
+  })
+
+  // Helper function to calculate distance between two coordinates
+  function getDistanceFromLatLng(lat1: number, lng1: number, lat2: number, lng2: number) {
+    const R = 6371 // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1)
+    const dLng = deg2rad(lng2 - lng1)
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    const d = R * c // Distance in km
+    return d
+  }
+
+  function deg2rad(deg: number) {
+    return deg * (Math.PI / 180)
+  }
+
   // Actions
   async function loadData() {
     try {
       loading.value = true
-      const response = await fetch('/roadtrip2025.json')
+      const response = await fetch('/roadtrip2025_mod.json')
       const data = await response.json()
       segments.value = data.semanticSegments
 
@@ -250,7 +373,7 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
 
   function activateTimelineMode() {
     isTimelineModeActive.value = true
-    timelineTimestamp.value = new Date('2025-08-10').getTime()
+    timelineTimestamp.value = TRIP_START_DATE.getTime()
   }
 
   function deactivateTimelineMode() {
@@ -303,6 +426,7 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     allComments,
     timelineTimestamp,
     isTimelineModeActive,
+    destinations,
 
     // Computed
     totalPoints,
@@ -315,6 +439,12 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     segmentMedia,
     segmentComments,
     timelineSegments,
+    currentPoints,
+    currentVisits,
+    currentDistance,
+    currentDistanceMiles,
+    currentDistanceKm,
+    reachedDestinations,
 
     // Actions
     loadData,

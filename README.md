@@ -104,7 +104,7 @@ roadtrip-map/
 │   ├── App.vue          # Root component
 │   └── main.ts          # App entry point
 ├── public/
-│   └── roadtrip2025.json # Trip data (1,615 segments)
+│   └── roadtrip2025_mod.json # Trip data (1,615 segments)
 └── package.json
 \`\`\`
 
