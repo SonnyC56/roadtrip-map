@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import RoadTripMap from './components/RoadTripMap.vue'
 import Sidebar from './components/Sidebar.vue'
+import LayersControl from './components/LayersControl.vue'
 </script>
 
 <template>
@@ -12,6 +13,7 @@ import Sidebar from './components/Sidebar.vue'
       <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent"></div>
     </div>
 
+    <LayersControl />
     <Sidebar />
   </div>
 </template>

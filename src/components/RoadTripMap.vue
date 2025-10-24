@@ -27,11 +27,7 @@ function parseCoord(coordStr: string): [number, number] {
 
 function getColorByDate(dateStr: string): string {
   const date = new Date(dateStr)
-  const month = date.getMonth()
-  if (month === 7) return '#FF6B6B'  // August - red
-  if (month === 8) return '#4ECDC4'  // September - teal
-  if (month === 9) return '#FF8C42'  // October - orange
-  return '#666'
+  return store.getColorForDate(date)
 }
 
 function clearAllLayers() {
@@ -74,10 +70,11 @@ function renderBaselineRoute() {
 
   if (allRouteCoords.length > 0) {
     // Draw the complete grey baseline route
+    const initialOpacity = store.layerVisibility.baselineRoute ? 0.5 : 0
     baselinePolyline = L.polyline(allRouteCoords, {
       color: '#D1D5DB',
       weight: 4,
-      opacity: 0.5,
+      opacity: initialOpacity,
       smoothFactor: 2,
       lineCap: 'round',
       lineJoin: 'round'
@@ -188,33 +185,43 @@ function createAllSegmentLayers() {
   updateSegmentVisibility()
 }
 
-// Update visibility of segments based on timeline position (fast!)
+// Update visibility of segments based on timeline position or day-by-day mode (fast!)
 function updateSegmentVisibility() {
   if (!map) return
 
+  const viewMode = store.viewMode
   const currentTimestamp = store.timelineTimestamp
   const isTimelineActive = store.isTimelineModeActive
+  const selectedDaySegments = store.selectedDaySegments
+  const { routeSegments, visitMarkers } = store.layerVisibility
 
   segmentLayers.forEach((layer) => {
     const segmentStart = new Date(layer.segment.startTime).getTime()
+    let shouldBeVisible = false
 
-    // Determine if this segment should be visible
-    const shouldBeVisible = !isTimelineActive ||
-                           currentTimestamp === null ||
-                           segmentStart <= currentTimestamp
+    // Day-by-day mode: only show segments from selected day
+    if (viewMode === 'day-by-day') {
+      shouldBeVisible = selectedDaySegments.some(seg => seg.startTime === layer.segment.startTime)
+    }
+    // Timeline mode: show segments up to current timestamp
+    else {
+      shouldBeVisible = !isTimelineActive ||
+                       currentTimestamp === null ||
+                       segmentStart <= currentTimestamp
+    }
 
-    // Update polyline visibility
+    // Update polyline visibility (also check layer toggle)
     if (layer.polyline) {
       layer.polyline.setStyle({
-        opacity: shouldBeVisible ? 0.9 : 0
+        opacity: (shouldBeVisible && routeSegments) ? 0.9 : 0
       })
     }
 
-    // Update marker visibility
+    // Update marker visibility (also check layer toggle)
     if (layer.marker) {
       layer.marker.setStyle({
-        opacity: shouldBeVisible ? 1 : 0,
-        fillOpacity: shouldBeVisible ? 0.9 : 0
+        opacity: (shouldBeVisible && visitMarkers) ? 1 : 0,
+        fillOpacity: (shouldBeVisible && visitMarkers) ? 0.9 : 0
       })
     }
   })
@@ -226,12 +233,32 @@ function scheduleVisibilityUpdate() {
   renderDestinations()
 }
 
+// Zoom map to fit the selected day's route
+function zoomToSelectedDay() {
+  if (!map) return
+
+  const bounds = store.selectedDayBounds
+  if (bounds && bounds.length > 0) {
+    map.fitBounds(bounds, {
+      padding: [80, 80],
+      maxZoom: 14,
+      animate: true,
+      duration: 0.8
+    })
+  }
+}
+
 function renderDestinations() {
   if (!map) return
 
   // Clear existing destination markers
   destinationMarkers.forEach(m => m.remove())
   destinationMarkers.length = 0
+
+  // Only render destinations for default data source and if layer is enabled
+  if (store.dataSource !== 'default' || !store.layerVisibility.destinationIcons) {
+    return
+  }
 
   // Get reached destinations from store
   const reachedDests = store.reachedDestinations
@@ -310,11 +337,37 @@ watch(() => [store.timelineTimestamp, store.isTimelineModeActive], () => {
   scheduleVisibilityUpdate()
 }, { deep: true })
 
+// Watch for day-by-day view changes - update visibility and zoom
+watch(() => [store.selectedDay, store.viewMode], () => {
+  scheduleVisibilityUpdate()
+  if (store.viewMode === 'day-by-day') {
+    zoomToSelectedDay()
+  } else {
+    // Reset to full view when switching back to timeline mode
+    if (allRouteCoords.length > 0 && map) {
+      map.fitBounds(allRouteCoords, { padding: [50, 50] })
+    }
+  }
+}, { deep: true })
+
 // Watch for data changes - recreate everything
 watch(() => [store.segments], () => {
   renderBaselineRoute()
   createAllSegmentLayers()
   renderDestinations()
+}, { deep: true })
+
+// Watch for layer visibility changes
+watch(() => store.layerVisibility, () => {
+  // Update baseline route visibility
+  if (baselinePolyline) {
+    baselinePolyline.setStyle({
+      opacity: store.layerVisibility.baselineRoute ? 0.5 : 0
+    })
+  }
+
+  // Update segment and marker visibility
+  scheduleVisibilityUpdate()
 }, { deep: true })
 
 onUnmounted(() => {
@@ -345,17 +398,13 @@ onUnmounted(() => {
     <div class="map-legend absolute bottom-48 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-gray-200">
       <strong class="legend-title text-sm text-gray-900 block mb-3">Route Colors</strong>
       <div class="space-y-2">
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-1 bg-[#FF6B6B] rounded"></span>
-          <span class="legend-text text-xs text-gray-600">August</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-1 bg-[#4ECDC4] rounded"></span>
-          <span class="legend-text text-xs text-gray-600">September</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-1 bg-[#FF8C42] rounded"></span>
-          <span class="legend-text text-xs text-gray-600">October</span>
+        <div
+          v-for="boundary in store.monthBoundaries"
+          :key="boundary.monthKey"
+          class="flex items-center gap-2"
+        >
+          <span class="w-6 h-1 rounded" :style="{ background: boundary.color }"></span>
+          <span class="legend-text text-xs text-gray-600">{{ boundary.name }}</span>
         </div>
         <div class="flex items-center gap-2 pt-2 border-t border-gray-200">
           <span class="w-3 h-3 bg-[#2E86AB] border-2 border-white rounded-full"></span>

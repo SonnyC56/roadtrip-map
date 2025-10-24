@@ -9,8 +9,6 @@ import {
   PauseIcon,
   PlayIcon
 } from '@heroicons/vue/24/outline'
-import { TRIP_DURATION_MS, TRIP_END_DATE, TRIP_START_DATE, TRIP_TOTAL_DAYS } from '../constants/trip'
-
 const store = useRoadTripStore()
 
 const isParksExpanded = ref(false)
@@ -20,28 +18,48 @@ const playbackSpeed = ref(1)
 let animationFrame: number | null = null
 
 const currentDate = computed(() => {
-  const offset = (sliderValue.value / 100) * TRIP_DURATION_MS
-  return new Date(TRIP_START_DATE.getTime() + offset)
+  const offset = (sliderValue.value / 100) * store.tripDurationMs
+  return new Date(store.tripStartDate.getTime() + offset)
 })
 
-const formattedCurrentDate = computed(() => format(currentDate.value, 'EEEE, MMM dd'))
+const formattedCurrentDate = computed(() => format(currentDate.value, 'EEEE, MMM dd, yyyy'))
 const currentDay = computed(() => {
-  const dayIndex = Math.floor((sliderValue.value / 100) * TRIP_TOTAL_DAYS) + 1
-  return Math.min(Math.max(dayIndex, 1), TRIP_TOTAL_DAYS)
+  const dayIndex = Math.floor((sliderValue.value / 100) * store.tripTotalDays) + 1
+  return Math.min(Math.max(dayIndex, 1), store.tripTotalDays)
 })
 const progressPercent = computed(() => Math.round(sliderValue.value))
 const playbackStatus = computed(() => (isPlaying.value ? 'Playing' : 'Paused'))
-const startLabel = computed(() => format(TRIP_START_DATE, 'MMM dd'))
-const endLabel = computed(() => format(TRIP_END_DATE, 'MMM dd'))
+const startLabel = computed(() => format(store.tripStartDate, 'MMM dd, yyyy'))
+const endLabel = computed(() => format(store.tripEndDate, 'MMM dd, yyyy'))
 
 function formatNumber(value: number | null | undefined) {
   if (typeof value !== 'number' || Number.isNaN(value)) return '0'
   return value.toLocaleString()
 }
 
-const milesDisplay = computed(() => formatNumber(store.currentDistanceMiles))
-const kmDisplay = computed(() => formatNumber(store.currentDistanceKm))
+const milesDisplay = computed(() => {
+  if (store.viewMode === 'day-by-day') {
+    return formatNumber(store.selectedDayDistanceMiles)
+  }
+  return formatNumber(store.currentDistanceMiles)
+})
+
+const kmDisplay = computed(() => {
+  if (store.viewMode === 'day-by-day') {
+    return formatNumber(Math.round(store.selectedDayDistance / 1000))
+  }
+  return formatNumber(store.currentDistanceKm)
+})
+
 const destinationsVisited = computed(() => store.reachedDestinations.filter(dest => dest.reached).length)
+
+// Day-by-day view computeds
+const selectedDayDate = computed(() => {
+  const dayOffset = (store.selectedDay - 1) * 24 * 60 * 60 * 1000
+  return new Date(store.tripStartDate.getTime() + dayOffset)
+})
+
+const formattedSelectedDayDate = computed(() => format(selectedDayDate.value, 'EEEE, MMM dd, yyyy'))
 
 // Get list of reached national parks
 const reachedNationalParks = computed(() => {
@@ -60,51 +78,55 @@ function toggleParksExpanded() {
 
 // Get color based on current date
 const currentColor = computed(() => {
-  const month = currentDate.value.getMonth()
-  if (month === 7) return '#FF6B6B'  // August - red
-  if (month === 8) return '#4ECDC4'  // September - teal
-  if (month === 9) return '#FF8C42'  // October - orange
-  return '#666'
-})
-
-// Calculate month boundaries as percentages
-const augustEnd = computed(() => {
-  const augustEndDate = new Date('2025-09-01T00:00:00Z')
-  return ((augustEndDate.getTime() - TRIP_START_DATE.getTime()) / TRIP_DURATION_MS) * 100
-})
-
-const septemberEnd = computed(() => {
-  const septemberEndDate = new Date('2025-10-01T00:00:00Z')
-  return ((septemberEndDate.getTime() - TRIP_START_DATE.getTime()) / TRIP_DURATION_MS) * 100
+  return store.getColorForDate(currentDate.value)
 })
 
 // Build gradient that shows colors for completed months
 const progressGradient = computed(() => {
   const current = sliderValue.value
+  const boundaries = store.monthBoundaries
 
-  if (current <= augustEnd.value) {
-    // Still in August, all red
-    return '#FF6B6B'
-  } else if (current <= septemberEnd.value) {
-    // In September, show red for August portion, then teal up to current position
-    const augustPercent = (augustEnd.value / current) * 100
-    return `linear-gradient(90deg,
-      #FF6B6B 0%,
-      #FF6B6B ${augustPercent}%,
-      #4ECDC4 ${augustPercent}%,
-      #4ECDC4 100%)`
-  } else {
-    // In October, show red, teal, then orange
-    const augustPercent = (augustEnd.value / current) * 100
-    const septemberPercent = (septemberEnd.value / current) * 100
-    return `linear-gradient(90deg,
-      #FF6B6B 0%,
-      #FF6B6B ${augustPercent}%,
-      #4ECDC4 ${augustPercent}%,
-      #4ECDC4 ${septemberPercent}%,
-      #FF8C42 ${septemberPercent}%,
-      #FF8C42 100%)`
+  if (boundaries.length === 0) {
+    return currentColor.value
   }
+
+  const firstBoundary = boundaries[0]
+  if (!firstBoundary) {
+    return currentColor.value
+  }
+
+  // If we're still in the first month
+  if (current <= firstBoundary.percent) {
+    return firstBoundary.color
+  }
+
+  // Build gradient stops
+  const gradientStops: string[] = []
+  let prevPercent = 0
+
+  boundaries.forEach((boundary, index) => {
+    if (boundary.percent <= current) {
+      // This month is complete
+      const percentInGradient = (boundary.percent / current) * 100
+      gradientStops.push(`${boundary.color} ${prevPercent}%`)
+      gradientStops.push(`${boundary.color} ${percentInGradient}%`)
+      prevPercent = percentInGradient
+    } else {
+      const prevBoundary = boundaries[index - 1]
+      if (index === 0 || (prevBoundary && prevBoundary.percent < current)) {
+        // We're currently in this month
+        const percentInGradient = 100
+        gradientStops.push(`${boundary.color} ${prevPercent}%`)
+        gradientStops.push(`${boundary.color} ${percentInGradient}%`)
+      }
+    }
+  })
+
+  if (gradientStops.length === 0) {
+    return currentColor.value
+  }
+
+  return `linear-gradient(90deg, ${gradientStops.join(', ')})`
 })
 
 watch(
@@ -115,8 +137,8 @@ watch(
       return
     }
 
-    const clamped = Math.min(TRIP_END_DATE.getTime(), Math.max(TRIP_START_DATE.getTime(), timestamp))
-    const percent = ((clamped - TRIP_START_DATE.getTime()) / TRIP_DURATION_MS) * 100
+    const clamped = Math.min(store.tripEndDate.getTime(), Math.max(store.tripStartDate.getTime(), timestamp))
+    const percent = ((clamped - store.tripStartDate.getTime()) / store.tripDurationMs) * 100
     sliderValue.value = Math.max(0, Math.min(100, Number(percent.toFixed(3))))
   },
   { immediate: true }
@@ -158,7 +180,7 @@ function handleSliderInput(event: Event) {
 function play() {
   if (sliderValue.value >= 100) {
     sliderValue.value = 0
-    store.setTimelineTimestamp(TRIP_START_DATE.getTime())
+    store.setTimelineTimestamp(store.tripStartDate.getTime())
   }
 
   if (isPlaying.value) return
@@ -195,7 +217,7 @@ function animate() {
 function reset() {
   pause()
   sliderValue.value = 0
-  store.setTimelineTimestamp(TRIP_START_DATE.getTime())
+  store.setTimelineTimestamp(store.tripStartDate.getTime())
 }
 
 function skipForward() {
@@ -213,6 +235,24 @@ function cycleSpeed() {
   const currentIndex = speeds.indexOf(playbackSpeed.value)
   playbackSpeed.value = speeds[(currentIndex + 1) % speeds.length] || 1
 }
+
+// Day-by-day view functions
+function toggleViewMode() {
+  if (store.viewMode === 'timeline') {
+    store.setViewMode('day-by-day')
+    pause() // Pause playback when switching to day view
+  } else {
+    store.setViewMode('timeline')
+  }
+}
+
+function nextDay() {
+  store.nextDay()
+}
+
+function previousDay() {
+  store.previousDay()
+}
 </script>
 
 <template>
@@ -222,17 +262,30 @@ function cycleSpeed() {
         <div class="glass-panel toolbar-panel">
           <div class="panel-content">
             <div class="panel-top-row">
-              <div class="summary-block">
+              <!-- Timeline Mode Summary -->
+              <div v-if="store.viewMode === 'timeline'" class="summary-block">
                 <p class="summary-label">Timeline</p>
                 <div class="summary-day">
                   <span class="day-number">Day {{ currentDay }}</span>
-                  <span class="day-total">of {{ TRIP_TOTAL_DAYS }}</span>
+                  <span class="day-total">of {{ store.tripTotalDays }}</span>
                 </div>
                 <p class="summary-date">{{ formattedCurrentDate }}</p>
                 <p class="summary-progress">{{ progressPercent }}% of journey</p>
               </div>
 
-              <div class="timeline-block">
+              <!-- Day-by-Day Mode Summary -->
+              <div v-else class="summary-block">
+                <p class="summary-label">Day by Day</p>
+                <div class="summary-day">
+                  <span class="day-number">Day {{ store.selectedDay }}</span>
+                  <span class="day-total">of {{ store.tripTotalDays }}</span>
+                </div>
+                <p class="summary-date">{{ formattedSelectedDayDate }}</p>
+                <p class="summary-progress">{{ store.selectedDayVisits }} stops this day</p>
+              </div>
+
+              <!-- Timeline Slider (only in timeline mode) -->
+              <div v-if="store.viewMode === 'timeline'" class="timeline-block">
                 <div class="timeline-slider-container">
                   <div class="timeline-track"></div>
                   <div
@@ -261,23 +314,19 @@ function cycleSpeed() {
 
                 <!-- Color Legend -->
                 <div class="color-legend">
-                  <div class="legend-item">
-                    <span class="legend-color" style="background: #FF6B6B;"></span>
-                    <span class="legend-label">August</span>
-                  </div>
-                  <div class="legend-item">
-                    <span class="legend-color" style="background: #4ECDC4;"></span>
-                    <span class="legend-label">September</span>
-                  </div>
-                  <div class="legend-item">
-                    <span class="legend-color" style="background: #FF8C42;"></span>
-                    <span class="legend-label">October</span>
+                  <div
+                    v-for="boundary in store.monthBoundaries"
+                    :key="boundary.monthKey"
+                    class="legend-item"
+                  >
+                    <span class="legend-color" :style="{ background: boundary.color }"></span>
+                    <span class="legend-label">{{ boundary.name }}</span>
                   </div>
                 </div>
               </div>
 
               <div class="distance-block">
-                <p class="summary-label">Distance covered</p>
+                <p class="summary-label">{{ store.viewMode === 'timeline' ? 'Distance covered' : 'Day distance' }}</p>
                 <p class="distance-miles">
                   {{ milesDisplay }}
                   <span>mi</span>
@@ -287,7 +336,8 @@ function cycleSpeed() {
             </div>
 
             <div class="panel-bottom-row">
-              <div class="controls-group">
+              <!-- Timeline Mode Controls -->
+              <div v-if="store.viewMode === 'timeline'" class="controls-group">
                 <button
                   @click="reset"
                   class="control-button"
@@ -326,15 +376,50 @@ function cycleSpeed() {
                 </button>
               </div>
 
+              <!-- Day-by-Day Mode Controls -->
+              <div v-else class="controls-group">
+                <button
+                  @click="previousDay"
+                  class="control-button"
+                  title="Previous day"
+                  :disabled="store.selectedDay === 1"
+                >
+                  <BackwardIcon class="icon-regular" />
+                </button>
+                <button
+                  @click="nextDay"
+                  class="control-button"
+                  title="Next day"
+                  :disabled="store.selectedDay === store.tripTotalDays"
+                >
+                  <ForwardIcon class="icon-regular" />
+                </button>
+              </div>
+
               <div class="meta-group">
+                <!-- Mode Toggle Button -->
+                <button
+                  @click="toggleViewMode"
+                  class="mode-toggle-button"
+                  :title="store.viewMode === 'timeline' ? 'Switch to Day-by-Day' : 'Switch to Timeline'"
+                >
+                  <span class="mode-icon">{{ store.viewMode === 'timeline' ? '📅' : '▶️' }}</span>
+                  <span class="mode-label">{{ store.viewMode === 'timeline' ? 'Day View' : 'Timeline' }}</span>
+                </button>
+
+                <!-- Status Pill (only in timeline mode) -->
                 <span
+                  v-if="store.viewMode === 'timeline'"
                   class="status-pill"
                   :class="isPlaying ? 'status-live' : ''"
                 >
                   <span class="status-dot"></span>
                   {{ playbackStatus }}
                 </span>
+
+                <!-- National Parks Badge (only for default data) -->
                 <button
+                  v-if="store.dataSource === 'default'"
                   @click="toggleParksExpanded"
                   class="parks-badge"
                 >
@@ -646,6 +731,17 @@ function cycleSpeed() {
   box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
 }
 
+.control-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.control-button:disabled:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: none;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
 .control-button-play {
   height: 56px;
   width: 56px;
@@ -679,6 +775,38 @@ function cycleSpeed() {
 
 .speed-button:hover {
   background: rgba(15, 23, 42, 0.16);
+}
+
+.mode-toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: 44px;
+  border-radius: 14px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  cursor: pointer;
+}
+
+.mode-toggle-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.mode-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.mode-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
 }
 
 .meta-group {
