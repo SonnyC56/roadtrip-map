@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { format } from 'date-fns'
-import { useRoadTripStore } from '../stores/roadtrip'
+import { useRoadTripStore, type MediaItem } from '../stores/roadtrip'
 import {
   ArrowPathIcon,
   BackwardIcon,
@@ -9,6 +9,11 @@ import {
   PauseIcon,
   PlayIcon
 } from '@heroicons/vue/24/outline'
+import MediaLightbox from './MediaLightbox.vue'
+import Media360Viewer from './Media360Viewer.vue'
+import AddMediaForm from './AddMediaForm.vue'
+import { useVirtualScroll } from '../composables/useVirtualScroll'
+
 const store = useRoadTripStore()
 
 const isParksExpanded = ref(false)
@@ -16,6 +21,14 @@ const isPlaying = ref(false)
 const sliderValue = ref(0)
 const playbackSpeed = ref(1)
 let animationFrame: number | null = null
+
+// Media viewer state
+const showMediaLightbox = ref(false)
+const showMedia360Viewer = ref(false)
+const showAddMediaForm = ref(false)
+const currentMediaItem = ref<MediaItem | null>(null)
+const currentMediaIndex = ref(0)
+const currentMediaList = ref<MediaItem[]>([])
 
 const currentDate = computed(() => {
   const offset = (sliderValue.value / 100) * store.tripDurationMs
@@ -60,6 +73,51 @@ const selectedDayDate = computed(() => {
 })
 
 const formattedSelectedDayDate = computed(() => format(selectedDayDate.value, 'EEEE, MMM dd, yyyy'))
+
+// Media thumbnail timeline - use markers for lightweight rendering
+const sortedMediaMarkers = computed(() => {
+  return [...store.allMediaMarkers].sort((a, b) => {
+    return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  })
+})
+
+const visibleMedia = computed(() => {
+  let markers = sortedMediaMarkers.value
+  if (store.isTimelineModeActive && store.timelineTimestamp) {
+    markers = markers.filter(m => {
+      return new Date(m.timestamp).getTime() <= store.timelineTimestamp!
+    })
+  }
+
+  // Convert markers to full MediaItems using cached details where available
+  // This allows backward compatibility with existing UI code
+  return markers.map(marker => {
+    const cached = store.loadedMediaDetails.get(marker.id)
+    if (cached) {
+      return cached
+    }
+    // Return a minimal MediaItem if details haven't been loaded yet
+    return {
+      ...marker,
+      url: marker.thumbnail || '', // Fallback to thumbnail if full URL not loaded
+      caption: undefined,
+      exifData: undefined,
+      comments: undefined
+    }
+  })
+})
+
+// Virtual scrolling for thumbnail timeline
+const thumbnailContainerRef = ref<HTMLElement | null>(null)
+const { visibleItems: virtualVisibleMedia, totalWidth, handleScroll } = useVirtualScroll(
+  visibleMedia,
+  thumbnailContainerRef,
+  {
+    itemWidth: 60, // Width of each thumbnail + gap
+    itemHeight: 60,
+    buffer: 5 // Render 5 extra items on each side for smooth scrolling
+  }
+)
 
 // Get list of reached national parks
 const reachedNationalParks = computed(() => {
@@ -131,7 +189,7 @@ const progressGradient = computed(() => {
 
 watch(
   () => store.timelineTimestamp,
-  timestamp => {
+  async timestamp => {
     if (!timestamp) {
       sliderValue.value = 0
       return
@@ -140,8 +198,50 @@ watch(
     const clamped = Math.min(store.tripEndDate.getTime(), Math.max(store.tripStartDate.getTime(), timestamp))
     const percent = ((clamped - store.tripStartDate.getTime()) / store.tripDurationMs) * 100
     sliderValue.value = Math.max(0, Math.min(100, Number(percent.toFixed(3))))
+
+    // Preload media details around the current timeline position for sidebar display
+    // This loads a 24-hour window of media details
+    await store.preloadMediaAroundTime(timestamp)
   },
   { immediate: true }
+)
+
+// Debug: Watch selectedSegmentIndex
+watch(
+  () => store.selectedSegmentIndex,
+  (newIndex, oldIndex) => {
+    console.log(`🎨 Sidebar: selectedSegmentIndex changed from ${oldIndex} to ${newIndex}`)
+    if (newIndex !== null) {
+      console.log(`🎨 Sidebar: MediaGallery should now be visible for segment ${newIndex}`)
+    } else {
+      console.log('🎨 Sidebar: MediaGallery should be hidden (no segment selected)')
+    }
+  },
+  { immediate: true }
+)
+
+// Watch for media view triggers (e.g., from map marker clicks)
+watch(
+  () => store.mediaToView,
+  async (trigger) => {
+    if (!trigger) return
+
+    console.log(`🎬 Sidebar: Media view triggered for ${trigger.mediaId}`)
+
+    // Get the full media details
+    const mediaItem = store.loadedMediaDetails.get(trigger.mediaId)
+    if (!mediaItem) {
+      console.error(`Failed to find media ${trigger.mediaId} in loaded details`)
+      return
+    }
+
+    // Open the media viewer
+    await openMediaViewer(mediaItem)
+
+    // Clear the trigger
+    store.mediaToView = null
+  },
+  { deep: true }
 )
 
 onMounted(() => {
@@ -253,6 +353,94 @@ function nextDay() {
 function previousDay() {
   store.previousDay()
 }
+
+// Media functions
+function handleOpenMedia(mediaItem: MediaItem, index: number) {
+  currentMediaItem.value = mediaItem
+  currentMediaIndex.value = index
+
+  // Get all media for the current segment
+  if (store.selectedSegmentIndex !== null) {
+    currentMediaList.value = store.getMediaForSegment(store.selectedSegmentIndex)
+  }
+
+  // Open appropriate viewer based on media type
+  if (mediaItem.type === '360-photo' || mediaItem.type === '360-video') {
+    showMedia360Viewer.value = true
+  } else {
+    showMediaLightbox.value = true
+  }
+}
+
+function closeMediaViewers() {
+  showMediaLightbox.value = false
+  showMedia360Viewer.value = false
+  currentMediaItem.value = null
+}
+
+function navigateMediaNext() {
+  if (currentMediaIndex.value < currentMediaList.value.length - 1) {
+    const nextIndex = currentMediaIndex.value + 1
+    const nextItem = currentMediaList.value[nextIndex]
+    if (nextItem) {
+      handleOpenMedia(nextItem, nextIndex)
+    }
+  }
+}
+
+function navigateMediaPrevious() {
+  if (currentMediaIndex.value > 0) {
+    const prevIndex = currentMediaIndex.value - 1
+    const prevItem = currentMediaList.value[prevIndex]
+    if (prevItem) {
+      handleOpenMedia(prevItem, prevIndex)
+    }
+  }
+}
+
+function handleAddMedia() {
+  showAddMediaForm.value = true
+}
+
+function closeAddMediaForm() {
+  showAddMediaForm.value = false
+}
+
+function handleMediaAdded() {
+  showAddMediaForm.value = false
+}
+
+// Open media viewer when thumbnail is clicked
+async function openMediaViewer(mediaItem: MediaItem) {
+  // Ensure we have full details loaded
+  await store.loadMediaDetails(mediaItem.id)
+  const fullMedia = store.loadedMediaDetails.get(mediaItem.id)
+
+  if (fullMedia) {
+    currentMediaItem.value = fullMedia
+    currentMediaIndex.value = 0
+
+    // Check if it's a 360 media
+    if (fullMedia.type === '360-photo' || fullMedia.type === '360-video') {
+      showMedia360Viewer.value = true
+    } else {
+      showMediaLightbox.value = true
+    }
+  }
+}
+
+// Navigate to day when media thumbnail is clicked (shift+click or secondary action)
+function navigateToMediaDay(mediaItem: MediaItem) {
+  const mediaTime = new Date(mediaItem.timestamp).getTime()
+  const dayNumber = Math.floor((mediaTime - store.tripStartDate.getTime()) / (24 * 60 * 60 * 1000)) + 1
+
+  // Switch to day-by-day mode and navigate to that day
+  store.setViewMode('day-by-day')
+  store.setSelectedDay(dayNumber)
+
+  // Select the segment this media belongs to
+  store.selectSegment(mediaItem.segmentIndex)
+}
 </script>
 
 <template>
@@ -286,6 +474,41 @@ function previousDay() {
 
               <!-- Timeline Slider (only in timeline mode) -->
               <div v-if="store.viewMode === 'timeline'" class="timeline-block">
+                <!-- Media Thumbnail Timeline (Virtual Scrolling) -->
+                <div
+                  v-if="sortedMediaMarkers.length > 0"
+                  class="media-thumbnail-strip"
+                  ref="thumbnailContainerRef"
+                  @scroll="handleScroll"
+                >
+                  <div class="media-thumbnails" :style="{ width: `${totalWidth}px`, position: 'relative' }">
+                    <button
+                      v-for="{ item: media, index, offsetLeft } in virtualVisibleMedia"
+                      :key="media.id"
+                      @click="openMediaViewer(media)"
+                      @click.shift.exact="navigateToMediaDay(media)"
+                      class="media-thumb"
+                      :class="{ 'is-360': media.type === '360-photo' || media.type === '360-video' }"
+                      :title="media.caption || 'Click to view, Shift+Click to navigate to day'"
+                      :style="{ position: 'absolute', left: `${offsetLeft}px` }"
+                    >
+                      <img
+                        v-if="media.thumbnail"
+                        :src="media.thumbnail"
+                        :alt="media.caption || 'Media thumbnail'"
+                        class="thumb-image"
+                        loading="lazy"
+                      />
+                      <div v-else class="thumb-placeholder">
+                        <span class="thumb-icon">
+                          {{ media.type === 'photo' ? '📷' : media.type === 'video' ? '🎥' : media.type === '360-photo' ? '🌐' : '🎬' }}
+                        </span>
+                      </div>
+                      <div v-if="media.type === '360-photo' || media.type === '360-video'" class="thumb-360-badge">360°</div>
+                    </button>
+                  </div>
+                </div>
+
                 <div class="timeline-slider-container">
                   <div class="timeline-track"></div>
                   <div
@@ -465,6 +688,34 @@ function previousDay() {
       </div>
     </div>
   </Transition>
+
+  <!-- Media Viewers -->
+  <MediaLightbox
+    v-if="showMediaLightbox && currentMediaItem"
+    :media-item="currentMediaItem"
+    :all-media="currentMediaList"
+    :current-index="currentMediaIndex"
+    @close="closeMediaViewers"
+    @next="navigateMediaNext"
+    @previous="navigateMediaPrevious"
+  />
+
+  <Media360Viewer
+    v-if="showMedia360Viewer && currentMediaItem"
+    :media-item="currentMediaItem"
+    :all-media="currentMediaList"
+    :current-index="currentMediaIndex"
+    @close="closeMediaViewers"
+    @next="navigateMediaNext"
+    @previous="navigateMediaPrevious"
+  />
+
+  <AddMediaForm
+    v-if="showAddMediaForm"
+    :segment-index="store.selectedSegmentIndex"
+    @close="closeAddMediaForm"
+    @added="handleMediaAdded"
+  />
 </template>
 
 <style scoped>
@@ -562,6 +813,104 @@ function previousDay() {
 .timeline-block {
   flex: 2 1 320px;
   min-width: 260px;
+}
+
+.media-thumbnail-strip {
+  margin-bottom: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0 8px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  max-height: 80px;
+}
+
+.media-thumbnails {
+  height: 60px;
+  position: relative;
+  /* Width is set dynamically via inline style */
+  /* No flex - children are absolutely positioned for virtual scrolling */
+}
+
+.media-thumbnail-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.media-thumbnail-strip::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.05);
+  border-radius: 2px;
+}
+
+.media-thumbnail-strip::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 2px;
+}
+
+.media-thumbnail-strip::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+.media-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(248, 250, 252, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.media-thumb:hover {
+  transform: translateY(-2px) scale(1.05);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.media-thumb.is-360 {
+  border-color: #f59e0b;
+}
+
+.media-thumb.is-360:hover {
+  border-color: #d97706;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.thumb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.thumb-icon {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+.thumb-360-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #f59e0b;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
 }
 
 .timeline-slider-container {

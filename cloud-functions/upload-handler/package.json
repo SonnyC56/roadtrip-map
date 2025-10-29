@@ -1,0 +1,20 @@
+{
+  "name": "roadtrip-upload-handler",
+  "version": "1.0.0",
+  "description": "Cloud Function for handling media uploads to Google Cloud Storage",
+  "main": "index.js",
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.7.0",
+    "busboy": "^1.6.0"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.3.0"
+  },
+  "scripts": {
+    "start": "functions-framework --target=uploadMedia",
+    "deploy": "gcloud functions deploy uploadMedia --runtime nodejs18 --trigger-http --allow-unauthenticated --entry-point uploadMedia"
+  }
+}

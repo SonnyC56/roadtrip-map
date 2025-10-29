@@ -2,6 +2,18 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { majorDestinations, type Destination } from '../data/destinations'
 import { TRIP_START_DATE, TRIP_END_DATE } from '../constants/trip'
+import { db } from '../config/firebase'
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  onSnapshot,
+  type Unsubscribe
+} from 'firebase/firestore'
 
 export interface TimelinePoint {
   point: string
@@ -32,6 +44,29 @@ export interface Activity {
   }
 }
 
+export interface MediaComment {
+  id: string
+  author: string
+  text: string
+  timestamp: string
+  rating?: number
+}
+
+// Lightweight version for map markers - only essential data
+export interface MediaMarker {
+  id: string
+  segmentIndex: number
+  type: 'photo' | 'video' | '360-photo' | '360-video'
+  thumbnail?: string
+  timestamp: string
+  location?: {
+    lat: number
+    lng: number
+    isInferred?: boolean
+  }
+}
+
+// Full media item - loaded on demand
 export interface MediaItem {
   id: string
   segmentIndex: number
@@ -43,7 +78,15 @@ export interface MediaItem {
   location?: {
     lat: number
     lng: number
+    isInferred?: boolean
   }
+  exifData?: {
+    camera?: string
+    focalLength?: string
+    iso?: string
+    exposureTime?: string
+  }
+  comments?: MediaComment[]
 }
 
 export interface Comment {
@@ -84,7 +127,16 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     baselineRoute: true,
     routeSegments: true,
     visitMarkers: true,
-    destinationIcons: true
+    destinationIcons: true,
+    mediaMarkers: true
+  })
+
+  // Media type filters
+  const mediaTypeFilters = ref({
+    photo: true,
+    video: true,
+    '360-photo': true,
+    '360-video': true
   })
 
   // Timeline Playback
@@ -96,8 +148,14 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
   const selectedDay = ref(1) // Day 1-59
 
   // Media and comments storage
-  const allMedia = ref<MediaItem[]>([])
+  
+  const allMediaMarkers = ref<MediaMarker[]>([]) // Lightweight data for map
+  const loadedMediaDetails = ref<Map<string, MediaItem>>(new Map()) // Cache of full details
+  const allMedia = ref<MediaItem[]>([]) // For backward compatibility during transition
   const allComments = ref<Comment[]>([])
+
+  // Media viewer trigger - used to open media viewer from anywhere (e.g., map markers)
+  const mediaToView = ref<{ mediaId: string; timestamp: number } | null>(null)
 
   // Destinations
   const destinations = ref<Destination[]>([...majorDestinations])
@@ -567,9 +625,9 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
       // Build destination proximity cache for performance (only for default data)
       buildDestinationCache()
 
-      // Load media and comments from localStorage
-      loadMediaFromStorage()
-      loadCommentsFromStorage()
+      // Load lightweight media markers and comments from Firestore
+      await loadMediaMarkersFromFirestore()
+      await loadCommentsFromFirestore()
 
       error.value = null
     } catch (e) {
@@ -605,9 +663,9 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
       // Reset destination cache
       segmentDestinationCache.value = new Map()
 
-      // Load media and comments from localStorage
-      loadMediaFromStorage()
-      loadCommentsFromStorage()
+      // Load lightweight media markers and comments from Firestore
+      await loadMediaMarkersFromFirestore()
+      await loadCommentsFromFirestore()
 
       error.value = null
     } catch (e) {
@@ -619,33 +677,172 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     }
   }
 
-  function addMedia(media: Omit<MediaItem, 'id'>) {
+  async function addMedia(media: Omit<MediaItem, 'id' | 'segmentIndex'>) {
+    const segmentIndex = assignSegmentIndex(media.timestamp)
     const newMedia: MediaItem = {
       ...media,
-      id: `media-${Date.now()}-${Math.random()}`
+      id: `media-${Date.now()}-${Math.random()}`,
+      segmentIndex
     }
+
+    // Add to legacy store for backward compatibility
     allMedia.value.push(newMedia)
-    saveMediaToStorage()
+
+    // Add lightweight marker
+    allMediaMarkers.value.push({
+      id: newMedia.id,
+      segmentIndex: newMedia.segmentIndex,
+      type: newMedia.type,
+      thumbnail: newMedia.thumbnail,
+      timestamp: newMedia.timestamp,
+      location: newMedia.location
+    })
+
+    // Cache full details
+    loadedMediaDetails.value.set(newMedia.id, newMedia)
+
+    await saveMediaToFirestore(newMedia)
   }
 
-  function removeMedia(id: string) {
+  async function removeMedia(id: string) {
     allMedia.value = allMedia.value.filter(m => m.id !== id)
-    saveMediaToStorage()
+    allMediaMarkers.value = allMediaMarkers.value.filter(m => m.id !== id)
+    loadedMediaDetails.value.delete(id)
+    await deleteMediaFromFirestore(id)
   }
 
-  function addComment(comment: Omit<Comment, 'id' | 'timestamp'>) {
+  async function addMediaBulk(mediaArray: Omit<MediaItem, 'id' | 'segmentIndex'>[]) {
+    const newMedia = mediaArray.map(media => {
+      const segmentIndex = assignSegmentIndex(media.timestamp)
+      return {
+        ...media,
+        id: `media-${Date.now()}-${Math.random()}`,
+        segmentIndex,
+        comments: media.comments || []
+      }
+    })
+
+    // Add to legacy store for backward compatibility
+    allMedia.value.push(...newMedia)
+
+    // Add lightweight markers
+    const newMarkers = newMedia.map(m => ({
+      id: m.id,
+      segmentIndex: m.segmentIndex,
+      type: m.type,
+      thumbnail: m.thumbnail,
+      timestamp: m.timestamp,
+      location: m.location
+    }))
+    allMediaMarkers.value.push(...newMarkers)
+
+    // Cache full details
+    newMedia.forEach(m => loadedMediaDetails.value.set(m.id, m))
+
+    // Save all media to Firestore
+    await Promise.all(newMedia.map(media => saveMediaToFirestore(media)))
+
+    return newMedia.length
+  }
+
+  function assignSegmentIndex(timestamp: string): number {
+    const mediaTime = new Date(timestamp).getTime()
+
+    // Find segment that contains this timestamp
+    for (let i = 0; i < segments.value.length; i++) {
+      const segment = segments.value[i]
+      if (!segment) continue
+
+      const segStart = new Date(segment.startTime).getTime()
+      const segEnd = new Date(segment.endTime).getTime()
+
+      if (mediaTime >= segStart && mediaTime <= segEnd) {
+        return i
+      }
+    }
+
+    // Find nearest segment if not contained
+    let nearestIndex = 0
+    let minDiff = Infinity
+
+    segments.value.forEach((seg, index) => {
+      const segStart = new Date(seg.startTime).getTime()
+      const diff = Math.abs(mediaTime - segStart)
+      if (diff < minDiff) {
+        minDiff = diff
+        nearestIndex = index
+      }
+    })
+
+    return nearestIndex
+  }
+
+  function getMediaForSegment(segmentIndex: number): MediaItem[] {
+    // First, get markers for this segment
+    const markers = allMediaMarkers.value.filter(m => m.segmentIndex === segmentIndex)
+
+    // Return full details if loaded, otherwise return minimal data from allMedia
+    return markers.map(marker => {
+      const fullDetails = loadedMediaDetails.value.get(marker.id)
+      if (fullDetails) {
+        return fullDetails
+      }
+      // Fallback to minimal data from allMedia
+      const minimal = allMedia.value.find(m => m.id === marker.id)
+      return minimal || {
+        ...marker,
+        url: marker.thumbnail || '',
+        caption: undefined,
+        exifData: undefined,
+        comments: undefined
+      }
+    })
+  }
+
+  function getMediaUpToTimestamp(timestamp: number): MediaItem[] {
+    return allMedia.value.filter(m => {
+      const mediaTime = new Date(m.timestamp).getTime()
+      return mediaTime <= timestamp
+    })
+  }
+
+  async function addMediaComment(mediaId: string, comment: Omit<MediaComment, 'id' | 'timestamp'>) {
+    const media = allMedia.value.find(m => m.id === mediaId)
+    if (media) {
+      if (!media.comments) {
+        media.comments = []
+      }
+      const newComment: MediaComment = {
+        ...comment,
+        id: `comment-${Date.now()}-${Math.random()}`,
+        timestamp: new Date().toISOString()
+      }
+      media.comments.push(newComment)
+      await saveMediaToFirestore(media)
+    }
+  }
+
+  async function removeMediaComment(mediaId: string, commentId: string) {
+    const media = allMedia.value.find(m => m.id === mediaId)
+    if (media && media.comments) {
+      media.comments = media.comments.filter(c => c.id !== commentId)
+      await saveMediaToFirestore(media)
+    }
+  }
+
+  async function addComment(comment: Omit<Comment, 'id' | 'timestamp'>) {
     const newComment: Comment = {
       ...comment,
       id: `comment-${Date.now()}-${Math.random()}`,
       timestamp: new Date().toISOString()
     }
     allComments.value.push(newComment)
-    saveCommentsToStorage()
+    await saveCommentToFirestore(newComment)
   }
 
-  function removeComment(id: string) {
+  async function removeComment(id: string) {
     allComments.value = allComments.value.filter(c => c.id !== id)
-    saveCommentsToStorage()
+    await deleteCommentFromFirestore(id)
   }
 
   function selectSegment(index: number | null) {
@@ -667,6 +864,11 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
 
   function closeMediaGallery() {
     showMediaGallery.value = false
+  }
+
+  function triggerMediaView(mediaId: string) {
+    // Set a unique timestamp to trigger reactivity even if same media clicked twice
+    mediaToView.value = { mediaId, timestamp: Date.now() }
   }
 
   function setTimelineTimestamp(timestamp: number | null) {
@@ -716,34 +918,196 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     layerVisibility.value[layer] = visible
   }
 
-  // Storage helpers
-  function saveMediaToStorage() {
-    localStorage.setItem('roadtrip-media', JSON.stringify(allMedia.value))
+  // Firestore helpers
+  async function saveMediaToFirestore(mediaItem: MediaItem) {
+    try {
+      const mediaRef = doc(db, 'media', mediaItem.id)
+
+      // Clean the data - Firestore doesn't accept undefined values
+      const cleanData: any = { ...mediaItem }
+
+      // Convert undefined to null or omit fields
+      Object.keys(cleanData).forEach(key => {
+        if (cleanData[key] === undefined) {
+          delete cleanData[key]
+        }
+      })
+
+      // Handle nested objects
+      if (cleanData.exifData) {
+        Object.keys(cleanData.exifData).forEach(key => {
+          if (cleanData.exifData[key] === undefined) {
+            delete cleanData.exifData[key]
+          }
+        })
+      }
+
+      await setDoc(mediaRef, cleanData)
+      console.log('Media saved to Firestore:', mediaItem.id)
+    } catch (e) {
+      console.error('Failed to save media to Firestore:', e)
+      throw e
+    }
   }
 
-  function loadMediaFromStorage() {
-    const stored = localStorage.getItem('roadtrip-media')
-    if (stored) {
-      try {
-        allMedia.value = JSON.parse(stored)
-      } catch (e) {
-        console.error('Failed to load media from storage:', e)
+  // Load only lightweight markers for map display
+  async function loadMediaMarkersFromFirestore() {
+    try {
+      const mediaCollection = collection(db, 'media')
+      const snapshot = await getDocs(mediaCollection)
+      const markers: MediaMarker[] = []
+
+      snapshot.forEach((doc) => {
+        const data = doc.data()
+        // Extract only the fields needed for map markers
+        markers.push({
+          id: data.id,
+          segmentIndex: data.segmentIndex,
+          type: data.type,
+          thumbnail: data.thumbnail,
+          timestamp: data.timestamp,
+          location: data.location
+        })
+      })
+
+      allMediaMarkers.value = markers
+
+      // Also populate allMedia with minimal data for backward compatibility
+      // Components can check loadedMediaDetails for full info
+      allMedia.value = markers.map(m => ({
+        ...m,
+        url: m.thumbnail || '',
+        caption: undefined,
+        exifData: undefined,
+        comments: undefined
+      }))
+
+      console.log(`Loaded ${markers.length} media markers from Firestore`)
+    } catch (e) {
+      console.error('Failed to load media markers from Firestore:', e)
+      // Fallback to localStorage if Firestore fails
+      const stored = localStorage.getItem('roadtrip-media')
+      if (stored) {
+        try {
+          const fullMedia = JSON.parse(stored)
+          // Convert to markers
+          allMediaMarkers.value = fullMedia.map((m: MediaItem) => ({
+            id: m.id,
+            segmentIndex: m.segmentIndex,
+            type: m.type,
+            thumbnail: m.thumbnail,
+            timestamp: m.timestamp,
+            location: m.location
+          }))
+          console.log('Loaded media markers from localStorage fallback')
+        } catch (err) {
+          console.error('Failed to load media from localStorage:', err)
+        }
       }
     }
   }
 
-  function saveCommentsToStorage() {
-    localStorage.setItem('roadtrip-comments', JSON.stringify(allComments.value))
+  // Load full details for a specific media item (lazy-loaded on demand)
+  async function loadMediaDetails(mediaId: string): Promise<MediaItem | null> {
+    // Check cache first
+    if (loadedMediaDetails.value.has(mediaId)) {
+      return loadedMediaDetails.value.get(mediaId)!
+    }
+
+    try {
+      const mediaRef = doc(db, 'media', mediaId)
+      const docSnap = await getDoc(mediaRef)
+
+      if (docSnap.exists()) {
+        const mediaItem = docSnap.data() as MediaItem
+        // Cache it
+        loadedMediaDetails.value.set(mediaId, mediaItem)
+        console.log('Loaded media details:', mediaId)
+        return mediaItem
+      } else {
+        console.error('Media not found:', mediaId)
+        return null
+      }
+    } catch (e) {
+      console.error('Failed to load media details:', e)
+      return null
+    }
   }
 
-  function loadCommentsFromStorage() {
-    const stored = localStorage.getItem('roadtrip-comments')
-    if (stored) {
-      try {
-        allComments.value = JSON.parse(stored)
-      } catch (e) {
-        console.error('Failed to load comments from storage:', e)
+  // Preload media details around a specific timestamp (for timeline sidebar)
+  async function preloadMediaAroundTime(timestamp: number, windowMs: number = 24 * 60 * 60 * 1000) {
+    const startTime = timestamp - windowMs / 2
+    const endTime = timestamp + windowMs / 2
+
+    const relevantMarkers = allMediaMarkers.value.filter(marker => {
+      const markerTime = new Date(marker.timestamp).getTime()
+      return markerTime >= startTime && markerTime <= endTime
+    })
+
+    console.log(`Preloading ${relevantMarkers.length} media items around timeline position`)
+
+    // Load in parallel
+    const promises = relevantMarkers.map(marker => loadMediaDetails(marker.id))
+    await Promise.all(promises)
+  }
+
+  async function deleteMediaFromFirestore(mediaId: string) {
+    try {
+      const mediaRef = doc(db, 'media', mediaId)
+      await deleteDoc(mediaRef)
+      console.log('Media deleted from Firestore:', mediaId)
+    } catch (e) {
+      console.error('Failed to delete media from Firestore:', e)
+      throw e
+    }
+  }
+
+  async function saveCommentToFirestore(comment: Comment) {
+    try {
+      const commentRef = doc(db, 'comments', comment.id)
+      await setDoc(commentRef, comment)
+      console.log('Comment saved to Firestore:', comment.id)
+    } catch (e) {
+      console.error('Failed to save comment to Firestore:', e)
+      throw e
+    }
+  }
+
+  async function loadCommentsFromFirestore() {
+    try {
+      const commentsCollection = collection(db, 'comments')
+      const snapshot = await getDocs(commentsCollection)
+      const commentsList: Comment[] = []
+
+      snapshot.forEach((doc) => {
+        commentsList.push(doc.data() as Comment)
+      })
+
+      allComments.value = commentsList
+      console.log(`Loaded ${commentsList.length} comments from Firestore`)
+    } catch (e) {
+      console.error('Failed to load comments from Firestore:', e)
+      // Fallback to localStorage if Firestore fails
+      const stored = localStorage.getItem('roadtrip-comments')
+      if (stored) {
+        try {
+          allComments.value = JSON.parse(stored)
+          console.log('Loaded comments from localStorage fallback')
+        } catch (err) {
+          console.error('Failed to load comments from localStorage:', err)
+        }
       }
+    }
+  }
+
+  async function deleteCommentFromFirestore(commentId: string) {
+    try {
+      const commentRef = doc(db, 'comments', commentId)
+      await deleteDoc(commentRef)
+      console.log('Comment deleted from Firestore:', commentId)
+    } catch (e) {
+      console.error('Failed to delete comment from Firestore:', e)
+      throw e
     }
   }
 
@@ -759,13 +1123,17 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     showMediaGallery,
     selectedMediaIndex,
     allMedia,
+    allMediaMarkers,
+    loadedMediaDetails,
     allComments,
+    mediaToView,
     timelineTimestamp,
     isTimelineModeActive,
     destinations,
     viewMode,
     selectedDay,
     layerVisibility,
+    mediaTypeFilters,
 
     // Computed
     totalPoints,
@@ -802,6 +1170,11 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     loadCustomData,
     addMedia,
     removeMedia,
+    addMediaBulk,
+    getMediaForSegment,
+    getMediaUpToTimestamp,
+    addMediaComment,
+    removeMediaComment,
     addComment,
     removeComment,
     selectSegment,
@@ -809,6 +1182,7 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     setDateRange,
     openMediaGallery,
     closeMediaGallery,
+    triggerMediaView,
     setTimelineTimestamp,
     activateTimelineMode,
     deactivateTimelineMode,
@@ -818,5 +1192,8 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     previousDay,
     toggleLayer,
     setLayerVisibility,
+    loadMediaMarkersFromFirestore,
+    loadMediaDetails,
+    preloadMediaAroundTime,
   }
 })

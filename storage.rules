@@ -1,0 +1,41 @@
+rules_version = '2';
+
+// Storage Security Rules for Interactive Road Trip
+// Only allows the owner to upload media files
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Public directory - anyone can read
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // No public uploads
+    }
+
+    // Media directory - only you can upload
+    match /media/{allPaths=**} {
+      // Public read access for displaying media
+      allow read: if true;
+
+      // Only authenticated owner can upload (no file size limit)
+      allow create, update: if request.auth != null
+                           && request.auth.uid == 'bKEEpiGmFmY9myxuPnj9rDGDQym2';
+
+      // Only owner can delete
+      allow delete: if request.auth != null
+                    && request.auth.uid == 'bKEEpiGmFmY9myxuPnj9rDGDQym2';
+    }
+
+    // Thumbnails directory - only you can upload
+    match /thumbnails/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+                           && request.auth.uid == 'bKEEpiGmFmY9myxuPnj9rDGDQym2';
+      allow delete: if request.auth != null
+                    && request.auth.uid == 'bKEEpiGmFmY9myxuPnj9rDGDQym2';
+    }
+
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

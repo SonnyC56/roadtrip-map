@@ -144,6 +144,64 @@ function loadDefaultData() {
                 />
                 <span class="toggle-label">Destination Icons</span>
               </label>
+
+              <label class="layer-toggle">
+                <input
+                  type="checkbox"
+                  v-model="store.layerVisibility.mediaMarkers"
+                />
+                <span class="toggle-label">Media Markers</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Media Type Filters Section -->
+          <div v-if="store.layerVisibility.mediaMarkers" class="section">
+            <h4 class="section-title">Media Types</h4>
+            <div class="layer-toggles">
+              <label class="layer-toggle media-type-toggle">
+                <input
+                  type="checkbox"
+                  v-model="store.mediaTypeFilters.photo"
+                />
+                <span class="toggle-label">
+                  <span class="media-icon">📷</span>
+                  Photos
+                </span>
+              </label>
+
+              <label class="layer-toggle media-type-toggle">
+                <input
+                  type="checkbox"
+                  v-model="store.mediaTypeFilters.video"
+                />
+                <span class="toggle-label">
+                  <span class="media-icon">🎥</span>
+                  Videos
+                </span>
+              </label>
+
+              <label class="layer-toggle media-type-toggle">
+                <input
+                  type="checkbox"
+                  v-model="store.mediaTypeFilters['360-photo']"
+                />
+                <span class="toggle-label">
+                  <span class="media-icon">🌐</span>
+                  360° Photos
+                </span>
+              </label>
+
+              <label class="layer-toggle media-type-toggle">
+                <input
+                  type="checkbox"
+                  v-model="store.mediaTypeFilters['360-video']"
+                />
+                <span class="toggle-label">
+                  <span class="media-icon">🎬</span>
+                  360° Videos
+                </span>
+              </label>
             </div>
           </div>
         </div>
@@ -155,9 +213,9 @@ function loadDefaultData() {
 <style scoped>
 .layers-control {
   position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
-  z-index: 1000;
+  top: 5rem;
+  left: 1.5rem;
+  z-index: 2000;
 }
 
 .layers-toggle-btn {
@@ -189,7 +247,7 @@ function loadDefaultData() {
 .layers-panel {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   width: 320px;
   background: white;
   border-radius: 16px;
@@ -355,6 +413,23 @@ function loadDefaultData() {
   font-weight: 500;
   color: #1f2937;
   user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.media-type-toggle {
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.media-type-toggle:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.media-icon {
+  font-size: 1rem;
 }
 
 .panel-slide-enter-active,
@@ -365,13 +440,13 @@ function loadDefaultData() {
 .panel-slide-enter-from,
 .panel-slide-leave-to {
   opacity: 0;
-  transform: translateX(20px) scale(0.95);
+  transform: translateX(-20px) scale(0.95);
 }
 
 @media (max-width: 640px) {
   .layers-control {
-    top: 1rem;
-    right: 1rem;
+    top: 4.5rem;
+    left: 1rem;
   }
 
   .layers-toggle-btn {

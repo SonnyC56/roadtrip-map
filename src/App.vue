@@ -2,6 +2,7 @@
 import RoadTripMap from './components/RoadTripMap.vue'
 import Sidebar from './components/Sidebar.vue'
 import LayersControl from './components/LayersControl.vue'
+import AdminPanel from './components/AdminPanel.vue'
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import LayersControl from './components/LayersControl.vue'
       <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent"></div>
     </div>
 
+    <AdminPanel />
     <LayersControl />
     <Sidebar />
   </div>

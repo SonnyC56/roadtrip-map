@@ -18,6 +18,7 @@ interface SegmentLayer {
 const segmentLayers: SegmentLayer[] = []
 
 const destinationMarkers: L.Marker[] = []
+const mediaMarkers: L.Marker[] = []
 let allRouteCoords: [number, number][] = []
 
 function parseCoord(coordStr: string): [number, number] {
@@ -44,6 +45,9 @@ function clearAllLayers() {
 
   destinationMarkers.forEach(m => m.remove())
   destinationMarkers.length = 0
+
+  mediaMarkers.forEach(m => m.remove())
+  mediaMarkers.length = 0
 }
 
 // Render the baseline grey route (only called once or when data changes)
@@ -59,6 +63,7 @@ function renderBaselineRoute() {
   allRouteCoords = []
 
   // Collect all route coordinates from all segments
+  // Only use timelinePath data - same as segment polylines
   store.segments.forEach(segment => {
     if (segment.timelinePath && segment.timelinePath.length > 0) {
       segment.timelinePath.forEach(p => {
@@ -69,11 +74,11 @@ function renderBaselineRoute() {
   })
 
   if (allRouteCoords.length > 0) {
-    // Draw the complete grey baseline route
-    const initialOpacity = store.layerVisibility.baselineRoute ? 0.5 : 0
+    // Draw the complete grey baseline route (more visible now)
+    const initialOpacity = store.layerVisibility.baselineRoute ? 0.8 : 0
     baselinePolyline = L.polyline(allRouteCoords, {
-      color: '#D1D5DB',
-      weight: 4,
+      color: '#9CA3AF',
+      weight: 5,
       opacity: initialOpacity,
       smoothFactor: 2,
       lineCap: 'round',
@@ -231,6 +236,7 @@ function updateSegmentVisibility() {
 function scheduleVisibilityUpdate() {
   updateSegmentVisibility()
   renderDestinations()
+  renderMediaMarkers()
 }
 
 // Zoom map to fit the selected day's route
@@ -309,6 +315,196 @@ function renderDestinations() {
   })
 }
 
+function renderMediaMarkers() {
+  if (!map) return
+
+  // Clear existing media markers
+  mediaMarkers.forEach(m => m.remove())
+  mediaMarkers.length = 0
+
+  // Only render if layer is enabled
+  if (!store.layerVisibility.mediaMarkers) {
+    return
+  }
+
+  // Get current zoom level
+  const currentZoom = map.getZoom()
+  const showThumbnails = currentZoom >= 13 // Show thumbnails at zoom level 13 and above
+
+  // Use lightweight markers instead of full media
+  let visibleMarkers = store.allMediaMarkers
+
+  // Filter by media type
+  visibleMarkers = visibleMarkers.filter(marker => {
+    return store.mediaTypeFilters[marker.type]
+  })
+
+  // Filter by timeline
+  if (store.isTimelineModeActive && store.timelineTimestamp) {
+    visibleMarkers = visibleMarkers.filter(marker => {
+      return new Date(marker.timestamp).getTime() <= store.timelineTimestamp!
+    })
+  }
+
+  visibleMarkers.forEach(marker => {
+    if (!marker.location) return
+
+    // Determine icon based on media type
+    let iconHtml = ''
+    let bgColor = ''
+    let iconContent = ''
+
+    switch (marker.type) {
+      case 'photo':
+        iconContent = '📷'
+        bgColor = '#3b82f6'
+        break
+      case 'video':
+        iconContent = '🎥'
+        bgColor = '#8b5cf6'
+        break
+      case '360-photo':
+        iconContent = '🌐'
+        bgColor = '#f59e0b'
+        break
+      case '360-video':
+        iconContent = '🎬'
+        bgColor = '#ec4899'
+        break
+    }
+
+    // Use thumbnail if available and zoomed in enough, otherwise use icon
+    if (showThumbnails && marker.thumbnail && (marker.type === 'photo' || marker.type === '360-photo')) {
+      // Show thumbnail image for photos at high zoom
+      iconHtml = `
+        <div style="
+          width: 64px;
+          height: 64px;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 3px solid white;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          background: white;
+        " class="media-marker-thumbnail">
+          <img
+            src="${marker.thumbnail}"
+            style="
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              display: block;
+            "
+            alt="Media thumbnail"
+          />
+          <div style="
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: ${bgColor};
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 1px solid white;
+          ">
+            ${iconContent}
+          </div>
+        </div>
+      `
+    } else {
+      // Show icon for videos or at low zoom
+      iconHtml = `
+        <div style="
+          background: ${bgColor};
+          color: white;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          border: 2px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        " class="media-marker-icon">
+          ${iconContent}
+        </div>
+      `
+    }
+
+    const iconSize = showThumbnails && marker.thumbnail && (marker.type === 'photo' || marker.type === '360-photo')
+      ? [64, 64] as [number, number]
+      : [32, 32] as [number, number]
+
+    const iconAnchor = showThumbnails && marker.thumbnail && (marker.type === 'photo' || marker.type === '360-photo')
+      ? [32, 32] as [number, number]
+      : [16, 16] as [number, number]
+
+    const icon = L.divIcon({
+      html: iconHtml,
+      className: 'media-marker',
+      iconSize: iconSize,
+      iconAnchor: iconAnchor,
+      popupAnchor: [0, -20]
+    })
+
+    const mapMarker = L.marker([marker.location.lat, marker.location.lng], {
+      icon: icon
+    }).addTo(map!)
+
+    // Lightweight tooltip - shows on hover
+    const timestamp = new Date(marker.timestamp).toLocaleString()
+    const locationNote = marker.location.isInferred ? ' (inferred)' : ''
+
+    const tooltip = L.tooltip({
+      permanent: false,
+      direction: 'top',
+      offset: [0, -10],
+      className: 'media-marker-tooltip'
+    }).setContent(`
+      <div style="text-align: center;">
+        <div style="font-size: 16px; margin-bottom: 4px;">${iconContent}</div>
+        <div style="font-size: 11px; color: #64748b;">
+          ${new Date(marker.timestamp).toLocaleDateString()}
+        </div>
+      </div>
+    `)
+    mapMarker.bindTooltip(tooltip)
+
+    // Click handler - directly open media viewer
+    mapMarker.on('click', async (e) => {
+      // Prevent popup from showing
+      e.target.closePopup()
+
+      console.log(`📍 Map marker clicked: ${marker.type} (id: ${marker.id})`)
+
+      // Add visual feedback - pulse the marker
+      const markerElement = e.target.getElement()
+      if (markerElement) {
+        markerElement.style.animation = 'none'
+        setTimeout(() => {
+          markerElement.style.animation = 'marker-pulse 0.6s ease-out'
+        }, 10)
+      }
+
+      // Load media details and trigger viewer
+      await store.loadMediaDetails(marker.id)
+      store.triggerMediaView(marker.id)
+      console.log(`✅ Media viewer triggered for ${marker.id}`)
+    })
+
+    mediaMarkers.push(mapMarker)
+  })
+}
+
 onMounted(async () => {
   if (!mapContainer.value) return
 
@@ -320,6 +516,11 @@ onMounted(async () => {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
   }).addTo(map)
+
+  // Add zoom event listener to re-render media markers with thumbnails
+  map.on('zoomend', () => {
+    renderMediaMarkers()
+  })
 
   // Load data
   await store.loadData()
@@ -355,6 +556,12 @@ watch(() => [store.segments], () => {
   renderBaselineRoute()
   createAllSegmentLayers()
   renderDestinations()
+  renderMediaMarkers()
+}, { deep: true })
+
+// Watch for media marker changes - re-render media markers
+watch(() => store.allMediaMarkers, () => {
+  renderMediaMarkers()
 }, { deep: true })
 
 // Watch for layer visibility changes
@@ -362,12 +569,17 @@ watch(() => store.layerVisibility, () => {
   // Update baseline route visibility
   if (baselinePolyline) {
     baselinePolyline.setStyle({
-      opacity: store.layerVisibility.baselineRoute ? 0.5 : 0
+      opacity: store.layerVisibility.baselineRoute ? 0.8 : 0
     })
   }
 
   // Update segment and marker visibility
   scheduleVisibilityUpdate()
+}, { deep: true })
+
+// Watch for media type filter changes - re-render media markers
+watch(() => store.mediaTypeFilters, () => {
+  renderMediaMarkers()
 }, { deep: true })
 
 onUnmounted(() => {
@@ -488,6 +700,39 @@ onUnmounted(() => {
   }
 }
 
+/* Media marker styles */
+.media-marker {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.media-marker-icon:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.media-marker-thumbnail {
+  position: relative;
+}
+
+.media-marker-thumbnail:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+  border-width: 4px !important;
+}
+
+@keyframes marker-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* Mobile optimizations for legend */
 @media (max-width: 640px) {
   .map-legend {
@@ -525,6 +770,33 @@ onUnmounted(() => {
 
   .map-legend .space-y-2 {
     gap: 0.25rem !important;
+  }
+}
+
+/* Media marker tooltip styling */
+.media-marker-tooltip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px !important;
+}
+
+.media-marker-tooltip::before {
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Marker pulse animation */
+@keyframes marker-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 </style>

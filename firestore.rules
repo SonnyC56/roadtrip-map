@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Firestore Security Rules for Interactive Road Trip
+// Only allows the owner to write media, but anyone can read
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Media collection - stores uploaded media metadata
+    match /media/{mediaId} {
+      // Anyone can read media
+      allow read: if true;
+
+      // Only authenticated owner can create/update/delete media
+      allow create, update, delete: if request.auth != null
+                                    && request.auth.uid == 'bKEEpiGmFmY9myxuPnj9rDGDQym2';
+    }
+
+    // Comments collection - stores comments on segments
+    match /comments/{commentId} {
+      // Anyone can read comments
+      allow read: if true;
+
+      // Only authenticated owner can create/update/delete comments
+      allow create, update, delete: if request.auth != null
+                                    && request.auth.uid == 'bKEEpiGmFmY9myxuPnj9rDGDQym2';
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
