@@ -52,11 +52,63 @@ export interface MediaComment {
   rating?: number
 }
 
+// Extended media types to support immersive experiences
+export type MediaType = 'photo' | 'video' | '360-photo' | '360-video' | 'splat' | 'xr-scene'
+
+// Gaussian Splat scene configuration
+export interface SplatConfig {
+  sceneId?: string // StorySplat scene ID for API fetch
+  sceneUrl?: string // Direct URL to scene JSON
+  autoPlay?: boolean
+  showUI?: boolean
+  revealEffect?: 'fast' | 'medium' | 'slow' | 'none'
+}
+
+// XR Gallery scene configuration
+export interface XRSceneConfig {
+  configUrl?: string  // URL to fetch full config JSON (stages can be loaded from here)
+  stages: XRStage[]
+  navigation?: {
+    type: 'floorplan' | 'map' | 'none'
+    showMinimap?: boolean
+  }
+  globalAudio?: {
+    url: string
+    volume?: number
+    loop?: boolean
+  }
+}
+
+export interface XRStage {
+  id: string
+  name?: string
+  skybox: {
+    type: 'video' | 'image' | 'color'
+    url?: string
+    hlsUrl?: string
+    color?: string
+    rotation?: number
+  }
+  hotspots?: XRHotspot[]
+  audioUrl?: string
+  audioVolume?: number
+}
+
+export interface XRHotspot {
+  id: string
+  position: { x: number; y: number; z: number }
+  type: 'info' | 'audio' | 'navigation'
+  label?: string
+  infoTitle?: string
+  infoDescription?: string
+  targetSceneId?: string
+}
+
 // Lightweight version for map markers - only essential data
 export interface MediaMarker {
   id: string
   segmentIndex: number
-  type: 'photo' | 'video' | '360-photo' | '360-video'
+  type: MediaType
   thumbnail?: string
   timestamp: string
   location?: {
@@ -70,7 +122,7 @@ export interface MediaMarker {
 export interface MediaItem {
   id: string
   segmentIndex: number
-  type: 'photo' | 'video' | '360-photo' | '360-video'
+  type: MediaType
   url: string
   thumbnail?: string
   caption?: string
@@ -87,6 +139,9 @@ export interface MediaItem {
     exposureTime?: string
   }
   comments?: MediaComment[]
+  // Extended config for immersive media types
+  splatConfig?: SplatConfig
+  xrConfig?: XRSceneConfig
 }
 
 export interface Comment {
@@ -136,7 +191,9 @@ export const useRoadTripStore = defineStore('roadtrip', () => {
     photo: true,
     video: true,
     '360-photo': true,
-    '360-video': true
+    '360-video': true,
+    splat: true,
+    'xr-scene': true
   })
 
   // Timeline Playback

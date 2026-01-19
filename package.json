@@ -23,6 +23,8 @@
     "leaflet": "^1.9.4",
     "mediainfo.js": "^0.3.6",
     "pinia": "^3.0.3",
+    "playcanvas": "^2.15.1",
+    "storysplat-viewer": "^2.3.3",
     "video.js": "^8.23.4",
     "videojs-vr": "^2.0.0",
     "vue": "^3.5.22"

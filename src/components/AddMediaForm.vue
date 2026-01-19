@@ -22,7 +22,12 @@ const selectedFiles = ref<File[]>([])
 const url = ref('')
 const thumbnailUrl = ref('')
 const thumbnailDataUrl = ref('')
-const type = ref<'photo' | 'video' | '360-photo' | '360-video'>('photo')
+const type = ref<'photo' | 'video' | '360-photo' | '360-video' | 'splat' | 'xr-scene'>('photo')
+
+// Splat/XR specific fields
+const splatSceneId = ref('')
+const splatSceneUrl = ref('')
+const xrSceneUrl = ref('')
 const caption = ref('')
 const timestamp = ref('')
 const lat = ref<number | null>(null)
@@ -46,6 +51,16 @@ timestamp.value = defaultTimestamp
 
 const hasLocation = computed(() => lat.value !== null && lng.value !== null)
 const canSubmit = computed(() => {
+  // For splat/xr-scene, require either scene ID/URL or main URL
+  if (type.value === 'splat') {
+    const hasSplatSource = splatSceneId.value.trim() !== '' || splatSceneUrl.value.trim() !== '' || url.value.trim() !== ''
+    return hasSplatSource && timestamp.value && (inferLocation.value || hasLocation.value)
+  }
+  if (type.value === 'xr-scene') {
+    const hasXRSource = xrSceneUrl.value.trim() !== '' || url.value.trim() !== ''
+    return hasXRSource && timestamp.value && (inferLocation.value || hasLocation.value)
+  }
+  // For regular media types
   const hasMedia = uploadMode.value === 'file' ? selectedFiles.value.length > 0 : url.value.trim() !== ''
   return hasMedia && type.value && timestamp.value && (inferLocation.value || hasLocation.value)
 })
@@ -568,10 +583,25 @@ async function addMedia() {
       uploadStatus.value = `Complete! Uploaded ${totalFiles} file(s)`
       emit('added')
       emit('close')
-    } else if (uploadMode.value === 'url') {
-      // Handle single URL upload (existing logic)
-      const finalUrl = url.value.trim()
+    } else if (uploadMode.value === 'url' || type.value === 'splat' || type.value === 'xr-scene') {
+      // Handle single URL upload and splat/xr-scene types
+      let finalUrl = url.value.trim()
       const finalThumbnail = thumbnailUrl.value.trim()
+
+      // For splat type, use scene URL if main URL is empty
+      if (type.value === 'splat') {
+        if (!finalUrl && splatSceneUrl.value.trim()) {
+          finalUrl = splatSceneUrl.value.trim()
+        } else if (!finalUrl && splatSceneId.value.trim()) {
+          // Use scene ID as a placeholder URL
+          finalUrl = `storysplat://scene/${splatSceneId.value.trim()}`
+        }
+      }
+
+      // For xr-scene type, use xr scene URL if main URL is empty
+      if (type.value === 'xr-scene' && !finalUrl && xrSceneUrl.value.trim()) {
+        finalUrl = xrSceneUrl.value.trim()
+      }
 
       const mediaItem: any = {
         url: finalUrl,
@@ -603,6 +633,32 @@ async function addMedia() {
 
       if (Object.keys(exifData).length > 0) {
         mediaItem.exifData = exifData
+      }
+
+      // Add splat configuration
+      if (type.value === 'splat') {
+        mediaItem.splatConfig = {
+          autoPlay: true,
+          showUI: true,
+          revealEffect: 'medium'
+        }
+        if (splatSceneId.value.trim()) {
+          mediaItem.splatConfig.sceneId = splatSceneId.value.trim()
+        }
+        if (splatSceneUrl.value.trim()) {
+          mediaItem.splatConfig.sceneUrl = splatSceneUrl.value.trim()
+        }
+      }
+
+      // Add XR scene configuration
+      if (type.value === 'xr-scene') {
+        // The xrSceneUrl points to a JSON config file with stage data
+        // Store the URL so the viewer can fetch and parse the full config
+        mediaItem.xrConfig = {
+          configUrl: xrSceneUrl.value.trim() || finalUrl,
+          stages: [], // Will be populated from configUrl by viewer
+          navigation: { type: 'none' }
+        }
       }
 
       uploadStatus.value = 'Saving media...'
@@ -848,6 +904,68 @@ function cancel() {
               >
                 🎬 360° Video
               </button>
+              <button
+                type="button"
+                @click="type = 'splat'"
+                class="type-button"
+                :class="{ active: type === 'splat' }"
+              >
+                🎨 3D Splat
+              </button>
+              <button
+                type="button"
+                @click="type = 'xr-scene'"
+                class="type-button"
+                :class="{ active: type === 'xr-scene' }"
+              >
+                🥽 XR Scene
+              </button>
+            </div>
+          </div>
+
+          <!-- Splat Configuration (shown when type is splat) -->
+          <div v-if="type === 'splat'" class="form-group scene-config">
+            <label class="form-label">3D Splat Scene *</label>
+            <div class="scene-help">
+              Enter a StorySplat scene ID, or provide a direct URL to a .ply/.splat file
+            </div>
+            <div class="scene-inputs">
+              <div class="form-group-small">
+                <label class="form-label-small">Scene ID (from StorySplat)</label>
+                <input
+                  v-model="splatSceneId"
+                  type="text"
+                  placeholder="e.g., abc123"
+                  class="form-input"
+                />
+              </div>
+              <div class="input-divider">OR</div>
+              <div class="form-group-small">
+                <label class="form-label-small">Scene URL (.ply or .splat file)</label>
+                <input
+                  v-model="splatSceneUrl"
+                  type="url"
+                  placeholder="https://example.com/scene.ply"
+                  class="form-input"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- XR Scene Configuration (shown when type is xr-scene) -->
+          <div v-if="type === 'xr-scene'" class="form-group scene-config">
+            <label class="form-label">XR Gallery Scene *</label>
+            <div class="scene-help">
+              Enter the URL to your XR Gallery scene configuration JSON file
+            </div>
+            <div class="form-group-small">
+              <label class="form-label-small">Scene Config URL</label>
+              <input
+                v-model="xrSceneUrl"
+                type="url"
+                placeholder="https://example.com/xr-scene.json"
+                class="form-input"
+              />
             </div>
           </div>
 
@@ -1171,7 +1289,7 @@ function cancel() {
 
 .type-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 
@@ -1193,6 +1311,37 @@ function cancel() {
 .type-button.active {
   border-color: #3b82f6;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.scene-config {
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.scene-help {
+  font-size: 0.75rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.scene-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .location-header {
@@ -1382,7 +1531,7 @@ function cancel() {
   }
 
   .type-buttons {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .exif-content {

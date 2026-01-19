@@ -9,8 +9,7 @@ import {
   PauseIcon,
   PlayIcon
 } from '@heroicons/vue/24/outline'
-import MediaLightbox from './MediaLightbox.vue'
-import Media360Viewer from './Media360Viewer.vue'
+import MediaViewer from './MediaViewer.vue'
 import AddMediaForm from './AddMediaForm.vue'
 import { useVirtualScroll } from '../composables/useVirtualScroll'
 
@@ -23,8 +22,7 @@ const playbackSpeed = ref(1)
 let animationFrame: number | null = null
 
 // Media viewer state
-const showMediaLightbox = ref(false)
-const showMedia360Viewer = ref(false)
+const showMediaViewer = ref(false)
 const showAddMediaForm = ref(false)
 const currentMediaItem = ref<MediaItem | null>(null)
 const currentMediaIndex = ref(0)
@@ -364,17 +362,12 @@ function handleOpenMedia(mediaItem: MediaItem, index: number) {
     currentMediaList.value = store.getMediaForSegment(store.selectedSegmentIndex)
   }
 
-  // Open appropriate viewer based on media type
-  if (mediaItem.type === '360-photo' || mediaItem.type === '360-video') {
-    showMedia360Viewer.value = true
-  } else {
-    showMediaLightbox.value = true
-  }
+  // Open unified media viewer (it handles type dispatch internally)
+  showMediaViewer.value = true
 }
 
 function closeMediaViewers() {
-  showMediaLightbox.value = false
-  showMedia360Viewer.value = false
+  showMediaViewer.value = false
   currentMediaItem.value = null
 }
 
@@ -419,13 +412,8 @@ async function openMediaViewer(mediaItem: MediaItem) {
   if (fullMedia) {
     currentMediaItem.value = fullMedia
     currentMediaIndex.value = 0
-
-    // Check if it's a 360 media
-    if (fullMedia.type === '360-photo' || fullMedia.type === '360-video') {
-      showMedia360Viewer.value = true
-    } else {
-      showMediaLightbox.value = true
-    }
+    // Use unified media viewer for all types
+    showMediaViewer.value = true
   }
 }
 
@@ -488,7 +476,11 @@ function navigateToMediaDay(mediaItem: MediaItem) {
                       @click="openMediaViewer(media)"
                       @click.shift.exact="navigateToMediaDay(media)"
                       class="media-thumb"
-                      :class="{ 'is-360': media.type === '360-photo' || media.type === '360-video' }"
+                      :class="{
+                        'is-360': media.type === '360-photo' || media.type === '360-video',
+                        'is-splat': media.type === 'splat',
+                        'is-xr': media.type === 'xr-scene'
+                      }"
                       :title="media.caption || 'Click to view, Shift+Click to navigate to day'"
                       :style="{ position: 'absolute', left: `${offsetLeft}px` }"
                     >
@@ -501,10 +493,12 @@ function navigateToMediaDay(mediaItem: MediaItem) {
                       />
                       <div v-else class="thumb-placeholder">
                         <span class="thumb-icon">
-                          {{ media.type === 'photo' ? '📷' : media.type === 'video' ? '🎥' : media.type === '360-photo' ? '🌐' : '🎬' }}
+                          {{ media.type === 'photo' ? '📷' : media.type === 'video' ? '🎥' : media.type === '360-photo' ? '🌐' : media.type === '360-video' ? '🎬' : media.type === 'splat' ? '🎨' : media.type === 'xr-scene' ? '🥽' : '📁' }}
                         </span>
                       </div>
                       <div v-if="media.type === '360-photo' || media.type === '360-video'" class="thumb-360-badge">360°</div>
+                      <div v-else-if="media.type === 'splat'" class="thumb-splat-badge">3D</div>
+                      <div v-else-if="media.type === 'xr-scene'" class="thumb-xr-badge">XR</div>
                     </button>
                   </div>
                 </div>
@@ -689,19 +683,9 @@ function navigateToMediaDay(mediaItem: MediaItem) {
     </div>
   </Transition>
 
-  <!-- Media Viewers -->
-  <MediaLightbox
-    v-if="showMediaLightbox && currentMediaItem"
-    :media-item="currentMediaItem"
-    :all-media="currentMediaList"
-    :current-index="currentMediaIndex"
-    @close="closeMediaViewers"
-    @next="navigateMediaNext"
-    @previous="navigateMediaPrevious"
-  />
-
-  <Media360Viewer
-    v-if="showMedia360Viewer && currentMediaItem"
+  <!-- Unified Media Viewer (handles all types: photo, video, 360, splat, xr-scene) -->
+  <MediaViewer
+    v-if="showMediaViewer && currentMediaItem"
     :media-item="currentMediaItem"
     :all-media="currentMediaList"
     :current-index="currentMediaIndex"
@@ -880,6 +864,24 @@ function navigateToMediaDay(mediaItem: MediaItem) {
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
 }
 
+.media-thumb.is-splat {
+  border-color: #8b5cf6;
+}
+
+.media-thumb.is-splat:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.media-thumb.is-xr {
+  border-color: #06b6d4;
+}
+
+.media-thumb.is-xr:hover {
+  border-color: #0891b2;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+}
+
 .thumb-image {
   width: 100%;
   height: 100%;
@@ -905,6 +907,32 @@ function navigateToMediaDay(mediaItem: MediaItem) {
   top: 2px;
   right: 2px;
   background: #f59e0b;
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.thumb-splat-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.thumb-xr-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
   color: white;
   font-size: 0.5rem;
   font-weight: 700;

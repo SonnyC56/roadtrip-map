@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoadTripStore, type MediaItem } from '../stores/roadtrip'
 
 const emit = defineEmits<{
@@ -44,10 +44,50 @@ function handleFileUpload(event: Event) {
       jsonData.media.forEach((item, index) => {
         if (!item.url) throw new Error(`Media item ${index}: missing "url"`)
         if (!item.type) throw new Error(`Media item ${index}: missing "type"`)
-        if (!['photo', 'video', '360-photo', '360-video'].includes(item.type)) {
+        if (!['photo', 'video', '360-photo', '360-video', 'splat', 'xr-scene'].includes(item.type)) {
           throw new Error(`Media item ${index}: invalid type "${item.type}"`)
         }
         if (!item.timestamp) throw new Error(`Media item ${index}: missing "timestamp"`)
+
+        // Validate splatConfig for splat type
+        if (item.type === 'splat') {
+          const config = (item as any).splatConfig
+          if (config) {
+            if (config.sceneId && typeof config.sceneId !== 'string') {
+              throw new Error(`Media item ${index}: splatConfig.sceneId must be a string`)
+            }
+            if (config.sceneUrl && typeof config.sceneUrl !== 'string') {
+              throw new Error(`Media item ${index}: splatConfig.sceneUrl must be a string`)
+            }
+            if (config.revealEffect && !['fast', 'medium', 'slow', 'none'].includes(config.revealEffect)) {
+              throw new Error(`Media item ${index}: splatConfig.revealEffect must be 'fast', 'medium', 'slow', or 'none'`)
+            }
+          }
+        }
+
+        // Validate xrConfig for xr-scene type
+        if (item.type === 'xr-scene') {
+          const config = (item as any).xrConfig
+          if (config) {
+            if (config.configUrl && typeof config.configUrl !== 'string') {
+              throw new Error(`Media item ${index}: xrConfig.configUrl must be a string`)
+            }
+            if (config.stages && !Array.isArray(config.stages)) {
+              throw new Error(`Media item ${index}: xrConfig.stages must be an array`)
+            }
+            // Validate individual stages if present
+            if (config.stages && config.stages.length > 0) {
+              config.stages.forEach((stage: any, stageIndex: number) => {
+                if (!stage.id && !stage.name) {
+                  throw new Error(`Media item ${index}, stage ${stageIndex}: stage must have an id or name`)
+                }
+                if (stage.skybox && !['video', 'image', 'color'].includes(stage.skybox.type)) {
+                  throw new Error(`Media item ${index}, stage ${stageIndex}: skybox.type must be 'video', 'image', or 'color'`)
+                }
+              })
+            }
+          }
+        }
       })
 
       previewData.value = jsonData.media
@@ -62,22 +102,26 @@ function handleFileUpload(event: Event) {
   reader.readAsText(file)
 }
 
-function getMediaBreakdown() {
+const mediaBreakdown = computed(() => {
   if (!previewData.value) return null
 
   const breakdown = {
     photo: 0,
     video: 0,
     '360-photo': 0,
-    '360-video': 0
+    '360-video': 0,
+    splat: 0,
+    'xr-scene': 0
   }
 
   previewData.value.forEach(item => {
-    breakdown[item.type]++
+    if (item.type in breakdown) {
+      breakdown[item.type as keyof typeof breakdown]++
+    }
   })
 
   return breakdown
-}
+})
 
 async function importMedia() {
   if (!previewData.value) return
@@ -171,26 +215,36 @@ function close() {
               <span class="stat-value">{{ previewData.length }}</span>
             </div>
 
-            <div v-if="getMediaBreakdown()" class="breakdown">
-              <div v-if="getMediaBreakdown()!.photo > 0" class="breakdown-item">
+            <div v-if="mediaBreakdown" class="breakdown">
+              <div v-if="mediaBreakdown.photo > 0" class="breakdown-item">
                 <span class="breakdown-icon">📷</span>
                 <span class="breakdown-label">Photos:</span>
-                <span class="breakdown-value">{{ getMediaBreakdown()!.photo }}</span>
+                <span class="breakdown-value">{{ mediaBreakdown.photo }}</span>
               </div>
-              <div v-if="getMediaBreakdown()!['360-photo'] > 0" class="breakdown-item">
+              <div v-if="mediaBreakdown['360-photo'] > 0" class="breakdown-item">
                 <span class="breakdown-icon">🌐</span>
                 <span class="breakdown-label">360° Photos:</span>
-                <span class="breakdown-value">{{ getMediaBreakdown()!['360-photo'] }}</span>
+                <span class="breakdown-value">{{ mediaBreakdown['360-photo'] }}</span>
               </div>
-              <div v-if="getMediaBreakdown()!.video > 0" class="breakdown-item">
+              <div v-if="mediaBreakdown.video > 0" class="breakdown-item">
                 <span class="breakdown-icon">🎥</span>
                 <span class="breakdown-label">Videos:</span>
-                <span class="breakdown-value">{{ getMediaBreakdown()!.video }}</span>
+                <span class="breakdown-value">{{ mediaBreakdown.video }}</span>
               </div>
-              <div v-if="getMediaBreakdown()!['360-video'] > 0" class="breakdown-item">
+              <div v-if="mediaBreakdown['360-video'] > 0" class="breakdown-item">
                 <span class="breakdown-icon">🎬</span>
                 <span class="breakdown-label">360° Videos:</span>
-                <span class="breakdown-value">{{ getMediaBreakdown()!['360-video'] }}</span>
+                <span class="breakdown-value">{{ mediaBreakdown['360-video'] }}</span>
+              </div>
+              <div v-if="mediaBreakdown.splat > 0" class="breakdown-item">
+                <span class="breakdown-icon">🎨</span>
+                <span class="breakdown-label">3D Splats:</span>
+                <span class="breakdown-value">{{ mediaBreakdown.splat }}</span>
+              </div>
+              <div v-if="mediaBreakdown['xr-scene'] > 0" class="breakdown-item">
+                <span class="breakdown-icon">🥽</span>
+                <span class="breakdown-label">XR Scenes:</span>
+                <span class="breakdown-value">{{ mediaBreakdown['xr-scene'] }}</span>
               </div>
             </div>
           </div>
