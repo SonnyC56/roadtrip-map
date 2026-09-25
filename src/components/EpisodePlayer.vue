@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
-import { mediaUrl, playableFormat } from '../lib/manifest'
+import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
 
 const store = useTripStore()
@@ -87,7 +87,7 @@ watch(
         <!-- header -->
         <div class="flex items-start gap-3 px-4 pt-3 pb-2">
           <div class="min-w-0 flex-1">
-            <div class="font-pixel text-[11px] text-brass-4">EPISODE {{ pad2(episode.ep) }}<span class="text-brass-2"> / {{ store.episodes.length }}</span></div>
+            <div class="font-pixel text-[11px] text-brass-4"><template v-if="epKind(episode) === 'intro'">THE INTRO</template><template v-else>EPISODE {{ pad2(episode.ep) }}<span class="text-brass-2"> / {{ store.episodeCount }}</span></template></div>
             <h2 class="font-display text-[1.9rem] sm:text-[2.3rem] leading-none text-ivory mt-0.5">{{ episode.title }}</h2>
           </div>
           <button class="btn btn-icon shrink-0" aria-label="Close" title="Close (Esc)" @click="close">
@@ -123,7 +123,7 @@ watch(
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-ui uppercase tracking-wide text-sm">
             <span class="text-amber">{{ dateSpan(episode.start, episode.end) }}</span>
             <span v-if="episode.duration" class="text-muted">{{ fmtDuration(episode.duration) }}</span>
-            <span v-if="!store.episodePaths.has(episode.ep)" class="text-muted">Epilogue · at home</span>
+            <span v-if="epKind(episode) === 'epilogue'" class="text-muted">Epilogue · at home</span>
             <button v-if="hasBoth" class="chip ml-auto !py-1" :aria-pressed="fmt === '9x16'" :title="`Switch to ${fmt === '16x9' ? 'vertical 9:16' : 'wide 16:9'}`" @click="toggleFmt">
               <svg v-if="fmt === '16x9'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2" /></svg>
               <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2" /></svg>
@@ -144,10 +144,10 @@ watch(
           <div class="flex items-center gap-2 pt-1">
             <button class="btn flex-1 sm:flex-none justify-start min-w-0" :disabled="!prev" @click="prev && store.showEpisode(prev.ep)">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M15 5v14L6 12z" /></svg>
-              <span class="truncate min-w-0">{{ prev ? `E${pad2(prev.ep)} ${prev.title}` : 'Start' }}</span>
+              <span class="truncate min-w-0">{{ prev ? (epKind(prev) === 'intro' ? 'Intro' : `${epLabel(prev)} ${prev.title}`) : 'Start' }}</span>
             </button>
             <button class="btn flex-1 sm:flex-none sm:ml-auto justify-end min-w-0" :disabled="!next" @click="next && store.showEpisode(next.ep)">
-              <span class="truncate min-w-0">{{ next ? `E${pad2(next.ep)} ${next.title}` : 'The end' }}</span>
+              <span class="truncate min-w-0">{{ next ? `${epLabel(next)} ${next.title}` : 'The end' }}</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 5v14l9-7z" /></svg>
             </button>
           </div>

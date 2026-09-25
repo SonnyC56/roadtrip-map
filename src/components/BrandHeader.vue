@@ -9,7 +9,7 @@ const store = useTripStore()
 const day = computed(() => (store.atEnd ? store.trip.days : store.currentDay))
 const miles = computed(() => store.currentMiles.toLocaleString('en-US'))
 const ep = computed(() => {
-  if (store.atEnd) return store.episodes.length ? pad2(store.episodes[store.episodes.length - 1]!.ep) : '--'
+  if (store.atEnd) return store.episodeCount ? pad2(store.episodes[store.episodes.length - 1]!.ep) : '--'
   return store.currentEpisode ? pad2(store.currentEpisode.ep) : '--'
 })
 </script>
@@ -24,11 +24,20 @@ const ep = computed(() => {
           <span class="text-[1.45rem] whitespace-nowrap">ROADTRIP <span class="text-amber">2025</span></span>
         </h1>
         <h1 v-else class="font-display text-ivory truncate text-[2.1rem]">SONNY'S ROADTRIP <span class="text-amber">2025</span></h1>
-        <p v-if="!compact" class="font-ui text-muted text-sm tracking-wide mt-1">{{ store.trip.tagline }}</p>
+        <p v-if="!compact" class="font-ui text-muted text-sm tracking-wide mt-1 flex items-center gap-2 flex-wrap">
+          {{ store.trip.tagline }}
+          <button v-if="store.intro" class="intro-btn" @click="store.showEpisode(store.intro.ep)">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z" /></svg>
+            Watch the intro
+          </button>
+        </p>
       </div>
     </div>
 
-    <dl class="counters flex gap-1.5" :class="compact ? 'ml-auto' : 'w-full mt-1'">
+    <button v-if="compact && store.intro" class="intro-btn intro-icon ml-auto" aria-label="Watch the intro" title="Watch the intro" @click="store.showEpisode(store.intro.ep)">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z" /></svg>
+    </button>
+    <dl class="counters flex gap-1.5" :class="compact ? (store.intro ? '' : 'ml-auto') : 'w-full mt-1'">
       <div class="plate">
         <dt>DAY</dt>
         <dd>{{ pad2(day) }}<small>/{{ store.trip.days }}</small></dd>
@@ -46,6 +55,32 @@ const ep = computed(() => {
 </template>
 
 <style scoped>
+.intro-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #7e5620;
+  color: #f4d38f;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.12s, color 0.12s;
+}
+.intro-btn:hover {
+  background: #e6b56a;
+  color: #101b23;
+}
+.intro-icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  justify-content: center;
+  flex: none;
+}
 .plate {
   display: flex;
   align-items: baseline;

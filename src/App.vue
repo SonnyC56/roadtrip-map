@@ -17,6 +17,10 @@ const { isMobile } = useViewport()
 // ---- deep links: #e12 opens episode 12, #m=<media id> opens a photo/video ----
 function readHash() {
   const h = decodeURIComponent(location.hash.slice(1))
+  if (h.toLowerCase() === 'intro') {
+    if (store.intro) store.showEpisode(store.intro.ep)
+    return
+  }
   const ep = /^e(\d+)$/i.exec(h)
   if (ep) {
     store.showEpisode(Number(ep[1]))
@@ -30,7 +34,7 @@ function writeHash() {
   if (store.lightbox) {
     const it = store.lightbox.list[store.lightbox.index]
     if (it) h = `m=${it.id}`
-  } else if (store.openEpisode != null) h = `e${store.openEpisode}`
+  } else if (store.openEpisode != null) h = store.intro && store.openEpisode === store.intro.ep ? 'intro' : `e${store.openEpisode}`
   const want = h ? `#${h}` : ''
   if (location.hash !== want) history.replaceState(null, '', want || location.pathname + location.search)
 }

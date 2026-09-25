@@ -4,6 +4,7 @@ import {
   loadFallbackRoute,
   loadMagnets,
   medalsFrom,
+  epKind,
   type Medal,
   loadManifest,
   loadRoute,
@@ -194,6 +195,7 @@ export const useTripStore = defineStore('trip', () => {
     const map = new Map<number, [number, number][]>()
     const r = route.value
     for (const e of episodes.value) {
+      if (epKind(e) === 'intro') continue // the intro has no leg
       if (Array.isArray(e.path)) {
         if (e.path.length >= 2) map.set(e.ep, e.path)
         continue // explicit [] = no leg (e.g. the epilogue)
@@ -308,8 +310,13 @@ export const useTripStore = defineStore('trip', () => {
 
   function showEpisode(ep: number | null) {
     openEpisode.value = ep
-    if (ep != null) focusEpisode(ep)
+    const e = ep != null ? episodeByNum.value.get(ep) : undefined
+    if (e && epKind(e) !== 'intro') focusEpisode(e.ep)
   }
+
+  /** Numbered episodes only (excludes the intro), e.g. 36. */
+  const episodeCount = computed(() => episodes.value.filter((e) => epKind(e) !== 'intro').length)
+  const intro = computed(() => episodes.value.find((e) => epKind(e) === 'intro') || null)
 
   function stepEpisode(delta: number) {
     if (openEpisode.value == null) return
@@ -386,6 +393,8 @@ export const useTripStore = defineStore('trip', () => {
     magnets,
     medals,
     episodeEnd,
+    episodeCount,
+    intro,
     // filters
     layers,
     dateFrom,

@@ -9,7 +9,7 @@ const store = useTripStore()
 
 const items = computed(() => {
   const out: { key: LayerKey; label: string; color: string; count?: number }[] = [
-    { key: 'episodes', label: 'Episodes', color: '#FFF0CC', count: store.episodes.length },
+    { key: 'episodes', label: 'Episodes', color: '#FFF0CC', count: store.episodeCount },
   ]
   for (const t of ['photo', 'video', 'pano', 'pano-video', 'splat', 'xr-scene'] as MediaType[]) {
     const n = store.typeCounts[t] || 0

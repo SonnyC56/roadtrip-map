@@ -65,7 +65,7 @@ function pickTab(t: 'episodes' | 'explore') {
       <BrandHeader />
     </div>
     <nav class="tabs px-3 pt-3" role="tablist">
-      <button role="tab" :aria-selected="tab === 'episodes'" @click="pickTab('episodes')">Episodes <span>{{ store.episodes.length }}</span></button>
+      <button role="tab" :aria-selected="tab === 'episodes'" @click="pickTab('episodes')">Episodes <span>{{ store.episodeCount }}</span></button>
       <button role="tab" :aria-selected="tab === 'explore'" @click="pickTab('explore')">Explore</button>
     </nav>
     <div class="flex-1 overflow-y-auto px-3 pt-3 pb-4">
@@ -93,7 +93,7 @@ function pickTab(t: 'episodes' | 'explore') {
       <div class="mx-auto h-1.5 w-12 rounded-full bg-brass-2"></div>
     </div>
     <nav class="tabs px-3" role="tablist">
-      <button role="tab" :aria-selected="tab === 'episodes'" @click="pickTab('episodes')">Episodes <span>{{ store.episodes.length }}</span></button>
+      <button role="tab" :aria-selected="tab === 'episodes'" @click="pickTab('episodes')">Episodes <span>{{ store.episodeCount }}</span></button>
       <button role="tab" :aria-selected="tab === 'explore'" @click="pickTab('explore')">Explore</button>
     </nav>
     <div class="flex-1 overflow-y-auto overscroll-contain px-3 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">

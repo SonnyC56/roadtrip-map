@@ -4,7 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import { useTripStore } from '../stores/trip'
-import { mediaUrl, type Media } from '../lib/manifest'
+import { epKind, mediaUrl, type Media } from '../lib/manifest'
 import { TYPE_META } from '../lib/typeMeta'
 import { dateSpan, localDateTime, pad2 } from '../lib/format'
 import { useViewport } from '../composables/useViewport'
@@ -91,6 +91,7 @@ function drawEpisodes() {
   badgeLayer.clearLayers()
   legHi.clear()
   for (const e of store.episodes) {
+    if (epKind(e) === 'intro') continue // no leg, no badge
     const path = store.episodePaths.get(e.ep)
     const tip = `<div class="rt-tip-ep"><b>E${pad2(e.ep)}</b> ${esc(e.title)}<br><span>${dateSpan(e.start, e.end)} · click to play</span></div>`
     let at: L.LatLngExpression | null = null

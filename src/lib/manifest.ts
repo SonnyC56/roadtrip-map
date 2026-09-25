@@ -51,6 +51,18 @@ export interface Episode {
   version?: string
   formats: Partial<Record<'16x9' | '9x16', EpisodeFormat>>
   ready?: boolean
+  kind?: 'intro' | 'episode' | 'epilogue'
+}
+
+/** kind from the manifest, else by number: 0 = intro, 36 = epilogue. */
+export function epKind(e: Pick<Episode, 'ep' | 'kind'>): 'intro' | 'episode' | 'epilogue' {
+  if (e.kind === 'intro' || e.kind === 'epilogue' || e.kind === 'episode') return e.kind
+  return e.ep === 0 ? 'intro' : e.ep === 36 ? 'epilogue' : 'episode'
+}
+
+/** "INTRO" or "E07" */
+export function epLabel(e: Pick<Episode, 'ep' | 'kind'>): string {
+  return epKind(e) === 'intro' ? 'INTRO' : `E${String(e.ep).padStart(2, '0')}`
 }
 
 /** A format is playable unless the manifest explicitly says it isn't ready yet. */

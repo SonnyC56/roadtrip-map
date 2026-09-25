@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
-import { mediaUrl, playableFormat } from '../lib/manifest'
-import { dateSpan, fmtDuration, pad2 } from '../lib/format'
+import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
+import { dateSpan, fmtDuration } from '../lib/format'
 
 const store = useTripStore()
 const listEl = ref<HTMLElement | null>(null)
@@ -47,14 +47,15 @@ watch(
       >
         <div class="thumb relative shrink-0 w-[92px] aspect-video rounded-lg overflow-hidden bg-ink-3 border border-line">
           <img v-if="poster(e.ep)" :src="poster(e.ep)" alt="" loading="lazy" decoding="async" class="w-full h-full object-cover" @error="($event.target as HTMLImageElement).style.display = 'none'" />
-          <span class="absolute left-1 top-1 font-pixel text-[10px] px-1 rounded bg-ink/85 text-brass-5">E{{ pad2(e.ep) }}</span>
+          <span class="absolute left-1 top-1 font-pixel text-[10px] px-1 rounded bg-ink/85 text-brass-5">{{ epLabel(e) }}</span>
           <span v-if="e.duration" class="absolute right-1 bottom-1 font-ui text-[11px] px-1 rounded bg-ink/85 text-ivory">{{ fmtDuration(e.duration) }}</span>
         </div>
         <div class="min-w-0 flex-1">
           <div class="font-display text-[1.2rem] leading-none text-ivory truncate">{{ e.title }}</div>
           <div class="font-ui text-[0.82rem] text-amber mt-1 tracking-wide uppercase">
             {{ dateSpan(e.start, e.end) }}
-            <span v-if="!store.episodePaths.has(e.ep)" class="text-muted"> · Epilogue · at home</span>
+            <span v-if="epKind(e) === 'epilogue'" class="text-muted"> · Epilogue · at home</span>
+            <span v-else-if="epKind(e) === 'intro'" class="text-muted"> · The film's opening</span>
             <span v-if="!playableFormat(e, '16x9') && !playableFormat(e, '9x16')" class="soon">Soon</span>
           </div>
           <div v-if="e.stops?.length" class="text-[0.78rem] text-muted truncate">{{ stopNames(e.stops) }}</div>
