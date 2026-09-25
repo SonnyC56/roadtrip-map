@@ -11,7 +11,8 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build"
+    "type-check": "vue-tsc --build",
+    "serve:media": "node scripts/serve-media.mjs"
   },
   "dependencies": {
     "@photo-sphere-viewer/core": "^5.14.0",

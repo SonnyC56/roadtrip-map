@@ -28,9 +28,11 @@ const ep = computed(() => {
         @error="logoOk = false"
       />
       <div v-if="!logoOk || !compact" class="min-w-0 leading-none">
-        <h1 class="font-display text-ivory truncate" :class="compact ? 'text-2xl' : 'text-[2.1rem]'">
-          SONNY'S ROADTRIP <span class="text-amber">2025</span>
+        <h1 v-if="compact" class="font-display text-ivory leading-[0.85]">
+          <span class="block text-[0.8rem] text-muted tracking-[0.2em]">SONNY'S</span>
+          <span class="text-[1.45rem] whitespace-nowrap">ROADTRIP <span class="text-amber">2025</span></span>
         </h1>
+        <h1 v-else class="font-display text-ivory truncate text-[2.1rem]">SONNY'S ROADTRIP <span class="text-amber">2025</span></h1>
         <p v-if="!compact" class="font-ui text-muted text-sm tracking-wide mt-1">{{ store.trip.tagline }}</p>
       </div>
     </div>

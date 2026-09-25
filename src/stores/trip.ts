@@ -297,7 +297,7 @@ export const useTripStore = defineStore('trip', () => {
 
   function openMediaById(id: string): boolean {
     const m = media.value.find((x) => x.id === id)
-    if (m) openMedia(m)
+    if (m) openMedia(m, filteredMedia.value.includes(m) ? filteredMedia.value : media.value)
     return !!m
   }
 

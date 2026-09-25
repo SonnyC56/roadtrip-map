@@ -104,7 +104,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   <Transition name="fade">
     <div
       v-if="item && !isImmersive"
-      class="lb fixed inset-0 z-[1100] bg-ink/95 flex flex-col"
+      class="lb fixed inset-0 z-[1100] bg-ink flex flex-col"
       role="dialog"
       aria-modal="true"
       :aria-label="meta?.short"
@@ -156,10 +156,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <Media360Viewer v-else-if="item.type === 'pano' || item.type === 'pano-video'" :key="item.id" :item="item" class="absolute inset-0" />
 
         <!-- side arrows -->
-        <button v-if="hasPrev" class="nav left-2 sm:left-4" aria-label="Previous" title="Previous (←)" @click="prev">
+        <button v-if="hasPrev" class="nav left-2 sm:left-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Previous" title="Previous (←)" @click="prev">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7" /></svg>
         </button>
-        <button v-if="hasNext" class="nav right-2 sm:right-4" aria-label="Next" title="Next (→)" @click="next">
+        <button v-if="hasNext" class="nav right-2 sm:right-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Next" title="Next (→)" @click="next">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
@@ -207,7 +207,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   color: #101b23;
 }
 @media (hover: none) {
-  .nav {
+  .nav:not(.mid) {
     top: auto;
     bottom: 12px;
     transform: none;

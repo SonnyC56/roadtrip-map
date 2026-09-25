@@ -176,9 +176,17 @@ button {
   background: var(--color-ink) !important;
   font-family: var(--font-body);
 }
-.leaflet-tile-pane {
-  /* nudge CARTO dark_matter toward the brand ink */
-  filter: sepia(0.25) hue-rotate(160deg) saturate(0.9) brightness(1.08) contrast(1.02);
+.rt-base-esri {
+  /* Esri dark gray → brand ink (#101B23) */
+  filter: brightness(0.62) sepia(0.35) hue-rotate(165deg) saturate(1.6) contrast(1.05);
+}
+.rt-base-carto,
+.rt-base-stadia {
+  filter: sepia(0.25) hue-rotate(160deg) saturate(0.9) brightness(0.95);
+}
+.rt-labels {
+  opacity: 0.75;
+  filter: sepia(0.4) saturate(0.8);
 }
 .leaflet-control-attribution {
   background: rgb(16 27 35 / 0.75) !important;

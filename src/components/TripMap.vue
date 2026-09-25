@@ -8,6 +8,7 @@ import { mediaUrl, type Media } from '../lib/manifest'
 import { TYPE_META } from '../lib/typeMeta'
 import { dateSpan, localDateTime, pad2 } from '../lib/format'
 import { useViewport } from '../composables/useViewport'
+import { addBasemap } from '../lib/basemap'
 
 const store = useTripStore()
 const { isMobile } = useViewport()
@@ -340,7 +341,7 @@ function applyLayerToggles() {
   }
   if (store.layers.magnets) magnetLayer.addTo(map)
   else magnetLayer.remove()
-  if (map.getZoom() < 4) map.getContainer().classList.add('rt-zoomed-out')
+  if (map.getZoom() < 5) map.getContainer().classList.add('rt-zoomed-out')
   else map.getContainer().classList.remove('rt-zoomed-out')
 }
 
@@ -350,19 +351,16 @@ onMounted(async () => {
   ;(window as unknown as { L: typeof L }).L = L
   await import('leaflet.markercluster')
 
-  map = L.map(el.value, { zoomControl: false, attributionControl: true, minZoom: 3, worldCopyJump: true }).setView([41, -100], 4)
+  map = L.map(el.value, { zoomControl: false, attributionControl: true, minZoom: 3, worldCopyJump: true, zoomSnap: 0.25, zoomDelta: 0.5 }).setView([41, -100], 4)
   map.createPane('routePane').style.zIndex = '405'
   map.createPane('legPane').style.zIndex = '410'
   map.createPane('headPane').style.zIndex = '640'
   map.createPane('badgePane').style.zIndex = '630'
   map.createPane('magnetPane').style.zIndex = '620'
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  }).addTo(map)
+  map.createPane('labelPane').style.zIndex = '401'
+  map.getPane('labelPane')!.style.pointerEvents = 'none'
+  addBasemap(map)
   if (!isMobile.value) L.control.zoom({ position: 'topright' }).addTo(map)
   map.attributionControl.setPrefix(false)
   map.on('zoomend', applyLayerToggles)
@@ -577,7 +575,8 @@ onBeforeUnmount(() => {
 .rt-tip-ep {
   font-size: 13px;
   line-height: 1.3;
-  max-width: 240px;
+  width: max-content;
+  max-width: 280px;
   white-space: normal;
 }
 .rt-tip-ep b {

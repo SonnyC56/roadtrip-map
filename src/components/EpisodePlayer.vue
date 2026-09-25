@@ -118,7 +118,7 @@ watch(
         </div>
 
         <!-- meta -->
-        <div class="px-4 pt-3 pb-3 grid gap-2">
+        <div class="px-4 pt-3 pb-3 grid grid-cols-1 gap-2 [&>*]:min-w-0">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-ui uppercase tracking-wide text-sm">
             <span class="text-amber">{{ dateSpan(episode.start, episode.end) }}</span>
             <span v-if="episode.duration" class="text-muted">{{ fmtDuration(episode.duration) }}</span>
@@ -143,10 +143,10 @@ watch(
           <div class="flex items-center gap-2 pt-1">
             <button class="btn flex-1 sm:flex-none justify-start min-w-0" :disabled="!prev" @click="prev && store.showEpisode(prev.ep)">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M15 5v14L6 12z" /></svg>
-              <span class="truncate">{{ prev ? `E${pad2(prev.ep)} ${prev.title}` : 'Start' }}</span>
+              <span class="truncate min-w-0">{{ prev ? `E${pad2(prev.ep)} ${prev.title}` : 'Start' }}</span>
             </button>
             <button class="btn flex-1 sm:flex-none sm:ml-auto justify-end min-w-0" :disabled="!next" @click="next && store.showEpisode(next.ep)">
-              <span class="truncate">{{ next ? `E${pad2(next.ep)} ${next.title}` : 'The end' }}</span>
+              <span class="truncate min-w-0">{{ next ? `E${pad2(next.ep)} ${next.title}` : 'The end' }}</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 5v14l9-7z" /></svg>
             </button>
           </div>
