@@ -7,6 +7,8 @@ import { localDateTime, pad2 } from '../lib/format'
 const dateOnly = (d: string) => (d ? localDateTime(d) : '')
 
 const Media360Viewer = defineAsyncComponent(() => import('./Media360Viewer.vue'))
+import Flat360 from './Flat360.vue'
+import { hasWebGL2, markWebGLUnavailable } from '../lib/webgl'
 const StorySplatViewer = defineAsyncComponent(() => import('./StorySplatViewer.vue'))
 const XRGalleryViewer = defineAsyncComponent(() => import('./XRGalleryViewer.vue'))
 
@@ -22,6 +24,13 @@ const locNote = computed(() => (item.value && item.value.loc && item.value.loc !
 const isImmersive = computed(() => item.value?.type === 'splat' || item.value?.type === 'xr-scene')
 const legacy = computed(() => (item.value && isImmersive.value ? toLegacyItem(item.value) : null))
 const legacyList = computed(() => (legacy.value ? [legacy.value] : []))
+
+// 360 needs WebGL 2; without it (or if the viewer fails to start) show the flat equirect instead
+const flat360 = ref(false)
+function on360Unsupported() {
+  markWebGLUnavailable()
+  flat360.value = true
+}
 
 const imgLoaded = ref(false)
 const imgFailed = ref(false)
@@ -154,7 +163,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
           preload="metadata"
         ></video>
 
-        <Media360Viewer v-else-if="item.type === 'pano' || item.type === 'pano-video'" :key="item.id" :item="item" class="absolute inset-0" />
+        <template v-else-if="item.type === 'pano' || item.type === 'pano-video'">
+          <Media360Viewer v-if="!flat360 && hasWebGL2()" :key="item.id" :item="item" class="absolute inset-0" @unsupported="on360Unsupported" />
+          <Flat360 v-else :item="item" class="absolute inset-0" />
+        </template>
 
         <!-- side arrows -->
         <button v-if="hasPrev" class="nav left-2 sm:left-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Previous" title="Previous (←)" @click="prev">

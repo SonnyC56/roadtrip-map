@@ -9,7 +9,7 @@ import '@photo-sphere-viewer/core/index.css'
 import { mediaUrl, type Media } from '../lib/manifest'
 
 const props = defineProps<{ item: Media }>()
-const emit = defineEmits<{ error: [string] }>()
+const emit = defineEmits<{ error: [string]; unsupported: [] }>()
 
 const host = ref<HTMLDivElement | null>(null)
 const viewer = shallowRef<Viewer | null>(null)
@@ -69,6 +69,8 @@ async function build() {
         plugins: [[GyroscopePlugin, { touchmove: true }]],
       })
     }
+    // PSV catches a WebGL failure itself (shows an overlay, no throw) and leaves no renderer behind
+    if (!(viewer.value as unknown as { renderer?: unknown }).renderer) throw new Error('WebGL unavailable')
     viewer.value.addEventListener('ready', () => (loading.value = false), { once: true })
     viewer.value.addEventListener('panorama-error', () => {
       failed.value = 'Could not load this 360 view.'
@@ -76,10 +78,10 @@ async function build() {
       emit('error', failed.value)
     })
   } catch (e) {
-    console.error('[360] init failed', e)
-    failed.value = 'This 360 view could not be started on this device.'
+    console.warn('[360] viewer could not start, falling back to flat view', e)
+    destroy()
     loading.value = false
-    emit('error', failed.value)
+    emit('unsupported')
   }
 }
 
