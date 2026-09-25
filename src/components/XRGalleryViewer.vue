@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
-import { useRoadTripStore, type MediaItem, type XRSceneConfig } from '../stores/roadtrip'
+import type { MediaItem, XRSceneConfig } from '../lib/legacyViewer'
 import { format } from 'date-fns'
-import MediaComments from './MediaComments.vue'
 
 // XRGallery is loaded as IIFE and exposes window.XRGallery
 declare global {
@@ -37,7 +36,6 @@ const emit = defineEmits<{
   previous: []
 }>()
 
-const store = useRoadTripStore()
 const viewerContainer = ref<HTMLDivElement | null>(null)
 const galleryInstance = ref<any>(null)
 const isLoading = ref(true)
@@ -424,10 +422,6 @@ function prevStage() {
           <button @click="toggleInfo" class="btn-toolbar" :class="{ active: showInfo }" title="Show Info">
             <span class="icon">ℹ️</span>
           </button>
-          <button @click="toggleComments" class="btn-toolbar" :class="{ active: showComments }" title="Show Comments">
-            <span class="icon">💬</span>
-            <span class="count">{{ currentMedia.comments?.length || 0 }}</span>
-          </button>
         </div>
       </div>
 
@@ -538,20 +532,6 @@ function prevStage() {
                 with a VR headset (Meta Quest, HTC Vive, etc.)
               </p>
             </div>
-          </div>
-        </div>
-      </Transition>
-
-      <!-- Comments panel -->
-      <Transition name="slide-left">
-        <div v-if="showComments" class="overlay-panel comments-panel">
-          <div class="panel-header">
-            <h3 class="panel-title">Comments</h3>
-            <button @click="showComments = false" class="btn-close-panel">✕</button>
-          </div>
-
-          <div class="panel-content">
-            <MediaComments :media-id="currentMedia.id" />
           </div>
         </div>
       </Transition>
