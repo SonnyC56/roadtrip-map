@@ -17,6 +17,7 @@ const items = computed(() => {
     if (!n && (t === 'splat' || t === 'xr-scene')) continue
     out.push({ key: t, label: TYPE_META[t].label, color: TYPE_META[t].color, count: n })
   }
+  if (store.medals.length) out.push({ key: 'medals', label: 'Park medals', color: '#DDAA5E', count: store.medals.length })
   if (store.magnets.length) out.push({ key: 'magnets', label: 'Magnets', color: '#AE7E36', count: store.magnets.length })
   return out
 })

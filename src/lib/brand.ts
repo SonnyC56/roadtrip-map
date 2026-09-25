@@ -1,88 +1,80 @@
-// Brand loading: fonts + logo from ${VITE_MEDIA_BASE}/brand/, with fallbacks.
+// Brand loading: fonts + logo + medals from ${VITE_MEDIA_BASE}/brand/, with fallbacks.
+//  brand/brand.json  → { fonts, logos, magnets, medals, tokens }
+//  brand/tokens.json → { colors, fonts: { display|condensed|body: { family, src, weight } } }
+import { ref } from 'vue'
 import { mediaUrl } from './manifest'
 
-interface Face {
-  family: string
-  weight: string
-  files: string[] // candidate bucket keys, first that loads wins
-  google: string // Google Fonts family spec (fallback)
+export interface BrandIndex {
+  logos?: Record<string, string>
+  medals?: Record<string, string>
+  magnets?: string
+  tokens?: string
 }
 
-const FACES: Face[] = [
-  {
-    family: 'Bebas Neue',
-    weight: '400',
-    files: ['brand/fonts/BebasNeue-Regular.woff2', 'brand/fonts/bebas-neue.woff2', 'brand/fonts/BebasNeue-Regular.ttf'],
-    google: 'Bebas+Neue',
-  },
-  {
-    family: 'Barlow Condensed',
-    weight: '500',
-    files: ['brand/fonts/BarlowCondensed-Medium.woff2', 'brand/fonts/barlow-condensed-500.woff2'],
-    google: 'Barlow+Condensed:wght@500;600;700',
-  },
-  {
-    family: 'Barlow Condensed',
-    weight: '700',
-    files: ['brand/fonts/BarlowCondensed-Bold.woff2', 'brand/fonts/barlow-condensed-700.woff2'],
-    google: 'Barlow+Condensed:wght@500;600;700',
-  },
-  {
-    family: 'Space Grotesk',
-    weight: '400 700',
-    files: ['brand/fonts/SpaceGrotesk-Variable.woff2', 'brand/fonts/SpaceGrotesk-Regular.woff2', 'brand/fonts/space-grotesk.woff2'],
-    google: 'Space+Grotesk:wght@400;500;700',
-  },
-  {
-    family: 'Roadtrip Pixel',
-    weight: '400',
-    files: ['brand/fonts/pixel.woff2', 'brand/fonts/RoadtripPixel.woff2'],
-    google: 'Silkscreen', // loaded under its own name; CSS stack falls through to it
-  },
+interface FontSpec {
+  family: string
+  src: string
+  weight?: string | number
+}
+
+const GOOGLE: Record<string, string> = {
+  'Bebas Neue': 'Bebas+Neue',
+  'Barlow Condensed': 'Barlow+Condensed:wght@500;600;700',
+  'Space Grotesk': 'Space+Grotesk:wght@400;500;700',
+}
+
+// Used if tokens.json is missing or lists no fonts.
+const CONVENTIONAL: FontSpec[] = [
+  { family: 'Bebas Neue', src: 'brand/fonts/bebasneue-regular.ttf', weight: 400 },
+  { family: 'Barlow Condensed', src: 'brand/fonts/barlowcondensed-semibold.ttf', weight: 600 },
+  { family: 'Space Grotesk', src: 'brand/fonts/spacegrotesk-variable.ttf', weight: '300 700' },
 ]
 
-async function tryFace(face: Face): Promise<boolean> {
-  for (const f of face.files) {
-    try {
-      const ff = new FontFace(face.family, `url(${mediaUrl(f)})`, { weight: face.weight, display: 'swap' })
-      await ff.load()
-      document.fonts.add(ff)
-      return true
-    } catch {
-      /* try next */
-    }
-  }
-  return false
-}
+export const brandIndex = ref<BrandIndex | null>(null)
+export const logoUrl = ref(mediaUrl('brand/logo/sonnys-roadtrip-2025-outlined.svg'))
 
-export async function loadBrandFonts(): Promise<void> {
-  if (typeof FontFace === 'undefined') return
-  // 1) an optional stylesheet published with the brand kit
-  const css = mediaUrl('brand/fonts/fonts.css')
+async function json<T>(key: string): Promise<T | null> {
   try {
-    const head = await fetch(css, { method: 'HEAD' })
-    if (head.ok) {
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = css
-      document.head.appendChild(link)
-      return
-    }
+    const r = await fetch(mediaUrl(key), { cache: 'no-cache' })
+    return r.ok ? ((await r.json()) as T) : null
   } catch {
-    /* ignore */
-  }
-  // 2) conventional file names; 3) Google Fonts for anything missing
-  const results = await Promise.all(FACES.map(tryFace))
-  const missing = new Set<string>()
-  FACES.forEach((f, i) => {
-    if (!results[i]) missing.add(f.google)
-  })
-  if (missing.size) {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = `https://fonts.googleapis.com/css2?${[...missing].map((g) => `family=${g}`).join('&')}&display=swap`
-    document.head.appendChild(link)
+    return null
   }
 }
 
-export const LOGO_URL = mediaUrl('brand/logo.svg')
+async function loadFace(f: FontSpec): Promise<boolean> {
+  try {
+    const face = new FontFace(f.family, `url(${mediaUrl(f.src)})`, { weight: String(f.weight ?? 400), display: 'swap' })
+    await face.load()
+    document.fonts.add(face)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function googleFallback(families: string[]) {
+  const specs = families.map((f) => GOOGLE[f]).filter(Boolean)
+  specs.push('Silkscreen') // pixel counters (no pixel webfont in the brand kit)
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?${[...new Set(specs)].map((g) => `family=${g}`).join('&')}&display=swap`
+  document.head.appendChild(link)
+}
+
+export async function loadBrand(brandKey = 'brand/brand.json'): Promise<void> {
+  const [idx, tokens] = await Promise.all([
+    json<BrandIndex>(brandKey),
+    json<{ fonts?: Record<string, FontSpec> }>('brand/tokens.json'),
+  ])
+  brandIndex.value = idx
+  const logos = idx?.logos || {}
+  const logo = logos['sonnys-roadtrip-2025-outlined'] || Object.values(logos).find((v) => v.endsWith('.svg'))
+  if (logo) logoUrl.value = mediaUrl(logo)
+
+  if (typeof FontFace === 'undefined') return
+  const specs = tokens?.fonts ? Object.values(tokens.fonts).filter((f) => f?.family && f?.src) : CONVENTIONAL
+  const ok = await Promise.all(specs.map(loadFace))
+  const loaded = new Set(specs.filter((_, i) => ok[i]).map((f) => f.family))
+  googleFallback(Object.keys(GOOGLE).filter((f) => !loaded.has(f)))
+}

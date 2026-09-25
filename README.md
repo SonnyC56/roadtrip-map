@@ -15,9 +15,9 @@ Everything is read relative to `VITE_MEDIA_BASE`:
 | `manifest.json` | Trip info, stops, episodes (with each leg's `path`), media index. Contract: `D:/RoadTrip-Production/site/manifest-schema.md` (v1). Media with `ready: false` are skipped. Big media lists may be split: `media_files: ["media-01.json", …]` or string entries inside `media`. |
 | `route/route.json` | `[[lat, lon, t_unix], …]`. If missing, the site falls back to `public/roadtrip2025_mod.json`. |
 | `episodes/eNN/…`, `photos/`, `thumbs/`, `videos/`, `posters/`, `pano/<id>/…`, `pano360v/` | Media files referenced by the manifest. |
-| `brand/logo.svg` | Header logo (falls back to a text wordmark). |
-| `brand/fonts/…` | `fonts.css` if present; otherwise `BebasNeue-Regular.woff2`, `BarlowCondensed-Medium.woff2`, `BarlowCondensed-Bold.woff2`, `SpaceGrotesk-Variable.woff2` (or `-Regular`), `pixel.woff2`. Anything missing falls back to Google Fonts (pixel font: Silkscreen). |
-| `brand/magnets.json` | Optional. Array or `{ "magnets": [...] }` of `{ label, src (e.g. "brand/magnets/glacier.webp"), lat, lon, kind: "park"|"place"|"state", episode }`. `stop` can replace lat/lon. |
+| `brand/brand.json` | Brand index (key from manifest `brand`): `logos` (loading screen uses `sonnys-roadtrip-2025-outlined`), `medals` (`{ park_id: "brand/medals/x.webp" }` shown as park medal markers at each park episode's stop), `magnets`. |
+| `brand/tokens.json` | `fonts: { display, condensed, body: { family, src, weight } }`, loaded with FontFace (TTF or WOFF2). Missing families fall back to Google Fonts; the DAY/MILES pixel counters use Silkscreen from Google Fonts. |
+| `brand/magnets.json` | Array or `{ magnets: [...] }` of `{ label, src, kind, episode }` plus a position: `lat`/`lon`, `stop`, or `through` (0..1 fraction along the route). Magnets show from zoom 5 up. |
 
 Optional media types (not in schema v1) kept from the earlier site: `type: "splat"` with `splat: { sceneId | sceneUrl }`
 opens the StorySplat viewer; `type: "xr-scene"` with `xr: { configUrl, stages }` opens the XR gallery viewer.

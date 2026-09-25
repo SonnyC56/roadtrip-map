@@ -23,6 +23,7 @@ let headMarker: L.Marker | null = null
 const legLayer = L.layerGroup()
 const badgeLayer = L.layerGroup()
 const magnetLayer = L.layerGroup()
+const medalLayer = L.layerGroup()
 const legHi = new Map<number, L.Polyline>()
 let hoverTip: L.Tooltip | null = null
 
@@ -174,6 +175,31 @@ function drawMagnets() {
   }
 }
 
+function drawMedals() {
+  medalLayer.clearLayers()
+  for (const md of store.medals) {
+    const at = store.episodeEnd(md.ep)
+    if (!at) continue
+    const mk = L.marker(at, {
+      pane: 'magnetPane',
+      riseOnHover: true,
+      zIndexOffset: 200,
+      icon: L.divIcon({
+        className: '',
+        html: `<div class="rt-medal"><img src="${esc(mediaUrl(md.src))}" alt="" loading="lazy" decoding="async"></div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 46],
+      }),
+    })
+    mk.bindTooltip(
+      `<div class="rt-tip-ep"><b>${esc(md.name)}</b><br><span>National park ${md.n} of 17 · Episode ${pad2(md.ep)}</span></div>`,
+      { className: 'rt-tip', direction: 'top', offset: [0, -44] },
+    )
+    mk.on('click', () => store.showEpisode(md.ep))
+    medalLayer.addLayer(mk)
+  }
+}
+
 // ---------------- media ----------------
 const markerOf = new WeakMap<Media, L.Marker>()
 let shownList: Media[] | null = null
@@ -297,7 +323,7 @@ function setupCluster() {
       const meta = TYPE_META[m.type]
       showMarkerTip(
         layer.getLatLng(),
-        `<div class="rt-tip-media">${thumbHtml(m, 150)}<div><b>${meta.short}</b> · ${esc(localDateTime(m.local_time || m.time_utc))}</div>${
+        `<div class="rt-tip-media">${thumbHtml(m, 150)}<div><b>${meta.short}</b> · ${esc(localDateTime(m.local_time || m.time_utc || m.day))}</div>${
           m.stop != null && store.stopById.get(m.stop) ? `<div class="rt-tip-sub">${esc(store.stopById.get(m.stop)!.name)}</div>` : ''
         }</div>`,
       )
@@ -341,6 +367,8 @@ function applyLayerToggles() {
   }
   if (store.layers.magnets) magnetLayer.addTo(map)
   else magnetLayer.remove()
+  if (store.layers.medals) medalLayer.addTo(map)
+  else medalLayer.remove()
   if (map.getZoom() < 5) map.getContainer().classList.add('rt-zoomed-out')
   else map.getContainer().classList.remove('rt-zoomed-out')
 }
@@ -385,6 +413,7 @@ watch(
   },
 )
 watch(() => store.magnets, drawMagnets)
+watch(() => store.medals, drawMedals)
 watch(() => [store.filteredMedia, store.visibleCount], queueSync)
 
 let progQueued = false
@@ -401,7 +430,7 @@ watch(
   },
 )
 watch(() => [store.hoverEpisode, store.openEpisode], applyEpisodeHighlight)
-watch(() => [store.layers.episodes, store.layers.magnets], applyLayerToggles)
+watch(() => [store.layers.episodes, store.layers.magnets, store.layers.medals], applyLayerToggles)
 watch(
   () => store.focus,
   (f) => {
@@ -522,6 +551,29 @@ onBeforeUnmount(() => {
 }
 .rt-magnet:hover {
   transform: scale(1.6);
+}
+.rt-medal {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.6));
+  transition: transform 0.12s;
+}
+.rt-medal img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.rt-medal:hover {
+  transform: scale(1.8);
+}
+/* zoomed out: keep the route readable (magnets appear from zoom 5, medals shrink) */
+.rt-zoomed-out .rt-medal {
+  width: 24px;
+  height: 24px;
+}
+.rt-zoomed-out .rt-magnet {
+  display: none;
 }
 .rt-mm {
   width: 34px;

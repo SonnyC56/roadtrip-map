@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
-import { mediaUrl } from '../lib/manifest'
+import { mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
 
 const store = useTripStore()
@@ -18,12 +18,13 @@ const override = ref<Fmt | null>(null)
 const autoFmt = computed<Fmt>(() => (isPortrait.value && isMobile.value ? '9x16' : '16x9'))
 const fmt = computed<Fmt>(() => {
   const want = override.value || autoFmt.value
-  const f = episode.value?.formats
-  if (f?.[want]) return want
-  return f?.['16x9'] ? '16x9' : '9x16'
+  const other: Fmt = want === '16x9' ? '9x16' : '16x9'
+  if (playableFormat(episode.value, want)) return want
+  return playableFormat(episode.value, other) ? other : want
 })
-const source = computed(() => episode.value?.formats[fmt.value] || null)
-const hasBoth = computed(() => !!(episode.value?.formats['16x9'] && episode.value?.formats['9x16']))
+const source = computed(() => playableFormat(episode.value, fmt.value))
+const posterFallback = computed(() => episode.value?.formats[fmt.value]?.poster || episode.value?.formats['16x9']?.poster)
+const hasBoth = computed(() => !!(playableFormat(episode.value, '16x9') && playableFormat(episode.value, '9x16')))
 const video = ref<HTMLVideoElement | null>(null)
 const failed = ref(false)
 
@@ -110,7 +111,7 @@ watch(
           ></video>
           <div v-else class="absolute inset-0 grid place-items-center text-center p-6">
             <div>
-              <img v-if="source?.poster" :src="mediaUrl(source.poster)" alt="" class="absolute inset-0 w-full h-full object-cover opacity-30" />
+              <img v-if="posterFallback" :src="mediaUrl(posterFallback)" alt="" @error="($event.target as HTMLImageElement).style.display = 'none'" class="absolute inset-0 w-full h-full object-cover opacity-30" />
               <p class="relative font-display text-2xl text-amber">Coming soon</p>
               <p class="relative text-muted text-sm mt-1">This episode's video isn't uploaded yet.</p>
             </div>

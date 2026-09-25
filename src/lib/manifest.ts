@@ -37,6 +37,7 @@ export interface EpisodeFormat {
   poster?: string
   w?: number
   h?: number
+  ready?: boolean
 }
 
 export interface Episode {
@@ -49,6 +50,13 @@ export interface Episode {
   duration?: number
   version?: string
   formats: Partial<Record<'16x9' | '9x16', EpisodeFormat>>
+  ready?: boolean
+}
+
+/** A format is playable unless the manifest explicitly says it isn't ready yet. */
+export function playableFormat(e: Episode | null | undefined, k: '16x9' | '9x16'): EpisodeFormat | null {
+  const f = e?.formats?.[k]
+  return f && f.src && f.ready !== false ? f : null
 }
 
 export interface PanoInfo {
@@ -65,8 +73,8 @@ export interface RawMedia {
   source?: string
   stop?: number | null
   episode?: number | null
-  time_utc: string
-  local_time?: string
+  time_utc: string | null
+  local_time?: string | null
   lat: number
   lon: number
   loc?: 'gps' | 'timeline' | 'stop' | string
@@ -100,6 +108,8 @@ export interface Manifest {
   stops: Stop[]
   episodes: Episode[]
   media: (RawMedia | string)[]
+  /** brand index key, e.g. "brand/brand.json" */
+  brand?: string
   /** Optional: split media files, e.g. ["media-01.json", ...] (each an array or {media: [...]}) */
   media_files?: string[]
 }
@@ -117,6 +127,14 @@ export interface Magnet {
   lon: number
   kind?: string
   episode?: number
+}
+
+export interface Medal {
+  id: string
+  name: string
+  n: number // park number in Sonny's count (1..17)
+  ep: number
+  src: string
 }
 
 async function getJson<T>(url: string): Promise<T> {
@@ -144,13 +162,22 @@ export async function loadManifest(): Promise<{ manifest: Manifest; media: Media
     )
     for (const p of parts) raw.push(...(Array.isArray(p) ? p : p.media || []))
   }
+  const stopStart = new Map((manifest.stops || []).map((s) => [s.id, s.start]))
+  const epStart = new Map((manifest.episodes || []).map((e) => [e.ep, e.start]))
   const media: Media[] = []
   for (const m of raw) {
     if (m.ready === false) continue
     if (!Number.isFinite(m.lat) || !Number.isFinite(m.lon) || (m.lat === 0 && m.lon === 0)) continue
-    const t = Date.parse(m.time_utc)
+    let t = Date.parse(m.time_utc || m.local_time || '')
+    let day = (m.local_time || m.time_utc || '').slice(0, 10)
+    if (!Number.isFinite(t)) {
+      // undated (e.g. placed at a stop): put it at midday on the stop's / episode's first day
+      const d = (m.stop != null && stopStart.get(m.stop)) || (m.episode != null && epStart.get(m.episode)) || ''
+      t = Date.parse(`${d}T12:00:00-06:00`)
+      day = d
+    }
     if (!Number.isFinite(t)) continue
-    media.push({ ...m, t, day: (m.local_time || m.time_utc).slice(0, 10) })
+    media.push({ ...m, t, day })
   }
   media.sort((a, b) => a.t - b.t)
   return { manifest, media }
@@ -181,11 +208,19 @@ export async function loadFallbackRoute(): Promise<RoutePoint[]> {
   return out
 }
 
-/** brand/magnets.json — accepts an array or {magnets: [...]}; each needs src/file + lat/lon (or a stop id). */
-export async function loadMagnets(stops: Stop[]): Promise<Magnet[]> {
+/**
+ * brand/magnets.json — an array or {magnets: [...]}. Each entry needs src (or file) and a position:
+ * lat/lon, a stop id, `through` (0..1 fraction along the route) or an episode (placed at its leg's end).
+ */
+export async function loadMagnets(
+  key: string,
+  stops: Stop[],
+  atFraction: (f: number) => [number, number] | null,
+  episodeEnd: (ep: number) => [number, number] | null,
+): Promise<Magnet[]> {
   let data: unknown
   try {
-    data = await getJson<unknown>(mediaUrl('brand/magnets.json'))
+    data = await getJson<unknown>(mediaUrl(key))
   } catch {
     return []
   }
@@ -196,17 +231,53 @@ export async function loadMagnets(stops: Stop[]): Promise<Magnet[]> {
     let src = String(r.src || r.file || r.image || '')
     if (!src) continue
     if (!/^(https?:|\/)/.test(src) && !src.startsWith('brand/')) src = `brand/${src}`
-    let lat = Number(r.lat)
-    let lon = Number(r.lon ?? r.lng)
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-      const s = byStop.get(Number(r.stop))
-      if (!s) continue
-      lat = s.lat
-      lon = s.lon
-    }
-    out.push({ label: String(r.label || r.name || ''), src, lat, lon, kind: r.kind as string, episode: Number(r.episode) || undefined })
+    let pos: [number, number] | null = null
+    const lat = Number(r.lat)
+    const lon = Number(r.lon ?? r.lng)
+    if (r.lat != null && Number.isFinite(lat) && Number.isFinite(lon)) pos = [lat, lon]
+    else if (r.stop != null && byStop.get(Number(r.stop))) {
+      const s = byStop.get(Number(r.stop))!
+      pos = [s.lat, s.lon]
+    } else if (r.through != null && Number.isFinite(Number(r.through))) pos = atFraction(Number(r.through))
+    else if (r.episode != null) pos = episodeEnd(Number(r.episode))
+    if (!pos) continue
+    out.push({
+      label: String(r.label || r.name || r.key || ''),
+      src,
+      lat: pos[0],
+      lon: pos[1],
+      kind: r.kind as string,
+      episode: Number(r.episode) || undefined,
+    })
   }
   return out
+}
+
+// Sonny's 17 national parks, in order (Banff excluded: "Banff is Canada, it doesn't count").
+const PARKS: [string, string, number][] = [
+  ['grand_teton', 'Grand Teton', 3],
+  ['yellowstone', 'Yellowstone', 4],
+  ['glacier', 'Glacier', 5],
+  ['olympic', 'Olympic', 10],
+  ['mount_rainier', 'Mount Rainier', 11],
+  ['crater_lake', 'Crater Lake', 14],
+  ['redwood', 'Redwood', 15],
+  ['pinnacles', 'Pinnacles', 20],
+  ['channel_islands', 'Channel Islands', 23],
+  ['joshua_tree', 'Joshua Tree', 26],
+  ['death_valley', 'Death Valley', 27],
+  ['grand_canyon', 'Grand Canyon', 28],
+  ['zion', 'Zion', 29],
+  ['bryce_canyon', 'Bryce Canyon', 30],
+  ['arches', 'Arches', 32],
+  ['gateway_arch', 'Gateway Arch', 33],
+  ['new_river_gorge', 'New River Gorge', 34],
+]
+
+/** Park medals from brand.json `medals` ({ park_id: "brand/medals/x.webp" }). */
+export function medalsFrom(map: Record<string, string> | undefined): Medal[] {
+  if (!map) return []
+  return PARKS.filter(([id]) => map[id]).map(([id, name, ep], i) => ({ id, name, n: i + 1, ep, src: map[id]! }))
 }
 
 /** Adapter for the kept StorySplat / XR viewers. */
@@ -217,7 +288,7 @@ export function toLegacyItem(m: Media): LegacyItem {
     url: mediaUrl(m.src),
     thumbnail: mediaUrl(m.thumb),
     caption: m.caption,
-    timestamp: m.local_time || m.time_utc,
+    timestamp: m.local_time || m.time_utc || new Date(m.t).toISOString(),
     location: { lat: m.lat, lng: m.lon, isInferred: m.loc !== 'gps' },
     splatConfig: m.splat,
     xrConfig: m.xr,

@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useTripStore } from '../stores/trip'
-import { LOGO_URL } from '../lib/brand'
 import { pad2 } from '../lib/format'
 
 defineProps<{ compact?: boolean }>()
 const store = useTripStore()
-const logoOk = ref(true)
 
 const day = computed(() => (store.atEnd ? store.trip.days : store.currentDay))
 const miles = computed(() => store.currentMiles.toLocaleString('en-US'))
@@ -19,15 +17,8 @@ const ep = computed(() => {
 <template>
   <header class="flex items-center gap-3 min-w-0" :class="compact ? '' : 'flex-wrap'">
     <div class="flex items-center gap-2.5 min-w-0">
-      <img
-        v-if="logoOk"
-        :src="LOGO_URL"
-        alt="Sonny's Roadtrip 2025"
-        class="shrink-0"
-        :class="compact ? 'h-8 max-w-[120px]' : 'h-12 max-w-[180px]'"
-        @error="logoOk = false"
-      />
-      <div v-if="!logoOk || !compact" class="min-w-0 leading-none">
+
+      <div class="min-w-0 leading-none">
         <h1 v-if="compact" class="font-display text-ivory leading-[0.85]">
           <span class="block text-[0.8rem] text-muted tracking-[0.2em]">SONNY'S</span>
           <span class="text-[1.45rem] whitespace-nowrap">ROADTRIP <span class="text-amber">2025</span></span>

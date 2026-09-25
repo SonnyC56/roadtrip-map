@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
-import { mediaUrl } from '../lib/manifest'
+import { mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
 
 const store = useTripStore()
@@ -55,6 +55,7 @@ watch(
           <div class="font-ui text-[0.82rem] text-amber mt-1 tracking-wide uppercase">
             {{ dateSpan(e.start, e.end) }}
             <span v-if="!store.episodePaths.has(e.ep)" class="text-muted"> · Epilogue · at home</span>
+            <span v-if="!playableFormat(e, '16x9') && !playableFormat(e, '9x16')" class="soon">Soon</span>
           </div>
           <div v-if="e.stops?.length" class="text-[0.78rem] text-muted truncate">{{ stopNames(e.stops) }}</div>
         </div>
@@ -86,5 +87,13 @@ watch(
 }
 .ep.is-open {
   border-color: #e6b56a;
+}
+.soon {
+  margin-left: 0.4rem;
+  padding: 0 0.3rem;
+  border-radius: 3px;
+  border: 1px solid #4e3312;
+  color: #ae7e36;
+  font-size: 0.7rem;
 }
 </style>

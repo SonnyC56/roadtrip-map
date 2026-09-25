@@ -4,6 +4,7 @@ import { useTripStore } from '../stores/trip'
 import { mediaUrl, toLegacyItem } from '../lib/manifest'
 import { TYPE_META, LOC_NOTE } from '../lib/typeMeta'
 import { localDateTime, pad2 } from '../lib/format'
+const dateOnly = (d: string) => (d ? localDateTime(d) : '')
 
 const Media360Viewer = defineAsyncComponent(() => import('./Media360Viewer.vue'))
 const StorySplatViewer = defineAsyncComponent(() => import('./StorySplatViewer.vue'))
@@ -168,7 +169,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
       <div class="shrink-0 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-line bg-ink">
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <span class="font-display text-xl sm:text-2xl text-ivory leading-tight">{{ stop?.name || 'On the road' }}</span>
-          <span class="font-ui text-sm text-amber uppercase tracking-wide">{{ localDateTime(item.local_time || item.time_utc) }}</span>
+          <span class="font-ui text-sm text-amber uppercase tracking-wide">{{ item.local_time || item.time_utc ? localDateTime((item.local_time || item.time_utc)!) : dateOnly(item.day) }}</span>
         </div>
         <p v-if="item.caption" class="text-sm text-ivory/90 mt-1">{{ item.caption }}</p>
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-muted">

@@ -9,7 +9,7 @@ import EpisodePlayer from './components/EpisodePlayer.vue'
 import MediaLightbox from './components/MediaLightbox.vue'
 import { useTripStore } from './stores/trip'
 import { useViewport } from './composables/useViewport'
-import { loadBrandFonts } from './lib/brand'
+import { logoUrl } from './lib/brand'
 
 const store = useTripStore()
 const { isMobile } = useViewport()
@@ -37,7 +37,6 @@ function writeHash() {
 watch(() => [store.openEpisode, store.lightbox], writeHash)
 
 onMounted(async () => {
-  loadBrandFonts()
   await store.init()
   readHash()
   window.addEventListener('hashchange', readHash)
@@ -81,8 +80,8 @@ onMounted(async () => {
     <!-- loading / error -->
     <Transition name="fade">
       <div v-if="store.status === 'loading'" class="absolute inset-0 z-[900] grid place-items-center bg-ink">
-        <div class="text-center">
-          <p class="font-display text-4xl text-ivory">SONNY'S ROADTRIP <span class="text-amber">2025</span></p>
+        <div class="text-center grid justify-items-center">
+          <img :src="logoUrl" alt="Sonny's Roadtrip 2025" class="w-56 max-w-[60vw] mb-2" @error="($event.target as HTMLImageElement).style.display = 'none'" />
           <p class="font-pixel text-xs text-brass-4 mt-3 loading-dots">LOADING THE ROAD</p>
         </div>
       </div>

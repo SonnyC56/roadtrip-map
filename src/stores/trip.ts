@@ -3,6 +3,8 @@ import { computed, reactive, ref, shallowRef } from 'vue'
 import {
   loadFallbackRoute,
   loadMagnets,
+  medalsFrom,
+  type Medal,
   loadManifest,
   loadRoute,
   MEDIA_BASE,
@@ -14,8 +16,9 @@ import {
   type Stop,
   type TripInfo,
 } from '../lib/manifest'
+import { brandIndex, loadBrand } from '../lib/brand'
 
-export type LayerKey = MediaType | 'episodes' | 'magnets'
+export type LayerKey = MediaType | 'episodes' | 'magnets' | 'medals'
 
 const DAY = 86_400_000
 const DEFAULT_TRIP: TripInfo = {
@@ -66,6 +69,7 @@ export const useTripStore = defineStore('trip', () => {
   const route = shallowRef<RoutePoint[]>([])
   const routeMiles = shallowRef<Float64Array>(new Float64Array())
   const magnets = shallowRef<Magnet[]>([])
+  const medals = shallowRef<Medal[]>([])
 
   // ---------- filters / layers ----------
   const layers = reactive<Record<LayerKey, boolean>>({
@@ -77,6 +81,7 @@ export const useTripStore = defineStore('trip', () => {
     splat: true,
     'xr-scene': true,
     magnets: true,
+    medals: true,
   })
   const dateFrom = ref<string | null>(null) // YYYY-MM-DD inclusive
   const dateTo = ref<string | null>(null)
@@ -213,9 +218,35 @@ export const useTripStore = defineStore('trip', () => {
     routeMiles.value = cum
   }
 
+  /** Point at fraction f (0..1) of the route's length. */
+  function atFraction(f: number): [number, number] | null {
+    const r = route.value
+    const cum = routeMiles.value
+    if (!r.length) return null
+    const target = Math.max(0, Math.min(1, f)) * (cum[cum.length - 1] || 0)
+    let lo = 0
+    let hi = cum.length - 1
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1
+      if (cum[mid]! < target) lo = mid + 1
+      else hi = mid
+    }
+    return [r[lo]!.lat, r[lo]!.lon]
+  }
+
+  /** Where an episode ends: its stop, else the end of its leg. */
+  function episodeEnd(ep: number): [number, number] | null {
+    const e = episodeByNum.value.get(ep)
+    const s = e?.stops?.length ? stopById.value.get(e.stops[e.stops.length - 1]!) : undefined
+    if (s) return [s.lat, s.lon]
+    const p = episodePaths.value.get(ep)
+    return p ? p[p.length - 1]! : null
+  }
+
   async function init() {
     status.value = 'loading'
     let routeKey = 'route/route.json'
+    let brandKey = 'brand/brand.json'
     try {
       const { manifest, media: items } = await loadManifest()
       trip.value = { ...DEFAULT_TRIP, ...(manifest.trip || {}) }
@@ -224,6 +255,7 @@ export const useTripStore = defineStore('trip', () => {
       media.value = Object.freeze(items) as Media[]
       isFixture.value = !!manifest.fixture
       if (manifest.route) routeKey = manifest.route
+      if (manifest.brand) brandKey = manifest.brand
     } catch (e) {
       console.warn('[trip] manifest unavailable:', e)
       manifestMissing.value = true
@@ -250,7 +282,10 @@ export const useTripStore = defineStore('trip', () => {
         ? `Couldn't load the trip from ${MEDIA_BASE}.`
         : 'VITE_MEDIA_BASE is not set and no local data was found.'
     }
-    loadMagnets(stops.value).then((m) => (magnets.value = m))
+    loadBrand(brandKey).then(async () => {
+      medals.value = medalsFrom(brandIndex.value?.medals)
+      magnets.value = await loadMagnets(brandIndex.value?.magnets || 'brand/magnets.json', stops.value, atFraction, episodeEnd)
+    })
   }
 
   function setLayer(key: LayerKey, on: boolean) {
@@ -349,6 +384,8 @@ export const useTripStore = defineStore('trip', () => {
     route,
     routeMiles,
     magnets,
+    medals,
+    episodeEnd,
     // filters
     layers,
     dateFrom,
