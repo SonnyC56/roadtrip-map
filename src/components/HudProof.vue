@@ -3,7 +3,7 @@ import { defineAsyncComponent, ref } from 'vue'
 import { enterVR, xrSupported, vrState } from '../lib/xr'
 const VRViewer=defineAsyncComponent(()=>import('./VRViewer.vue'))
 const error=ref('')
-const base='https://media.2025roadtrip.com/experiments/vr-hud-v01/'
+const base=import.meta.env.VITE_HUD_MEDIA_BASE || 'https://media.2025roadtrip.com/experiments/vr-hud-v01/'
 async function open(at=0,headset=false){
   error.value=''
   try{await enterVR({kind:'video',title:'Olympic · VR story HUD proof',src:base+(headset || window.innerWidth>700 ? 'olympic-hud-4k.mp4?v=20260927' : 'olympic-hud-mobile.mp4?v=20260927'),hud:base+'hud.json',startAt:at},!headset)}
