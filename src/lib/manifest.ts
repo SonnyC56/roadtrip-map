@@ -32,12 +32,16 @@ export interface Stop {
   lon: number
 }
 
+export type EpisodeFormatKey = '16x9' | '9x16' | 'vr'
+
 export interface EpisodeFormat {
   src: string
   poster?: string
   w?: number
   h?: number
   ready?: boolean
+  version?: string
+  duration?: number
 }
 
 export interface Episode {
@@ -49,7 +53,8 @@ export interface Episode {
   path?: [number, number][]
   duration?: number
   version?: string
-  formats: Partial<Record<'16x9' | '9x16', EpisodeFormat>>
+  /** '16x9' / '9x16': the flat film. 'vr': the VR edition (mono equirect 360 MP4, 3840x1920), when published. */
+  formats: Partial<Record<EpisodeFormatKey, EpisodeFormat>>
   ready?: boolean
   kind?: 'intro' | 'episode' | 'epilogue'
 }
@@ -66,7 +71,7 @@ export function epLabel(e: Pick<Episode, 'ep' | 'kind'>): string {
 }
 
 /** A format is playable unless the manifest explicitly says it isn't ready yet. */
-export function playableFormat(e: Episode | null | undefined, k: '16x9' | '9x16'): EpisodeFormat | null {
+export function playableFormat(e: Episode | null | undefined, k: EpisodeFormatKey): EpisodeFormat | null {
   const f = e?.formats?.[k]
   return f && f.src && f.ready !== false ? f : null
 }

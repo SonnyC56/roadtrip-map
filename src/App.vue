@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { defineAsyncComponent, onMounted, watch } from 'vue'
 import TripMap from './components/TripMap.vue'
 import TripPanel from './components/TripPanel.vue'
 import TimelineBar from './components/TimelineBar.vue'
@@ -10,6 +10,9 @@ import MediaLightbox from './components/MediaLightbox.vue'
 import { useTripStore } from './stores/trip'
 import { useViewport } from './composables/useViewport'
 import { logoUrl } from './lib/brand'
+import { vrState } from './lib/xr'
+// headset view (three.js WebXR), only loaded when someone enters VR
+const VRViewer = defineAsyncComponent(() => import('./components/VRViewer.vue'))
 
 const store = useTripStore()
 const { isMobile } = useViewport()
@@ -97,6 +100,7 @@ onMounted(async () => {
 
     <EpisodePlayer />
     <MediaLightbox />
+    <VRViewer v-if="vrState" :state="vrState" />
   </div>
 </template>
 

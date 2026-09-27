@@ -6,7 +6,11 @@
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { Viewer } from '@photo-sphere-viewer/core'
 import '@photo-sphere-viewer/core/index.css'
+import type { VideoPlugin as VideoPluginT } from '@photo-sphere-viewer/video-plugin'
 import { mediaUrl, type Media } from '../lib/manifest'
+import { enterVR, xrSupported } from '../lib/xr'
+import { useTripStore } from '../stores/trip'
+const store = useTripStore()
 
 const props = defineProps<{ item: Media }>()
 const emit = defineEmits<{ error: [string]; unsupported: [] }>()
@@ -15,6 +19,37 @@ const host = ref<HTMLDivElement | null>(null)
 const viewer = shallowRef<Viewer | null>(null)
 const loading = ref(true)
 const failed = ref('')
+let VideoPluginClass: typeof VideoPluginT | null = null
+
+// ---- headset: hand the current item (and view direction / video position) to the WebXR viewer ----
+const vrError = ref('')
+function onEnterVR() {
+  const m = props.item
+  const v = viewer.value
+  const video = m.type === 'pano-video' && v && VideoPluginClass ? v.getPlugin<VideoPluginT>(VideoPluginClass) : null
+  const title = m.caption || (m.stop != null && store.stopById.get(m.stop)?.name) || 'Roadtrip 360'
+  const p = m.pano
+  // no awaits before enterVR: the session must be requested inside the click gesture
+  enterVR(
+    m.type === 'pano-video'
+      ? { kind: 'video', title, src: mediaUrl(m.src), poster: mediaUrl(m.poster) || undefined, startAt: video?.getTime() || 0, yaw: v?.getPosition().yaw }
+      : {
+          kind: 'image',
+          title,
+          src: mediaUrl(p?.preview || m.src),
+          yaw: v?.getPosition().yaw,
+          tiles: p
+            ? { cols: p.cols, rows: p.rows, width: p.width, url: (c, r) => mediaUrl(p.tiles.replace('{col}', String(c)).replace('{row}', String(r))) }
+            : undefined,
+        },
+  )
+    .then(() => video?.pause())
+    .catch((e) => {
+      console.warn('[vr] session failed', e)
+      vrError.value = 'VR could not start.'
+      setTimeout(() => (vrError.value = ''), 3000)
+    })
+}
 
 async function build() {
   destroy()
@@ -29,6 +64,7 @@ async function build() {
         import('@photo-sphere-viewer/equirectangular-video-adapter'),
         import('@photo-sphere-viewer/video-plugin'),
       ])
+      VideoPluginClass = VideoPlugin
       await import('@photo-sphere-viewer/video-plugin/index.css')
       viewer.value = new Viewer({
         container: host.value,
@@ -106,6 +142,16 @@ onBeforeUnmount(destroy)
     <div class="hint absolute left-1/2 top-3 -translate-x-1/2 font-ui text-xs uppercase tracking-widest text-ivory/80 bg-ink/60 rounded-full px-3 py-1 pointer-events-none">
       Drag to look around
     </div>
+    <button
+      v-if="xrSupported && !failed"
+      class="vr-btn absolute left-3 top-3 z-10 inline-flex items-center gap-2 font-ui text-sm uppercase tracking-widest rounded-full px-4 py-2"
+      title="View in your VR headset"
+      @click="onEnterVR"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 7h18a1 1 0 011 1v8a1 1 0 01-1 1h-5.2l-2-2.6a2.25 2.25 0 00-3.6 0L8.2 17H3a1 1 0 01-1-1V8a1 1 0 011-1zm4.5 3a2 2 0 100 4 2 2 0 000-4zm9 0a2 2 0 100 4 2 2 0 000-4z" /></svg>
+      Enter VR
+    </button>
+    <div v-if="vrError" class="absolute left-3 top-14 z-10 font-ui text-xs text-ivory bg-ink/80 rounded px-2 py-1">{{ vrError }}</div>
   </div>
 </template>
 
@@ -121,6 +167,14 @@ onBeforeUnmount(destroy)
   100% {
     opacity: 0;
   }
+}
+.vr-btn {
+  background: #e6b56a;
+  color: #101b23;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.4);
+}
+.vr-btn:hover {
+  background: #f0c88a;
 }
 :deep(.psv-container) {
   background: #000;

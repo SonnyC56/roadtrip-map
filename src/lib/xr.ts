@@ -1,0 +1,96 @@
+/// <reference types="webxr" />
+// Headset (WebXR immersive-vr) support for 360 photos / 360 videos / the VR edition of the film.
+// The three.js scene lives in VRViewer.vue (lazy chunk). This module is tiny and loaded eagerly: the
+// click handler must call navigator.xr.requestSession() (and video.play()) synchronously inside the
+// user gesture, so it runs here, before any dynamic import.
+import { ref, shallowRef } from 'vue'
+
+export interface VRSource {
+  kind: 'image' | 'video'
+  title: string
+  /** image: equirect preview (2048x1024) shown first; video: the equirect mp4 */
+  src: string
+  poster?: string
+  /** image only: full-res tiles, stitched into a 4096-wide texture once in VR */
+  tiles?: { url: (col: number, row: number) => string; cols: number; rows: number; width: number }
+  /** video only: start position (s) */
+  startAt?: number
+  /** initial yaw in radians (photo-sphere-viewer convention: 0 = image centre, + = right) */
+  yaw?: number
+}
+
+export interface VRState {
+  source: VRSource
+  /** null = on-screen preview (?vr=preview), no headset */
+  session: XRSession | null
+  video: HTMLVideoElement | null
+}
+
+/** The active VR view (rendered by <VRViewer> in App.vue). */
+export const vrState = shallowRef<VRState | null>(null)
+/** true once navigator.xr reports immersive-vr support (or ?vr=preview is in the URL). */
+export const xrSupported = ref(false)
+/** ?vr=preview: show the VR buttons on any device and render the VR scene on screen (testing only). */
+export const vrPreview = typeof location !== 'undefined' && /[?&]vr=preview\b/.test(location.search)
+
+let checked = false
+export function checkXR(): void {
+  if (checked || typeof navigator === 'undefined') return
+  checked = true
+  if (vrPreview) {
+    xrSupported.value = true
+    return
+  }
+  const xr = navigator.xr
+  if (!xr?.isSessionSupported) return
+  xr.isSessionSupported('immersive-vr')
+    .then((ok) => {
+      xrSupported.value = ok
+      // warm the three.js chunk so entering VR is instant
+      if (ok) import('../components/VRViewer.vue').catch(() => {})
+    })
+    .catch(() => {})
+}
+checkXR()
+
+function makeVideo(src: string, startAt = 0): HTMLVideoElement {
+  const v = document.createElement('video')
+  v.crossOrigin = 'anonymous'
+  v.playsInline = true
+  v.preload = 'auto'
+  v.src = src
+  if (startAt > 0) v.currentTime = startAt
+  return v
+}
+
+/** Call directly from a click / tap handler (no awaits before it). */
+export async function enterVR(source: VRSource): Promise<void> {
+  if (vrState.value) return
+  let sessionP: Promise<XRSession> | null = null
+  if (!vrPreview) {
+    if (!navigator.xr) throw new Error('WebXR not available')
+    sessionP = navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['hand-tracking'] })
+  }
+  // start playback inside the same gesture so the headset browser allows sound
+  const video = source.kind === 'video' ? makeVideo(source.src, source.startAt) : null
+  video?.play().catch(() => {
+    if (!video) return
+    video.muted = true
+    video.play().catch(() => {})
+  })
+  try {
+    const session = sessionP ? await sessionP : null
+    vrState.value = { source, session, video }
+  } catch (e) {
+    video?.pause()
+    video?.removeAttribute('src')
+    throw e
+  }
+}
+
+export function exitVR(): void {
+  const s = vrState.value
+  if (!s) return
+  if (s.session) s.session.end().catch(() => (vrState.value = null))
+  else vrState.value = null // preview mode; headset sessions clear on their 'end' event
+}

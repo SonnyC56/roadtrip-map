@@ -13,16 +13,8 @@ declare global {
   }
 }
 
-// WebXR Navigator extension
-interface XRSystem {
-  isSessionSupported(mode: string): Promise<boolean>
-}
-
-declare global {
-  interface Navigator {
-    xr?: XRSystem
-  }
-}
+// navigator.xr types come from @types/webxr (pulled in with three)
+/// <reference types="webxr" />
 
 const props = defineProps<{
   mediaItem: MediaItem

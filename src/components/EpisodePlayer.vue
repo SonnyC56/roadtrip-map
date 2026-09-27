@@ -2,8 +2,9 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
-import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
+import { epKind, epLabel, mediaUrl, playableFormat, type Media } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
+import { enterVR, xrSupported } from '../lib/xr'
 
 const store = useTripStore()
 const { isMobile, isPortrait } = useViewport()
@@ -51,6 +52,46 @@ async function toggleFmt() {
 
 function close() {
   store.showEpisode(null)
+}
+
+// ---- VR edition (episodes[].formats.vr: mono equirect 360 MP4). Button appears only when the manifest has it. ----
+const vrFormat = computed(() => playableFormat(episode.value, 'vr'))
+const vrError = ref('')
+function watchVR() {
+  const e = episode.value
+  const f = vrFormat.value
+  if (!e || !f) return
+  const title = epKind(e) === 'intro' ? 'The Intro' : `${epLabel(e)} · ${e.title}`
+  if (xrSupported.value) {
+    // headset: straight into an immersive session (requested inside this click)
+    enterVR({ kind: 'video', title, src: mediaUrl(f.src), poster: mediaUrl(f.poster) || undefined }).catch((err) => {
+      console.warn('[vr] session failed', err)
+      vrError.value = 'VR could not start.'
+      setTimeout(() => (vrError.value = ''), 3000)
+    })
+    video.value?.pause()
+    return
+  }
+  // no headset: the same equirect film in the regular drag-to-look 360 viewer
+  const s = e.stops.map((id) => store.stopById.get(id)).find((x) => !!x)
+  const m: Media = {
+    id: `e${e.ep}-vr`,
+    type: 'pano-video',
+    episode: e.ep,
+    stop: s?.id ?? null,
+    time_utc: null,
+    lat: s?.lat ?? 0,
+    lon: s?.lon ?? 0,
+    src: f.src,
+    poster: f.poster ?? null,
+    thumb: f.poster ?? null,
+    caption: `${title} (VR edition)`,
+    duration: f.duration ?? e.duration,
+    t: Date.parse(`${e.start}T12:00:00Z`),
+    day: e.start,
+  }
+  video.value?.pause()
+  store.openMedia(m, [m])
 }
 
 function onKey(e: KeyboardEvent) {
@@ -124,7 +165,17 @@ watch(
             <span class="text-amber">{{ dateSpan(episode.start, episode.end) }}</span>
             <span v-if="episode.duration" class="text-muted">{{ fmtDuration(episode.duration) }}</span>
             <span v-if="epKind(episode) === 'epilogue'" class="text-muted">Epilogue · at home</span>
-            <button v-if="hasBoth" class="chip ml-auto !py-1" :aria-pressed="fmt === '9x16'" :title="`Switch to ${fmt === '16x9' ? 'vertical 9:16' : 'wide 16:9'}`" @click="toggleFmt">
+            <button
+              v-if="vrFormat"
+              class="chip vr-chip ml-auto !py-1"
+              :title="xrSupported ? 'Watch the VR edition in your headset' : 'Watch the 360° VR edition (drag to look around)'"
+              @click="watchVR"
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M3 7h18a1 1 0 011 1v8a1 1 0 01-1 1h-5.2l-2-2.6a2.25 2.25 0 00-3.6 0L8.2 17H3a1 1 0 01-1-1V8a1 1 0 011-1zm4.5 3a2 2 0 100 4 2 2 0 000-4zm9 0a2 2 0 100 4 2 2 0 000-4z" /></svg>
+              {{ xrSupported ? 'Watch in VR' : 'Watch in 360°' }}
+            </button>
+            <span v-if="vrError" class="text-ivory normal-case text-xs">{{ vrError }}</span>
+            <button v-if="hasBoth" class="chip !py-1" :class="{ 'ml-auto': !vrFormat }" :aria-pressed="fmt === '9x16'" :title="`Switch to ${fmt === '16x9' ? 'vertical 9:16' : 'wide 16:9'}`" @click="toggleFmt">
               <svg v-if="fmt === '16x9'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2" /></svg>
               <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2" /></svg>
               {{ fmt === '16x9' ? '9:16' : '16:9' }}
@@ -190,6 +241,10 @@ watch(
     aspect-ratio: auto !important;
     max-height: none !important;
   }
+}
+.vr-chip {
+  color: #e6b56a;
+  border-color: #e6b56a;
 }
 .fade-enter-active,
 .fade-leave-active {
