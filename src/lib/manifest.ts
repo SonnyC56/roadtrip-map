@@ -179,6 +179,10 @@ export async function loadManifest(): Promise<{ manifest: Manifest; media: Media
     )
     for (const p of parts) raw.push(...(Array.isArray(p) ? p : p.media || []))
   }
+  // dev-only fixture for the VR edition (dropped from production builds)
+  if (import.meta.env.DEV && /[?&]vrfixture\b/.test(location.search)) {
+    ;(await import('./vrFixture')).applyVRFixture(manifest, raw)
+  }
   const stopStart = new Map((manifest.stops || []).map((s) => [s.id, s.start]))
   const epStart = new Map((manifest.episodes || []).map((e) => [e.ep, e.start]))
   const media: Media[] = []

@@ -8,7 +8,7 @@ import { Viewer } from '@photo-sphere-viewer/core'
 import '@photo-sphere-viewer/core/index.css'
 import type { VideoPlugin as VideoPluginT } from '@photo-sphere-viewer/video-plugin'
 import { mediaUrl, type Media } from '../lib/manifest'
-import { enterVR, xrSupported } from '../lib/xr'
+import { enterVR, enterVRPlaylist, xrSupported, type VRItem } from '../lib/xr'
 import { useTripStore } from '../stores/trip'
 const store = useTripStore()
 
@@ -23,25 +23,38 @@ let VideoPluginClass: typeof VideoPluginT | null = null
 
 // ---- headset: hand the current item (and view direction / video position) to the WebXR viewer ----
 const vrError = ref('')
+function titleOf(m: Media) {
+  return m.caption || (m.stop != null && store.stopById.get(m.stop)?.name) || 'Roadtrip 360'
+}
 function onEnterVR() {
   const m = props.item
   const v = viewer.value
   const video = m.type === 'pano-video' && v && VideoPluginClass ? v.getPlugin<VideoPluginT>(VideoPluginClass) : null
-  const title = m.caption || (m.stop != null && store.stopById.get(m.stop)?.name) || 'Roadtrip 360'
+  const title = titleOf(m)
   const p = m.pano
+  // 360 videos: the lightbox's list (current filters, time order) becomes the in-VR playlist
+  const clips = m.type === 'pano-video' ? (store.lightbox?.list || [m]).filter((x) => x.type === 'pano-video') : []
+  if (!clips.includes(m)) clips.splice(0, clips.length, m)
+  const items: VRItem[] = clips.map((x) => ({
+    id: x.id,
+    label: new Date(`${x.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase(),
+    title: titleOf(x),
+    src: mediaUrl(x.src),
+    poster: mediaUrl(x.poster) || undefined,
+    duration: x.duration,
+  }))
   // no awaits before enterVR: the session must be requested inside the click gesture
-  enterVR(
-    m.type === 'pano-video'
-      ? { kind: 'video', title, src: mediaUrl(m.src), poster: mediaUrl(m.poster) || undefined, startAt: video?.getTime() || 0, yaw: v?.getPosition().yaw }
-      : {
-          kind: 'image',
-          title,
-          src: mediaUrl(p?.preview || m.src),
-          yaw: v?.getPosition().yaw,
-          tiles: p
-            ? { cols: p.cols, rows: p.rows, width: p.width, url: (c, r) => mediaUrl(p.tiles.replace('{col}', String(c)).replace('{row}', String(r))) }
-            : undefined,
-        },
+  ;(m.type === 'pano-video'
+    ? enterVRPlaylist(items, clips.indexOf(m), '360 clips', video?.getTime() || 0, v?.getPosition().yaw)
+    : enterVR({
+        kind: 'image',
+        title,
+        src: mediaUrl(p?.preview || m.src),
+        yaw: v?.getPosition().yaw,
+        tiles: p
+          ? { cols: p.cols, rows: p.rows, width: p.width, url: (c, r) => mediaUrl(p.tiles.replace('{col}', String(c)).replace('{row}', String(r))) }
+          : undefined,
+      })
   )
     .then(() => video?.pause())
     .catch((e) => {

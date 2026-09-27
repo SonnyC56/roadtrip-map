@@ -4,7 +4,7 @@ import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
 import { epKind, epLabel, mediaUrl, playableFormat, type Media } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
-import { enterVR, xrSupported } from '../lib/xr'
+import { enterVRPlaylist, episodePlaylist, xrSupported } from '../lib/xr'
 
 const store = useTripStore()
 const { isMobile, isPortrait } = useViewport()
@@ -63,8 +63,10 @@ function watchVR() {
   if (!e || !f) return
   const title = epKind(e) === 'intro' ? 'The Intro' : `${epLabel(e)} · ${e.title}`
   if (xrSupported.value) {
-    // headset: straight into an immersive session (requested inside this click)
-    enterVR({ kind: 'video', title, src: mediaUrl(f.src), poster: mediaUrl(f.poster) || undefined }).catch((err) => {
+    // headset: straight into an immersive session (requested inside this click) that plays on
+    // through the rest of the VR edition, up to the credits
+    const items = episodePlaylist(store.episodes)
+    enterVRPlaylist(items, Math.max(0, items.findIndex((x) => x.id === `ep${e.ep}`)), 'Episodes').catch((err) => {
       console.warn('[vr] session failed', err)
       vrError.value = 'VR could not start.'
       setTimeout(() => (vrError.value = ''), 3000)

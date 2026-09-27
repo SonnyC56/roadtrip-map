@@ -1,11 +1,23 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration } from '../lib/format'
+import { enterVRPlaylist, episodePlaylist, xrSupported } from '../lib/xr'
 
 const store = useTripStore()
 const listEl = ref<HTMLElement | null>(null)
+
+// "Watch the whole film in VR": only on a headset, and only once the manifest has VR episodes (formats.vr)
+const vrItems = computed(() => episodePlaylist(store.episodes))
+const vrError = ref('')
+function watchFilmVR() {
+  enterVRPlaylist(vrItems.value, 0, 'Episodes').catch((e) => {
+    console.warn('[vr] session failed', e)
+    vrError.value = 'VR could not start.'
+    setTimeout(() => (vrError.value = ''), 3000)
+  })
+}
 
 function stopNames(ids: number[]) {
   return ids
@@ -31,6 +43,16 @@ watch(
 </script>
 
 <template>
+  <button
+    v-if="xrSupported && vrItems.length"
+    class="vr-film w-full mb-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 font-ui text-sm uppercase tracking-widest"
+    title="Plays every episode in your headset, one after another, through the credits"
+    @click="watchFilmVR"
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 7h18a1 1 0 011 1v8a1 1 0 01-1 1h-5.2l-2-2.6a2.25 2.25 0 00-3.6 0L8.2 17H3a1 1 0 01-1-1V8a1 1 0 011-1zm4.5 3a2 2 0 100 4 2 2 0 000-4zm9 0a2 2 0 100 4 2 2 0 000-4z" /></svg>
+    Watch the whole film in VR
+  </button>
+  <p v-if="vrError" class="text-xs text-ivory mb-2">{{ vrError }}</p>
   <ol ref="listEl" class="grid gap-1.5" aria-label="Episodes">
     <li v-for="e in store.episodes" :key="e.ep" :data-ep="e.ep">
       <button
@@ -67,6 +89,13 @@ watch(
 </template>
 
 <style scoped>
+.vr-film {
+  background: #e6b56a;
+  color: #101b23;
+}
+.vr-film:hover {
+  background: #f0c88a;
+}
 .ep {
   transition: background 0.12s, border-color 0.12s;
 }

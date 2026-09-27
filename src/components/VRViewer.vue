@@ -6,6 +6,9 @@
 //     (Quest-friendly; the 12K original would blow the texture budget)
 //   - videos: a VideoTexture of the equirect MP4 (mono 3840x1920)
 // plus a floating control panel (play/pause, -10 s / +10 s, seek bar, exit) driven by controller or hand rays.
+// Videos can come with a playlist (the film's episodes, or the 360 clips in time order): prev / next,
+// an in-VR list, and auto-advance with an "Up next" card, all without leaving the session. At most two
+// <video> elements are alive: the current one and the preloaded next one.
 // Loaded lazily; the XR session itself is requested in lib/xr.ts inside the click gesture.
 // Without a session (?vr=preview) the same scene renders on screen: drag to look, click to use the panel.
 import { onBeforeUnmount, onMounted, ref } from 'vue'
@@ -32,7 +35,7 @@ import {
   WebGLRenderer,
   type Group,
 } from 'three'
-import { exitVR, vrState, type VRState } from '../lib/xr'
+import { exitVR, makeVideo, playVideo, vrState, type VRItem, type VRState } from '../lib/xr'
 
 const props = defineProps<{ state: VRState }>()
 const host = ref<HTMLDivElement | null>(null)
@@ -41,7 +44,9 @@ const pageStatus = ref('Starting VR…')
 const session = props.state.session
 const inHeadset = !!session
 const source = props.state.source
-const video = source.kind === 'video' ? props.state.video : null
+const isVideo = source.kind === 'video' && !!props.state.video
+const playlist = isVideo && source.playlist && source.playlist.length > 1 ? source.playlist : null
+const listName = source.listName || 'Playlist'
 
 let renderer: WebGLRenderer | null = null
 let disposed = false
@@ -68,6 +73,15 @@ function setMap(tex: Texture) {
   if (old && old !== tex) old.dispose()
 }
 
+const head = new Vector3()
+const fwd = new Vector3()
+/** Put the image centre where the viewer is currently facing (used when the next video starts). */
+function recenter() {
+  camera.getWorldDirection(fwd)
+  if (Math.abs(fwd.y) > 0.98) return
+  sphere.rotation.y = Math.atan2(-fwd.x, -fwd.z) - Math.PI / 2
+}
+
 function loadImage(url: string): Promise<HTMLImageElement> {
   const im = new Image()
   im.crossOrigin = 'anonymous'
@@ -75,6 +89,7 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   return im.decode().then(() => im)
 }
 
+// ---------------------------------------------------------------- photo
 async function showPhoto() {
   panelStatus = 'Loading…'
   const tiles = source.tiles
@@ -122,15 +137,33 @@ async function showPhoto() {
   if (!disposed) tex.needsUpdate = true
 }
 
+// ---------------------------------------------------------------- video + playlist
+let cur: HTMLVideoElement | null = isVideo ? props.state.video : null
+let idx = source.index ?? 0
+let curTitle = source.title || '360°'
+/** preloaded next item (the only other <video> allowed to exist) */
+let pre: { idx: number; el: HTMLVideoElement } | null = null
+let upNext: { at: number; i: number } | null = null
 let videoTex: VideoTexture | null = null
 let lastVideoT = -1
-function showVideo(v: HTMLVideoElement) {
+const PRELOAD_S = 20
+const UPNEXT_MS = 5000
+
+function disposeVideo(v: HTMLVideoElement) {
+  v.pause()
+  v.removeAttribute('src')
+  v.load()
+}
+
+function attachVideo(v: HTMLVideoElement, poster?: string) {
   panelStatus = 'Loading video…'
+  videoTex = null
+  lastVideoT = -1
   let ready = false
-  if (source.poster) {
-    loadImage(source.poster)
+  if (poster) {
+    loadImage(poster)
       .then((im) => {
-        if (ready || disposed) return
+        if (ready || disposed || v !== cur) return
         const t = new Texture(im)
         t.colorSpace = SRGBColorSpace
         t.needsUpdate = true
@@ -138,63 +171,188 @@ function showVideo(v: HTMLVideoElement) {
       })
       .catch(() => {})
   }
-  const vt = new VideoTexture(v)
-  vt.colorSpace = SRGBColorSpace
-  vt.minFilter = LinearFilter
-  vt.generateMipmaps = false
   const onData = () => {
+    if (disposed || v !== cur) return
     ready = true
     panelStatus = ''
+    const vt = new VideoTexture(v)
+    vt.colorSpace = SRGBColorSpace
+    vt.minFilter = LinearFilter
+    vt.generateMipmaps = false
     videoTex = vt
     setMap(vt)
   }
   if (v.readyState >= 2) onData()
   else v.addEventListener('loadeddata', onData, { once: true })
-  v.addEventListener('ended', () => showPanel())
-  v.addEventListener('error', () => (panelStatus = 'This video could not be loaded.'))
+  v.addEventListener('ended', () => v === cur && onEnded())
+  v.addEventListener('error', () => {
+    if (v === cur && v.getAttribute('src')) panelStatus = 'This video could not be loaded.'
+  })
 }
 
-// ---------------------------------------------------------------- control panel
-const isVideo = !!video
-const CW = 1024
-const CH = isVideo ? 300 : 190
-const panelCanvas = document.createElement('canvas')
-panelCanvas.width = CW
-panelCanvas.height = CH
-const pc = panelCanvas.getContext('2d')!
-const panelTex = new CanvasTexture(panelCanvas)
-panelTex.colorSpace = SRGBColorSpace
-const PW = 0.9 // metres
-const panel = new Mesh(
-  new PlaneGeometry(PW, (PW * CH) / CW),
-  new MeshBasicMaterial({ map: panelTex, transparent: true, depthTest: false }),
-)
-panel.renderOrder = 10
-scene.add(panel)
+function goTo(i: number) {
+  const it = playlist?.[i]
+  if (!it || disposed) return
+  cancelUpNext()
+  let el: HTMLVideoElement
+  if (pre && pre.idx === i) {
+    el = pre.el
+    pre = null
+  } else {
+    if (pre) disposeVideo(pre.el)
+    pre = null
+    el = makeVideo(it.src)
+  }
+  const old = cur
+  cur = el
+  idx = i
+  curTitle = itemTitle(it)
+  if (old) disposeVideo(old)
+  recenter()
+  attachVideo(el, it.poster)
+  playVideo(el)
+  if (sideMode === 'list') listPage = Math.floor(i / PAGE)
+}
 
-type BtnId = 'back' | 'play' | 'fwd' | 'exit' | 'seek'
+function itemTitle(it: VRItem) {
+  return it.label.toUpperCase() === it.title.toUpperCase() ? it.title : `${it.label} · ${it.title}`
+}
+
+function onEnded() {
+  if (playlist && idx + 1 < playlist.length) {
+    upNext = { at: performance.now() + UPNEXT_MS, i: idx + 1 }
+    sideMode = 'upnext'
+    placePanel()
+    panel.visible = true
+  } else showPanel()
+}
+function cancelUpNext() {
+  upNext = null
+  if (sideMode === 'upnext') sideMode = null
+}
+
+function maybePreload() {
+  if (!playlist || !cur || pre || !(cur.duration > 0)) return
+  const n = idx + 1
+  if (n >= playlist.length || cur.duration - cur.currentTime > PRELOAD_S) return
+  pre = { idx: n, el: makeVideo(playlist[n]!.src) } // preload="auto": starts buffering now
+}
+
+function togglePlay() {
+  if (!cur) return
+  if (cur.paused || cur.ended) playVideo(cur)
+  else cur.pause()
+}
+function seekBy(s: number) {
+  if (!cur) return
+  const d = cur.duration || Infinity
+  cur.currentTime = Math.min(Math.max(0, cur.currentTime + s), d - 0.1)
+}
+function prevItem() {
+  if (!cur) return
+  if (cur.currentTime > 5 || idx === 0) cur.currentTime = 0
+  else goTo(idx - 1)
+}
+
+// ---------------------------------------------------------------- UI (canvas-textured planes)
+const AMBER = '#e6b56a'
+const IVORY = '#f5f1e7'
+const MUTED = '#9aa6ad'
+const BTN = '#1c2a34'
+const FONT = 'system-ui, sans-serif'
+
 interface Btn {
-  id: BtnId
+  id: string
   x: number
   y: number
   w: number
   h: number
 }
-const bar = { x: 40, y: 118, w: 944, h: 18 }
-const buttons: Btn[] = isVideo
-  ? [
-      { id: 'back', x: 40, y: 170, w: 200, h: 96 },
-      { id: 'play', x: 256, y: 170, w: 240, h: 96 },
-      { id: 'fwd', x: 512, y: 170, w: 200, h: 96 },
-      { id: 'exit', x: 764, y: 170, w: 220, h: 96 },
-    ]
-  : [{ id: 'exit', x: 764, y: 72, w: 220, h: 90 }]
+const inside = (b: Btn, px: number, py: number) => px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h
 
-const AMBER = '#e6b56a'
-const IVORY = '#f5f1e7'
-const MUTED = '#9aa6ad'
-let hover: BtnId | null = null
-let panelSig = ''
+function canvasPlane(cw: number, ch: number, widthM: number) {
+  const canvas = document.createElement('canvas')
+  canvas.width = cw
+  canvas.height = ch
+  const tex = new CanvasTexture(canvas)
+  tex.colorSpace = SRGBColorSpace
+  const mesh = new Mesh(new PlaneGeometry(widthM, (widthM * ch) / cw), new MeshBasicMaterial({ map: tex, transparent: true, depthTest: false }))
+  mesh.renderOrder = 10
+  return { canvas, g: canvas.getContext('2d')!, tex, mesh, hM: (widthM * ch) / cw }
+}
+
+function fitText(g: CanvasRenderingContext2D, text: string, maxW: number) {
+  if (g.measureText(text).width <= maxW) return text
+  let t = text
+  while (t.length > 2 && g.measureText(t + '…').width > maxW) t = t.slice(0, -1)
+  return t.trimEnd() + '…'
+}
+function box(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  g.beginPath()
+  g.roundRect(x, y, w, h, r)
+}
+function background(g: CanvasRenderingContext2D, w: number, h: number) {
+  g.clearRect(0, 0, w, h)
+  g.fillStyle = 'rgba(16,27,35,0.92)'
+  g.strokeStyle = '#22303a'
+  g.lineWidth = 4
+  box(g, 2, 2, w - 4, h - 4, 28)
+  g.fill()
+  g.stroke()
+}
+
+// -- main control panel
+const CW = 1024
+const CH = isVideo ? 300 : 190
+const PW = 0.9 // metres
+const main = canvasPlane(CW, CH, PW)
+const panel = main.mesh
+scene.add(panel)
+const bar = { x: 40, y: 118, w: 944, h: 18 }
+const buttons: Btn[] = !isVideo
+  ? [{ id: 'exit', x: 764, y: 72, w: 220, h: 90 }]
+  : playlist
+    ? ['prev', 'back', 'play', 'fwd', 'next', 'list', 'exit'].map((id, k) => ({ id, x: 30 + k * 136, y: 170, w: 124, h: 96 }))
+    : [
+        { id: 'back', x: 40, y: 170, w: 200, h: 96 },
+        { id: 'play', x: 256, y: 170, w: 240, h: 96 },
+        { id: 'fwd', x: 512, y: 170, w: 200, h: 96 },
+        { id: 'exit', x: 764, y: 170, w: 220, h: 96 },
+      ]
+
+// -- side panel above it: "Up next" card or the episode / clip list
+const SW = 1024
+const SH = 640
+const side = canvasPlane(SW, SH, PW)
+side.mesh.position.set(0, main.hM / 2 + side.hM / 2 + 0.03, 0)
+side.mesh.visible = false
+panel.add(side.mesh)
+let sideMode: 'upnext' | 'list' | null = null
+const PAGE = 12
+let listPage = 0
+const pages = playlist ? Math.ceil(playlist.length / PAGE) : 1
+function sideButtons(): Btn[] {
+  if (sideMode === 'upnext')
+    return [
+      { id: 'playnow', x: 40, y: 430, w: 450, h: 120 },
+      { id: 'cancel', x: 534, y: 430, w: 450, h: 120 },
+    ]
+  if (sideMode === 'list' && playlist) {
+    const out: Btn[] = []
+    for (let k = 0; k < PAGE; k++) {
+      const i = listPage * PAGE + k
+      if (i >= playlist.length) break
+      out.push({ id: `item:${i}`, x: 30 + (k % 2) * 487, y: 96 + Math.floor(k / 2) * 70, w: 477, h: 62 })
+    }
+    out.push({ id: 'pgprev', x: 30, y: 536, w: 150, h: 80 }, { id: 'pgnext', x: 196, y: 536, w: 150, h: 80 }, { id: 'close', x: 794, y: 536, w: 200, h: 80 })
+    return out
+  }
+  return []
+}
+
+let hover: string | null = null
+let mainSig = ''
+let sideSig = ''
 
 const fmtT = (s: number) => {
   if (!Number.isFinite(s) || s < 0) s = 0
@@ -202,96 +360,170 @@ const fmtT = (s: number) => {
   return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 }
 
-function drawPanel() {
-  const playing = !!video && !video.paused && !video.ended
-  const t = video?.currentTime || 0
-  const d = video?.duration || 0
-  const sig = `${hover}|${playing}|${Math.floor(t * 4)}|${d}|${panelStatus}|${video?.muted}`
-  if (sig === panelSig) return
-  panelSig = sig
-  const g = pc
-  g.clearRect(0, 0, CW, CH)
-  g.fillStyle = 'rgba(16,27,35,0.9)'
-  g.strokeStyle = '#22303a'
-  g.lineWidth = 4
-  g.beginPath()
-  g.roundRect(2, 2, CW - 4, CH - 4, 28)
+function drawIcon(g: CanvasRenderingContext2D, id: string, cx: number, cy: number, playing: boolean) {
+  const tri = (x0: number, dir: 1 | -1, s = 24) => {
+    g.beginPath()
+    g.moveTo(x0, cy - s)
+    g.lineTo(x0 + dir * s * 1.5, cy)
+    g.lineTo(x0, cy + s)
+    g.closePath()
+    g.fill()
+  }
+  if (id === 'play') {
+    if (playing) {
+      g.fillRect(cx - 20, cy - 24, 14, 48)
+      g.fillRect(cx + 6, cy - 24, 14, 48)
+    } else tri(cx - 14, 1, 26)
+  } else if (id === 'prev') {
+    g.fillRect(cx - 24, cy - 20, 8, 40)
+    tri(cx + 22, -1, 20)
+  } else if (id === 'next') {
+    tri(cx - 22, 1, 20)
+    g.fillRect(cx + 16, cy - 20, 8, 40)
+  } else if (id === 'list') {
+    for (const dy of [-16, 0, 16]) g.fillRect(cx - 24, cy + dy - 4, 48, 8)
+  } else {
+    g.font = `700 ${playlist ? 32 : 36}px ${FONT}`
+    g.textAlign = 'center'
+    // the 7-button playlist row is narrower: shorter labels
+    const s = playlist ? '' : ' s'
+    const label = id === 'back' ? `« 10${s}` : id === 'fwd' ? `10${s} »` : playlist ? 'EXIT' : 'EXIT VR'
+    g.fillText(label, cx, cy + 2)
+    g.textAlign = 'left'
+  }
+}
+
+function drawButton(g: CanvasRenderingContext2D, b: Btn, outline = false) {
+  const on = hover === b.id
+  g.fillStyle = on ? AMBER : BTN
+  box(g, b.x, b.y, b.w, b.h, 18)
   g.fill()
-  g.stroke()
-  // title
+  if (outline && !on) {
+    g.strokeStyle = AMBER
+    g.lineWidth = 3
+    g.stroke()
+  }
+  g.fillStyle = on ? '#101b23' : IVORY
+}
+
+function drawMain() {
+  const v = cur
+  const playing = !!v && !v.paused && !v.ended
+  const t = v?.currentTime || 0
+  const d = v?.duration || 0
+  const status = panelStatus || (v?.muted ? 'Sound is off: press play / pause to turn it on' : '')
+  const sig = `${hover}|${playing}|${Math.floor(t * 4)}|${d}|${status}|${curTitle}`
+  if (sig === mainSig) return
+  mainSig = sig
+  const g = main.g
+  background(g, CW, CH)
   g.textBaseline = 'middle'
   g.fillStyle = IVORY
-  g.font = '600 40px system-ui, sans-serif'
-  const titleW = isVideo ? 700 : 690
-  let title = source.title || '360°'
-  while (g.measureText(title).width > titleW && title.length > 4) title = title.slice(0, -2)
-  if (title !== (source.title || '360°')) title = title.trimEnd() + '…'
-  g.fillText(title, 40, 58)
+  g.font = `600 40px ${FONT}`
+  g.fillText(fitText(g, curTitle, isVideo ? 680 : 690), 40, 58)
   if (isVideo) {
     g.fillStyle = AMBER
-    g.font = '500 34px system-ui, sans-serif'
+    g.font = `500 34px ${FONT}`
     g.textAlign = 'right'
     g.fillText(`${fmtT(t)} / ${fmtT(d)}`, CW - 40, 58)
     g.textAlign = 'left'
-    // seek bar
     g.fillStyle = '#22303a'
-    g.beginPath()
-    g.roundRect(bar.x, bar.y, bar.w, bar.h, 9)
+    box(g, bar.x, bar.y, bar.w, bar.h, 9)
     g.fill()
     g.fillStyle = hover === 'seek' ? '#f0c88a' : AMBER
-    g.beginPath()
-    g.roundRect(bar.x, bar.y, Math.max(bar.h, bar.w * (d ? t / d : 0)), bar.h, 9)
+    box(g, bar.x, bar.y, Math.max(bar.h, bar.w * (d ? Math.min(1, t / d) : 0)), bar.h, 9)
     g.fill()
+    if (status) {
+      g.fillStyle = MUTED
+      g.font = `400 26px ${FONT}`
+      g.fillText(status, 40, 98)
+    }
   } else {
     g.fillStyle = MUTED
-    g.font = '400 28px system-ui, sans-serif'
-    g.fillText(panelStatus || 'Look around · click the view to hide this panel', 40, 122)
-  }
-  if (isVideo && panelStatus) {
-    g.fillStyle = MUTED
-    g.font = '400 26px system-ui, sans-serif'
-    g.fillText(panelStatus, 40, 100)
+    g.font = `400 28px ${FONT}`
+    g.fillText(status || 'Look around · click the view to hide this panel', 40, 122)
   }
   for (const b of buttons) {
-    const on = hover === b.id
-    g.fillStyle = on ? AMBER : '#1c2a34'
-    g.beginPath()
-    g.roundRect(b.x, b.y, b.w, b.h, 20)
-    g.fill()
-    if (b.id === 'exit' && !on) {
-      g.strokeStyle = AMBER
-      g.lineWidth = 3
-      g.stroke()
-    }
-    const fg = on ? '#101b23' : IVORY
-    g.fillStyle = fg
-    const cx = b.x + b.w / 2
-    const cy = b.y + b.h / 2
-    if (b.id === 'play') {
-      if (playing) {
-        g.fillRect(cx - 22, cy - 26, 16, 52)
-        g.fillRect(cx + 6, cy - 26, 16, 52)
-      } else {
-        g.beginPath()
-        g.moveTo(cx - 18, cy - 28)
-        g.lineTo(cx + 26, cy)
-        g.lineTo(cx - 18, cy + 28)
-        g.closePath()
-        g.fill()
-      }
-    } else {
-      g.font = '700 36px system-ui, sans-serif'
-      g.textAlign = 'center'
-      const label = b.id === 'back' ? '« 10 s' : b.id === 'fwd' ? '10 s »' : 'EXIT VR'
-      g.fillText(label, cx, cy + 2)
-      g.textAlign = 'left'
-    }
+    drawButton(g, b, b.id === 'exit' || (b.id === 'list' && sideMode === 'list'))
+    drawIcon(g, b.id, b.x + b.w / 2, b.y + b.h / 2, playing)
   }
-  panelTex.needsUpdate = true
+  main.tex.needsUpdate = true
 }
 
-const head = new Vector3()
-const fwd = new Vector3()
+function drawSide() {
+  side.mesh.visible = !!sideMode
+  if (!sideMode || !playlist) return
+  const secs = upNext ? Math.max(0, Math.ceil((upNext.at - performance.now()) / 1000)) : 0
+  const sig = `${sideMode}|${hover}|${secs}|${listPage}|${idx}`
+  if (sig === sideSig) return
+  sideSig = sig
+  const g = side.g
+  background(g, SW, SH)
+  g.textBaseline = 'middle'
+  if (sideMode === 'upnext' && upNext) {
+    const it = playlist[upNext.i]!
+    g.fillStyle = AMBER
+    g.font = `700 34px ${FONT}`
+    g.fillText('UP NEXT', 40, 70)
+    g.fillStyle = IVORY
+    g.font = `600 64px ${FONT}`
+    g.fillText(fitText(g, itemTitle(it).replace(' · ', ' — '), SW - 80), 40, 170)
+    g.fillStyle = MUTED
+    g.font = `400 36px ${FONT}`
+    g.fillText(`Starting in ${secs} s${it.duration ? ` · ${fmtT(it.duration)}` : ''}`, 40, 250)
+    // countdown bar
+    const f = upNext ? 1 - (upNext.at - performance.now()) / UPNEXT_MS : 1
+    g.fillStyle = '#22303a'
+    box(g, 40, 320, SW - 80, 14, 7)
+    g.fill()
+    g.fillStyle = AMBER
+    box(g, 40, 320, Math.max(14, (SW - 80) * Math.min(1, Math.max(0, f))), 14, 7)
+    g.fill()
+    for (const b of sideButtons()) {
+      drawButton(g, b, b.id === 'cancel')
+      g.font = `700 40px ${FONT}`
+      g.textAlign = 'center'
+      g.fillText(b.id === 'playnow' ? 'PLAY NOW' : 'CANCEL', b.x + b.w / 2, b.y + b.h / 2 + 2)
+      g.textAlign = 'left'
+    }
+  } else if (sideMode === 'list') {
+    g.fillStyle = AMBER
+    g.font = `700 34px ${FONT}`
+    g.fillText(listName.toUpperCase(), 40, 50)
+    g.fillStyle = MUTED
+    g.font = `400 30px ${FONT}`
+    g.textAlign = 'right'
+    g.fillText(`${listPage + 1} / ${pages}`, SW - 40, 50)
+    g.textAlign = 'left'
+    for (const b of sideButtons()) {
+      if (b.id.startsWith('item:')) {
+        const i = Number(b.id.slice(5))
+        const it = playlist[i]!
+        const on = hover === b.id
+        g.fillStyle = on ? AMBER : i === idx ? 'rgba(230,181,106,0.18)' : BTN
+        box(g, b.x, b.y, b.w, b.h, 12)
+        g.fill()
+        g.fillStyle = on ? '#101b23' : AMBER
+        g.font = `700 24px ${FONT}`
+        g.fillText(fitText(g, it.label, 96), b.x + 14, b.y + b.h / 2 + 1)
+        g.fillStyle = on ? '#101b23' : IVORY
+        g.font = `500 28px ${FONT}`
+        g.fillText(fitText(g, it.title, b.w - 140), b.x + 124, b.y + b.h / 2 + 1)
+      } else {
+        const disabled = (b.id === 'pgprev' && listPage === 0) || (b.id === 'pgnext' && listPage >= pages - 1)
+        g.globalAlpha = disabled ? 0.35 : 1
+        drawButton(g, b, b.id === 'close')
+        g.font = `700 34px ${FONT}`
+        g.textAlign = 'center'
+        g.fillText(b.id === 'pgprev' ? '‹ PREV' : b.id === 'pgnext' ? 'NEXT ›' : 'CLOSE', b.x + b.w / 2, b.y + b.h / 2 + 2)
+        g.textAlign = 'left'
+        g.globalAlpha = 1
+      }
+    }
+  }
+  side.tex.needsUpdate = true
+}
+
 function placePanel() {
   camera.getWorldPosition(head)
   camera.getWorldDirection(fwd)
@@ -311,49 +543,60 @@ function togglePanel() {
   else showPanel()
 }
 
-function togglePlay() {
-  if (!video) return
-  if (video.paused || video.ended) {
-    video.play().catch(() => {
-      video.muted = true
-      video.play().catch(() => {})
-    })
-  } else video.pause()
-}
-function seekBy(s: number) {
-  if (!video) return
-  const d = video.duration || Infinity
-  video.currentTime = Math.min(Math.max(0, video.currentTime + s), d - 0.1)
-}
-
-function act(id: BtnId, frac: number) {
+function act(id: string, frac: number) {
+  if (cur?.muted) cur.muted = false // any click in VR is a user gesture: restore sound after a muted autoplay
   if (id === 'exit') exitVR()
   else if (id === 'play') togglePlay()
   else if (id === 'back') seekBy(-10)
   else if (id === 'fwd') seekBy(10)
-  else if (id === 'seek' && video?.duration) video.currentTime = Math.min(Math.max(0, frac), 0.999) * video.duration
+  else if (id === 'prev') prevItem()
+  else if (id === 'next') goTo(idx + 1)
+  else if (id === 'list') {
+    if (sideMode === 'list') sideMode = null
+    else {
+      cancelUpNext()
+      sideMode = 'list'
+      listPage = Math.floor(idx / PAGE)
+    }
+  } else if (id === 'seek' && cur?.duration) cur.currentTime = Math.min(Math.max(0, frac), 0.999) * cur.duration
+  else if (id === 'playnow' && upNext) goTo(upNext.i)
+  else if (id === 'cancel') cancelUpNext()
+  else if (id === 'pgprev') listPage = Math.max(0, listPage - 1)
+  else if (id === 'pgnext') listPage = Math.min(pages - 1, listPage + 1)
+  else if (id === 'close') sideMode = null
+  else if (id.startsWith('item:')) {
+    const i = Number(id.slice(5))
+    sideMode = null
+    if (i !== idx) goTo(i)
+    else if (cur?.ended) playVideo(cur)
+  }
 }
 
 // ---------------------------------------------------------------- pointing
 const raycaster = new Raycaster()
 interface Hit {
-  id: BtnId | null
+  id: string | null
   frac: number
   point: Vector3
 }
-function hitPanel(origin: Vector3, dir: Vector3): Hit | null {
+function hitUI(origin: Vector3, dir: Vector3): Hit | null {
   if (!panel.visible) return null
   raycaster.set(origin, dir)
-  const h = raycaster.intersectObject(panel, false)[0]
+  const h = raycaster.intersectObjects(side.mesh.visible ? [side.mesh, panel] : [panel], false)[0]
   if (!h || !h.uv) return null
+  if (h.object === side.mesh) {
+    const px = h.uv.x * SW
+    const py = (1 - h.uv.y) * SH
+    return { id: sideButtons().find((b) => inside(b, px, py))?.id ?? null, frac: 0, point: h.point }
+  }
   const px = h.uv.x * CW
   const py = (1 - h.uv.y) * CH
-  let id: BtnId | null = buttons.find((b) => px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h)?.id ?? null
+  let id: string | null = buttons.find((b) => inside(b, px, py))?.id ?? null
   if (!id && isVideo && px >= bar.x - 10 && px <= bar.x + bar.w + 10 && py >= bar.y - 24 && py <= bar.y + bar.h + 24) id = 'seek'
   return { id, frac: (px - bar.x) / bar.w, point: h.point }
 }
 function select(origin: Vector3, dir: Vector3) {
-  const h = hitPanel(origin, dir)
+  const h = hitUI(origin, dir)
   if (!h) togglePanel() // clicked the view itself
   else if (h.id) act(h.id, h.frac)
 }
@@ -421,7 +664,10 @@ function pollGamepads() {
     const x = gp.axes[2] ?? 0
     const stick = x > 0.7 ? 1 : x < -0.7 ? -1 : 0
     const prev = padPrev.get(s) || { a: false, b: false, stick: 0 }
-    if (a && !prev.a) togglePlay()
+    if (a && !prev.a) {
+      if (cur?.muted) cur.muted = false
+      togglePlay()
+    }
     if (b && !prev.b) togglePanel()
     if (stick && stick !== prev.stick) seekBy(stick * 10)
     padPrev.set(s, { a, b, stick })
@@ -435,17 +681,19 @@ function frame() {
   frames++
   if (frames === 3 && inHeadset) placePanel() // head pose is known after the first XR frames
   sphere.position.copy(camera.position) // no parallax: the sphere stays centred on the eyes
-  if (video && videoTex && video.readyState >= 2 && video.currentTime !== lastVideoT) {
-    lastVideoT = video.currentTime
+  if (cur && videoTex && cur.readyState >= 2 && cur.currentTime !== lastVideoT) {
+    lastVideoT = cur.currentTime
     videoTex.needsUpdate = true
   }
+  maybePreload()
+  if (upNext && performance.now() >= upNext.at) goTo(upNext.i)
   if (inHeadset) {
     pollGamepads()
-    let h: BtnId | null = null
+    let h: string | null = null
     for (const p of pointers) {
       if (!p.active) continue
       rayOf(p.c)
-      const hit = hitPanel(ro, rd)
+      const hit = hitUI(ro, rd)
       p.cursor.visible = !!hit
       if (hit) {
         p.cursor.position.copy(hit.point)
@@ -456,7 +704,8 @@ function frame() {
     }
     hover = h
   }
-  drawPanel()
+  drawMain()
+  drawSide()
   renderer.render(scene, camera)
 }
 
@@ -483,7 +732,7 @@ function onMove(e: PointerEvent) {
     camera.rotation.x = Math.max(-1.5, Math.min(1.5, drag.pitch + dy * 0.004))
   }
   previewRay(e)
-  hover = hitPanel(ro, rd)?.id ?? null
+  hover = hitUI(ro, rd)?.id ?? null
 }
 function onUp(e: PointerEvent) {
   if (drag && !drag.moved) {
@@ -504,7 +753,7 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     e.stopImmediatePropagation()
     exitVR()
-  } else if (e.key === ' ' && video) {
+  } else if (e.key === ' ' && cur) {
     e.preventDefault()
     togglePlay()
   }
@@ -541,7 +790,7 @@ onMounted(async () => {
     }
     placePanel()
     renderer.setAnimationLoop(frame)
-    if (video) showVideo(video)
+    if (cur) attachVideo(cur, source.poster)
     else
       showPhoto().catch((e) => {
         console.warn('[vr] photo failed', e)
@@ -563,18 +812,19 @@ onBeforeUnmount(() => {
     session.removeEventListener('end', onSessionEnd)
     session.end().catch(() => {}) // already ended in the normal path
   }
-  if (video) {
-    video.pause()
-    video.removeAttribute('src')
-    video.load()
-  }
+  if (cur) disposeVideo(cur)
+  if (pre) disposeVideo(pre.el)
+  cur = null
+  pre = null
   renderer?.setAnimationLoop(null)
   sphereMat.map?.dispose()
   sphereGeo.dispose()
   sphereMat.dispose()
-  panelTex.dispose()
-  panel.geometry.dispose()
-  ;(panel.material as MeshBasicMaterial).dispose()
+  for (const p of [main, side]) {
+    p.tex.dispose()
+    p.mesh.geometry.dispose()
+    ;(p.mesh.material as MeshBasicMaterial).dispose()
+  }
   rayGeo.dispose()
   rayMat.dispose()
   cursorGeo.dispose()
