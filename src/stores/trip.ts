@@ -18,6 +18,7 @@ import {
   type TripInfo,
 } from '../lib/manifest'
 import { brandIndex, loadBrand } from '../lib/brand'
+import { chapterIndex, episode360Media } from '../lib/episode360'
 
 export type LayerKey = MediaType | 'episodes' | 'magnets' | 'medals'
 
@@ -109,7 +110,7 @@ export const useTripStore = defineStore('trip', () => {
 
   // ---------- selection ----------
   const openEpisode = ref<number | null>(null)
-  const lightbox = shallowRef<{ list: Media[]; index: number } | null>(null)
+  const lightbox = shallowRef<{ list: Media[]; index: number; film?: boolean } | null>(null)
   const focus = shallowRef<{ bounds: [number, number][]; seq: number } | null>(null)
   const hoverEpisode = ref<number | null>(null)
   let focusSeq = 0
@@ -340,6 +341,8 @@ export const useTripStore = defineStore('trip', () => {
   }
 
   function openMediaById(id: string): boolean {
+    const chapter = /^e(\d+)-vr$/.exec(id)
+    if (chapter) return openEpisode360(Number(chapter[1]))
     const m = media.value.find((x) => x.id === id)
     if (m) openMedia(m, filteredMedia.value.includes(m) ? filteredMedia.value : media.value)
     return !!m
@@ -350,7 +353,15 @@ export const useTripStore = defineStore('trip', () => {
     if (!lb) return
     const i = lb.index + delta
     if (i < 0 || i >= lb.list.length) return
-    lightbox.value = { list: lb.list, index: i }
+    lightbox.value = { ...lb, index: i }
+  }
+
+  function openEpisode360(ep?: number): boolean {
+    const list = episode360Media(episodes.value, stops.value)
+    const index = chapterIndex(list, ep)
+    if (index < 0) return false
+    lightbox.value = { list, index, film: true }
+    return true
   }
 
   function closeMedia() {
@@ -436,6 +447,7 @@ export const useTripStore = defineStore('trip', () => {
     stepEpisode,
     openMedia,
     openMediaById,
+    openEpisode360,
     stepMedia,
     closeMedia,
     setStop,

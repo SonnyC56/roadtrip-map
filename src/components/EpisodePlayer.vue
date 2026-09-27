@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
-import { epKind, epLabel, mediaUrl, playableFormat, type Media } from '../lib/manifest'
+import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
 import { enterVRPlaylist, episodePlaylist, xrSupported } from '../lib/xr'
 
@@ -61,7 +61,6 @@ function watchVR() {
   const e = episode.value
   const f = vrFormat.value
   if (!e || !f) return
-  const title = epKind(e) === 'intro' ? 'The Intro' : `${epLabel(e)} · ${e.title}`
   if (xrSupported.value) {
     // headset: straight into an immersive session (requested inside this click) that plays on
     // through the rest of the VR edition, up to the credits
@@ -74,26 +73,9 @@ function watchVR() {
     video.value?.pause()
     return
   }
-  // no headset: the same equirect film in the regular drag-to-look 360 viewer
-  const s = e.stops.map((id) => store.stopById.get(id)).find((x) => !!x)
-  const m: Media = {
-    id: `e${e.ep}-vr`,
-    type: 'pano-video',
-    episode: e.ep,
-    stop: s?.id ?? null,
-    time_utc: null,
-    lat: s?.lat ?? 0,
-    lon: s?.lon ?? 0,
-    src: f.src,
-    poster: f.poster ?? null,
-    thumb: f.poster ?? null,
-    caption: `${title} (VR edition)`,
-    duration: f.duration ?? e.duration,
-    t: Date.parse(`${e.start}T12:00:00Z`),
-    day: e.start,
-  }
+  // Desktop and phone use the regular 360 player with the complete chapter list.
   video.value?.pause()
-  store.openMedia(m, [m])
+  store.openEpisode360(e.ep)
 }
 
 function onKey(e: KeyboardEvent) {

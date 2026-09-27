@@ -4,7 +4,8 @@
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { mediaUrl, type Media } from '../lib/manifest'
 
-const props = defineProps<{ item: Media }>()
+const props = defineProps<{ item: Media; continuous?: boolean }>()
+const emit = defineEmits<{ ended: [id: string] }>()
 const scroller = ref<HTMLDivElement | null>(null)
 
 function center() {
@@ -36,7 +37,7 @@ function up() {
   <div class="relative w-full h-full bg-black flex flex-col">
     <video
       v-if="item.type === 'pano-video'"
-      :key="item.id"
+      :key="continuous ? 'film360' : item.id"
       class="flex-1 min-h-0 w-full object-contain bg-black"
       :src="mediaUrl(item.src)"
       :poster="mediaUrl(item.poster || item.thumb)"
@@ -44,6 +45,7 @@ function up() {
       autoplay
       playsinline
       preload="metadata"
+      @ended="emit('ended', item.id)"
     ></video>
     <div
       v-else

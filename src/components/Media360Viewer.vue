@@ -9,12 +9,12 @@ import '@photo-sphere-viewer/core/index.css'
 import type { VideoPlugin as VideoPluginT } from '@photo-sphere-viewer/video-plugin'
 import { mediaUrl, type Media } from '../lib/manifest'
 import { textureUrl } from '../lib/textureUrl'
-import { enterVR, enterVRPlaylist, xrSupported, type VRItem } from '../lib/xr'
+import { enterVR, enterVRPlaylist, episodePlaylist, xrSupported, type VRItem } from '../lib/xr'
 import { useTripStore } from '../stores/trip'
 const store = useTripStore()
 
-const props = defineProps<{ item: Media }>()
-const emit = defineEmits<{ error: [string]; unsupported: [] }>()
+const props = defineProps<{ item: Media; continuous?: boolean }>()
+const emit = defineEmits<{ error: [string]; unsupported: []; ended: [id: string]; fullscreen: [] }>()
 
 const host = ref<HTMLDivElement | null>(null)
 const viewer = shallowRef<Viewer | null>(null)
@@ -24,6 +24,8 @@ let VideoPluginClass: typeof VideoPluginT | null = null
 let generation = 0
 let mediaVideo: HTMLVideoElement | null = null
 let watchdog: ReturnType<typeof setTimeout> | undefined
+let videoEvents: AbortController | null = null
+let playAttempt = 0
 const needsPlay = ref(false)
 const canPlay = ref(false)
 const playMessage = ref('')
@@ -31,14 +33,15 @@ const preview = computed(() => props.item.type === 'pano'
   ? textureUrl(props.item.pano?.preview || props.item.src)
   : mediaUrl(props.item.poster || props.item.thumb))
 
-function play() {
+function play(unmute = true) {
   const video = mediaVideo
   if (!video) return
+  const attempt = ++playAttempt
   playMessage.value = ''
   // Keep this synchronous with the tap: iOS requires a user gesture for sound.
-  video.muted = false
+  if (unmute) video.muted = false
   video.play().catch(() => {
-    if (video !== mediaVideo) return
+    if (video !== mediaVideo || attempt !== playAttempt) return
     needsPlay.value = true
     playMessage.value = 'Tap Play to start this video.'
   })
@@ -58,7 +61,7 @@ function onEnterVR() {
   // 360 videos: the lightbox's list (current filters, time order) becomes the in-VR playlist
   const clips = m.type === 'pano-video' ? (store.lightbox?.list || [m]).filter((x) => x.type === 'pano-video') : []
   if (!clips.includes(m)) clips.splice(0, clips.length, m)
-  const items: VRItem[] = clips.map((x) => ({
+  const items: VRItem[] = props.continuous ? episodePlaylist(store.episodes) : clips.map((x) => ({
     id: x.id,
     label: new Date(`${x.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase(),
     title: titleOf(x),
@@ -68,7 +71,7 @@ function onEnterVR() {
   }))
   // no awaits before enterVR: the session must be requested inside the click gesture
   ;(m.type === 'pano-video'
-    ? enterVRPlaylist(items, clips.indexOf(m), '360 clips', video?.getTime() || 0, v?.getPosition().yaw)
+    ? enterVRPlaylist(items, props.continuous ? items.findIndex(x => x.id === `ep${m.episode}`) : clips.indexOf(m), props.continuous ? 'Episodes' : '360 clips', video?.getTime() || 0, v?.getPosition().yaw)
     : enterVR({
         kind: 'image',
         title,
@@ -123,14 +126,27 @@ async function build() {
       video.setAttribute('playsinline', '')
       video.setAttribute('webkit-playsinline', '')
       video.preload = 'metadata'
-      video.loop = true
-      video.src = textureUrl(m.src)
+      video.loop = !props.continuous
+      videoEvents = new AbortController()
+      const options = { signal: videoEvents.signal }
       video.addEventListener('playing', () => {
         if (!current()) return
+        clearTimeout(watchdog)
+        loading.value = false
         needsPlay.value = false
         playMessage.value = ''
-      })
-      video.addEventListener('error', () => fail('This 360 video could not load. It may still be uploading.'))
+      }, options)
+      video.addEventListener('loadeddata', () => {
+        if (!current()) return
+        clearTimeout(watchdog)
+        loading.value = false
+      }, options)
+      video.addEventListener('ended', () => {
+        if (current() && video.ended && props.continuous) emit('ended', props.item.id)
+      }, options)
+      video.addEventListener('error', () => {
+        if (video.error) fail('This 360 video could not load. Please retry.')
+      }, options)
       needsPlay.value = true
       canPlay.value = true
       viewer.value = new Viewer({
@@ -141,12 +157,19 @@ async function build() {
         defaultZoomLvl: 20,
         touchmoveTwoFingers: false,
         mousewheelCtrlKey: false,
-        navbar: ['videoPlay', 'videoVolume', 'videoTime', 'zoom', 'gyroscope', 'fullscreen'],
+        navbar: ['videoPlay', 'videoVolume', 'videoTime', 'zoom', 'gyroscope',
+          ...(props.continuous ? (document.fullscreenEnabled ? [{
+            id: 'filmFullscreen', title: 'Toggle fullscreen',
+            content: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>',
+            onClick: () => emit('fullscreen'),
+          }] : []) : ['fullscreen'])],
         plugins: [
           [VideoPlugin, { progressbar: true, bigbutton: false }],
           [GyroscopePlugin, { touchmove: true }],
         ],
       })
+      // Set the source after the adapter has installed its metadata listener.
+      video.src = textureUrl(m.src)
     } else {
       const { EquirectangularTilesAdapter } = await import('@photo-sphere-viewer/equirectangular-tiles-adapter')
       if (!current()) return
@@ -179,6 +202,7 @@ async function build() {
       if (!current()) return
       clearTimeout(watchdog)
       loading.value = false
+      if (props.continuous && mediaVideo?.paused) play(false)
     }, { once: true })
     viewer.value.addEventListener('panorama-error', () => {
       fail('This 360 view could not load. Please retry.')
@@ -194,6 +218,9 @@ async function build() {
 
 function destroy() {
   generation++
+  playAttempt++
+  videoEvents?.abort()
+  videoEvents = null
   clearTimeout(watchdog)
   viewer.value?.destroy()
   viewer.value = null
@@ -206,8 +233,32 @@ function destroy() {
   }
 }
 
+function changeItem() {
+  if (!props.continuous || !mediaVideo || !viewer.value || props.item.type !== 'pano-video') {
+    void build()
+    return
+  }
+  // Keep the viewer and video across chapters: volume, autoplay permission and fullscreen survive.
+  const video = mediaVideo
+  playAttempt++
+  video.pause()
+  failed.value = ''
+  needsPlay.value = false
+  playMessage.value = ''
+  loading.value = true
+  clearTimeout(watchdog)
+  viewer.value.rotate({ yaw: 0, pitch: 0 })
+  video.src = textureUrl(props.item.src)
+  video.load()
+  play(false)
+  watchdog = setTimeout(() => {
+    loading.value = false
+    failed.value = 'This chapter is taking too long to load. Please retry.'
+  }, 45000)
+}
+
 onMounted(build)
-watch(() => props.item.id, build)
+watch(() => props.item.id, changeItem)
 onBeforeUnmount(destroy)
 </script>
 
@@ -221,7 +272,7 @@ onBeforeUnmount(destroy)
     <div v-if="needsPlay && !failed" class="absolute inset-0 grid place-items-center pointer-events-none">
       <img v-if="preview" :src="preview" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40" />
       <div class="relative text-center pointer-events-auto p-4 rounded-xl bg-ink/85">
-        <button class="btn min-h-12" :disabled="!canPlay" @click="play">Play 360 video</button>
+        <button class="btn min-h-12" :disabled="!canPlay" @click="play()">Play 360 video</button>
         <p v-if="playMessage" class="text-sm text-ivory mt-2">{{ playMessage }}</p>
       </div>
     </div>

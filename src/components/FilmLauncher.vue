@@ -12,7 +12,11 @@ function ready(format: EpisodeFormatKey) { return !!store.episodes.length && sto
 function watchFlat(format: FlatFormat) { store.showEpisode(null); store.closeMedia(); startFilm(store.episodes, format) }
 function watchVR() {
   store.showEpisode(null); store.closeMedia(); error.value = ''
-  enterVRPlaylist(episodePlaylist(store.episodes), 0, 'The whole journey', 0, undefined, !xrSupported.value)
+  if (!xrSupported.value) {
+    store.openEpisode360()
+    return
+  }
+  enterVRPlaylist(episodePlaylist(store.episodes), 0, 'The whole journey')
     .catch(() => { error.value = 'Could not start VR. Please try again.' })
 }
 </script>

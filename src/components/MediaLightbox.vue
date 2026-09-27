@@ -4,6 +4,7 @@ import { useTripStore } from '../stores/trip'
 import { mediaUrl, toLegacyItem } from '../lib/manifest'
 import { TYPE_META, LOC_NOTE } from '../lib/typeMeta'
 import { localDateTime, pad2 } from '../lib/format'
+import { vrState } from '../lib/xr'
 const dateOnly = (d: string) => (d ? localDateTime(d) : '')
 
 const Media360Viewer = defineAsyncComponent(() => import('./Media360Viewer.vue'))
@@ -14,10 +15,14 @@ const XRGalleryViewer = defineAsyncComponent(() => import('./XRGalleryViewer.vue
 
 const store = useTripStore()
 const lb = computed(() => store.lightbox)
+const lightboxRoot = ref<HTMLElement | null>(null)
+const finished = ref(false)
+const fullscreenError = ref('')
 const item = computed(() => (lb.value ? lb.value.list[lb.value.index] || null : null))
 const meta = computed(() => (item.value ? TYPE_META[item.value.type] : null))
 const hasPrev = computed(() => !!lb.value && lb.value.index > 0)
 const hasNext = computed(() => !!lb.value && lb.value.index < lb.value.list.length - 1)
+const following = computed(() => lb.value?.list[lb.value.index + 1])
 const stop = computed(() => (item.value?.stop != null ? store.stopById.get(item.value.stop) : undefined))
 const episode = computed(() => (item.value?.episode != null ? store.episodeByNum.get(item.value.episode) : undefined))
 const locNote = computed(() => (item.value && item.value.loc && item.value.loc !== 'gps' ? LOC_NOTE[item.value.loc] || 'Approximate location' : ''))
@@ -34,6 +39,8 @@ function on360Unsupported() {
 const imgLoaded = ref(false)
 const imgFailed = ref(false)
 watch(item, () => {
+  finished.value = false
+  fullscreenError.value = ''
   flat360.value = false
   imgLoaded.value = false
   imgFailed.value = false
@@ -53,6 +60,7 @@ function preloadNeighbours() {
 }
 
 function close() {
+  if (document.fullscreenElement === lightboxRoot.value) void document.exitFullscreen().catch(() => {})
   store.closeMedia()
 }
 function prev() {
@@ -60,6 +68,25 @@ function prev() {
 }
 function next() {
   store.stepMedia(1)
+}
+function chapter(index: number) {
+  if (!lb.value || !Number.isInteger(index)) return
+  store.stepMedia(index - lb.value.index)
+}
+function ended(id: string) {
+  if (!lb.value?.film || item.value?.id !== id || vrState.value) return
+  if (hasNext.value) next()
+  else finished.value = true
+}
+function fullscreen() {
+  fullscreenError.value = ''
+  const action = document.fullscreenElement === lightboxRoot.value
+    ? document.exitFullscreen()
+    : lightboxRoot.value?.requestFullscreen?.()
+  void action?.catch((error) => {
+    console.warn('[360] fullscreen request failed', error)
+    fullscreenError.value = 'Fullscreen is unavailable in this browser.'
+  })
 }
 function openEpisode() {
   if (!episode.value) return
@@ -74,8 +101,12 @@ function showOnMap() {
 }
 
 function onKey(e: KeyboardEvent) {
-  if (!item.value || isImmersive.value) return
-  if (e.key === 'Escape') close()
+  if (!item.value || isImmersive.value || vrState.value) return
+  if (e.key === 'Escape' && !document.fullscreenElement) close()
+  else if (lb.value?.film && e.shiftKey && !(e.target as HTMLElement)?.closest('input,select,textarea,[contenteditable="true"]')) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev() }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); next() }
+  }
   else if (e.key === 'ArrowLeft' && item.value.type !== 'pano' && item.value.type !== 'pano-video') prev()
   else if (e.key === 'ArrowRight' && item.value.type !== 'pano' && item.value.type !== 'pano-video') next()
 }
@@ -114,15 +145,17 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
   <Transition name="fade">
     <div
       v-if="item && !isImmersive"
+      ref="lightboxRoot"
       class="lb fixed inset-0 z-[1100] bg-ink flex flex-col"
       role="dialog"
       aria-modal="true"
-      :aria-label="meta?.short"
+      :aria-label="lb?.film ? '360 film' : meta?.short"
     >
       <!-- top bar -->
       <div class="flex items-center gap-2 px-3 sm:px-4 py-2 shrink-0">
         <span class="chip !py-1" :style="{ color: meta?.color }"><span class="dot" :style="{ background: meta?.color }"></span>{{ meta?.short }}</span>
         <span class="font-pixel text-[11px] text-muted">{{ (lb!.index + 1).toLocaleString('en-US') }} / {{ lb!.list.length.toLocaleString('en-US') }}</span>
+        <span v-if="lb?.film" class="font-ui text-xs text-muted uppercase tracking-wide truncate">The whole journey</span>
         <button class="btn btn-icon ml-auto" aria-label="Close" title="Close (Esc)" @click="close">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
@@ -164,21 +197,40 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         ></video>
 
         <template v-else-if="item.type === 'pano' || item.type === 'pano-video'">
-          <Media360Viewer v-if="!flat360 && hasWebGL2()" :key="item.id" :item="item" class="absolute inset-0" @unsupported="on360Unsupported" />
-          <Flat360 v-else :item="item" class="absolute inset-0" />
+          <Media360Viewer v-if="!flat360 && hasWebGL2()" :key="lb?.film ? 'film360' : item.id" :item="item" :continuous="lb?.film" class="absolute inset-0" @unsupported="on360Unsupported" @ended="ended" @fullscreen="fullscreen" />
+          <Flat360 v-else :item="item" :continuous="lb?.film" class="absolute inset-0" @ended="ended" />
         </template>
 
         <!-- side arrows -->
-        <button v-if="hasPrev" class="nav left-2 sm:left-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Previous" title="Previous (←)" @click="prev">
+        <button v-if="hasPrev && !lb?.film" class="nav left-2 sm:left-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Previous" title="Previous (←)" @click="prev">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7" /></svg>
         </button>
-        <button v-if="hasNext" class="nav right-2 sm:right-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Next" title="Next (→)" @click="next">
+        <button v-if="hasNext && !lb?.film" class="nav right-2 sm:right-4" :class="{ mid: item.type === 'pano' || item.type === 'pano-video' }" aria-label="Next" title="Next (→)" @click="next">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
 
-      <!-- caption -->
-      <div class="shrink-0 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-line bg-ink">
+      <footer v-if="lb?.film" class="chapter-controls shrink-0 px-3 sm:px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t border-line bg-ink">
+        <p v-if="fullscreenError" role="status" class="text-sm text-amber mb-1">{{ fullscreenError }}</p>
+        <div class="flex items-center gap-2">
+          <button class="chapter-button" :disabled="!hasPrev" aria-label="Previous chapter" title="Previous chapter (Shift+←)" @click="prev">←</button>
+          <label class="min-w-0 flex-1">
+            <span class="sr-only">Choose 360 chapter</span>
+            <select class="chapter-select w-full" aria-label="Choose 360 chapter" :value="lb.index" @change="chapter(Number(($event.target as HTMLSelectElement).value))">
+              <option v-for="(clip, i) in lb.list" :key="clip.id" :value="i">{{ clip.caption }}</option>
+            </select>
+          </label>
+          <button class="chapter-button" :disabled="!hasNext" aria-label="Next chapter" title="Next chapter (Shift+→)" @click="next">→</button>
+        </div>
+        <div class="chapter-status flex flex-wrap items-center justify-between gap-x-4 gap-y-1 mt-1 text-xs text-muted">
+          <p class="min-w-0 truncate" aria-live="polite">{{ finished ? 'Thanks for riding along.' : following ? `Up next: ${following.caption} · plays automatically` : 'The final chapter' }}</p>
+          <button v-if="finished" class="text-amber underline min-h-11" @click="chapter(0)">Watch again</button>
+          <button v-else-if="episode" class="text-amber underline min-h-11" @click="openEpisode">Watch in 16:9 / 9:16</button>
+        </div>
+      </footer>
+
+      <!-- caption for library photos and clips -->
+      <div v-else class="shrink-0 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-line bg-ink">
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <span class="font-display text-xl sm:text-2xl text-ivory leading-tight">{{ stop?.name || 'On the road' }}</span>
           <span class="font-ui text-sm text-amber uppercase tracking-wide">{{ item.local_time || item.time_utc ? localDateTime((item.local_time || item.time_utc)!) : dateOnly(item.day) }}</span>
@@ -200,6 +252,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 </template>
 
 <style scoped>
+.lb { padding-top: env(safe-area-inset-top); }
+.chapter-button { min-width: 44px; min-height: 44px; border: 1px solid #43514b; border-radius: 9px; color: #e6b56a; touch-action: manipulation; }
+.chapter-button:disabled { opacity: .3; }
+.chapter-select { min-height: 44px; background: #16242e; color: #f5f1e7; border: 1px solid #43514b; border-radius: 9px; padding: 0 8px; font-size: 16px; }
+.chapter-button:focus-visible, .chapter-select:focus-visible { outline: 2px solid #e6b56a; outline-offset: 2px; }
+@media (max-height: 480px) and (orientation: landscape) { .chapter-status { display: none; } }
 .nav {
   position: absolute;
   top: 50%;
