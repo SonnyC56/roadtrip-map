@@ -23,10 +23,15 @@ export function routeState(c: HudLocation, t: number) {
 export function hudLayout(width: number, height: number, footer = 156) {
   const halfH = 2*Math.tan(75*Math.PI/360)
   const halfW = halfH*width/Math.max(1,height)*.9
-  const lowerScale=Math.min(1,2*halfW/1.42), awardScale=Math.min(1,2*halfW/.75), narratorScale=Math.min(1,2*halfW/.62)
+  // A shallow phone viewport needs a larger angular panel to retain readable pixel size.
+  const unitsPerPixel=2*halfH/Math.max(1,height)
+  const lowerScale=Math.min(Math.max(1,350*unitsPerPixel/1.42),2*halfW/1.42)
+  const awardScale=Math.min(Math.max(1,205*unitsPerPixel/.75),2*halfW/.75)
+  const narratorScale=Math.min(Math.max(1,170*unitsPerPixel/.62),2*halfW/.62)
   const lowerHalfH=1.42*250/1440*lowerScale/2
   const lowerY=Math.max(-.59,-halfH+2*halfH*(footer+12)/height+lowerHalfH)
   return {lowerScale,awardScale,narratorScale,lowerY,
+    awardY:Math.max(.31,lowerY+lowerHalfH+.75*340/760*awardScale/2+.04),
     awardX:Math.min(.57,Math.max(0,halfW-.75*awardScale/2)),
     narratorX:-Math.min(.55,Math.max(0,halfW-.62*narratorScale/2)),
     narratorY:Math.max(-.29,lowerY+lowerHalfH+.62*250/720*narratorScale/2+.04)}
@@ -91,9 +96,9 @@ export class StoryHud {
   resize(width: number,height: number,footer: number) {
     const l=hudLayout(width,height,footer)
     this.lower.mesh.scale.set(l.lowerScale,l.lowerScale,1);this.lower.mesh.position.y=l.lowerY
-    this.award.mesh.scale.set(l.awardScale,l.awardScale,1);this.award.mesh.position.x=l.awardX
+    this.award.mesh.scale.set(l.awardScale,l.awardScale,1);this.award.mesh.position.set(l.awardX,l.awardY,-2)
     this.narrator.mesh.scale.set(l.narratorScale,l.narratorScale,1);this.narrator.mesh.position.set(l.narratorX,l.narratorY,-2)
-    this.narrow=width<600;this.lastSignature=''
+    this.narrow=width<600 || height<600;this.lastSignature=''
   }
   private art(p: Panel,c: HudCue,t: number,x: number,y: number,w: number,h: number) {
     const im=this.images.get(c.art.url);if(!im)return

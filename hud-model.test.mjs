@@ -28,5 +28,9 @@ test('phone HUD cards remain inside portrait/landscape viewports and above touch
     assert.ok(-layout.narratorX+.62*layout.narratorScale/2<=halfW*.91)
     const lowerBottom=layout.lowerY-1.42*250/1440*layout.lowerScale/2
     assert.ok(lowerBottom>=-halfH+2*halfH*156/h)
+    const lowerTop=layout.lowerY+1.42*250/1440*layout.lowerScale/2
+    assert.ok(layout.awardY-.75*340/760*layout.awardScale/2>lowerTop)
+    assert.ok(layout.awardY+.75*340/760*layout.awardScale/2<halfH)
+    if(w>=350)assert.ok(1.42*layout.lowerScale/(2*halfH)*h>=349)
   }
 })
