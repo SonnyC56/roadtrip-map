@@ -17,7 +17,7 @@ export default defineConfig({
       input: {
         app: fileURLToPath(new URL('./index.html', import.meta.url)),
         methodology: fileURLToPath(new URL('./methodology/index.html', import.meta.url)),
-        hudProof: fileURLToPath(new URL('./hud-preview.html', import.meta.url)),
+        hudProof: fileURLToPath(new URL('./review/vr-hud-olympic-7c9e2a/index.html', import.meta.url)),
       },
     },
   },

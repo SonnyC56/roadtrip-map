@@ -19,6 +19,19 @@ export function routeState(c: HudLocation, t: number) {
   return { miles: c.miles+(c.endMiles-c.miles)*u, through: c.through+(c.endThrough-c.through)*u }
 }
 
+/** Keep the same scene panels inside a phone viewport and above its touch controls. XR uses native dimensions. */
+export function hudLayout(width: number, height: number, footer = 156) {
+  const halfH = 2*Math.tan(75*Math.PI/360)
+  const halfW = halfH*width/Math.max(1,height)*.9
+  const lowerScale=Math.min(1,2*halfW/1.42), awardScale=Math.min(1,2*halfW/.75), narratorScale=Math.min(1,2*halfW/.62)
+  const lowerHalfH=1.42*250/1440*lowerScale/2
+  const lowerY=Math.max(-.59,-halfH+2*halfH*(footer+12)/height+lowerHalfH)
+  return {lowerScale,awardScale,narratorScale,lowerY,
+    awardX:Math.min(.57,Math.max(0,halfW-.75*awardScale/2)),
+    narratorX:-Math.min(.55,Math.max(0,halfW-.62*narratorScale/2)),
+    narratorY:Math.max(-.29,lowerY+lowerHalfH+.62*250/720*narratorScale/2+.04)}
+}
+
 const INK = '#101b23', IVORY = '#f5f1e7', AMBER = '#e6b56a', MUTED = '#a5b4bb'
 function plane(w: number, h: number, metres: number, x: number, y: number) {
   const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h
@@ -58,6 +71,7 @@ export class StoryHud {
   private disposed = false
   private lastTime = -1
   private lastSignature = ''
+  private narrow = false
   constructor(url: string, onError: (message: string) => void = () => {}) {
     this.group.add(this.lower.mesh,this.award.mesh,this.narrator.mesh)
     this.group.visible=false
@@ -74,6 +88,13 @@ export class StoryHud {
       entries.forEach(([src,im])=>this.images.set(src,im));this.data=d
     }).catch(e=>{if(!this.disposed && e.name!=='AbortError')onError('Story graphics unavailable. Video playback is unaffected.')})
   }
+  resize(width: number,height: number,footer: number) {
+    const l=hudLayout(width,height,footer)
+    this.lower.mesh.scale.set(l.lowerScale,l.lowerScale,1);this.lower.mesh.position.y=l.lowerY
+    this.award.mesh.scale.set(l.awardScale,l.awardScale,1);this.award.mesh.position.x=l.awardX
+    this.narrator.mesh.scale.set(l.narratorScale,l.narratorScale,1);this.narrator.mesh.position.set(l.narratorX,l.narratorY,-2)
+    this.narrow=width<600;this.lastSignature=''
+  }
   private art(p: Panel,c: HudCue,t: number,x: number,y: number,w: number,h: number) {
     const im=this.images.get(c.art.url);if(!im)return
     const a=c.art; const sw=a.frameWidth||im.width,sh=a.frameHeight||im.height
@@ -83,10 +104,10 @@ export class StoryHud {
   }
   private drawLocation(c: HudLocation,t: number) {
     const p=this.lower,g=p.g;panel(p)
-    g.fillStyle=AMBER;g.font='600 22px system-ui';g.fillText('OLYMPIC  ·  WASHINGTON',34,42)
-    g.fillStyle=IVORY;g.font='58px "Bebas Neue", "Arial Narrow", sans-serif';g.fillText(fit(g,c.title,930),34,115)
+    g.fillStyle=AMBER;g.font=`600 ${this.narrow?32:22}px system-ui`;g.fillText('OLYMPIC  ·  WASHINGTON',34,42)
+    g.fillStyle=IVORY;g.font=`${this.narrow?72:58}px "Bebas Neue", "Arial Narrow", sans-serif`;g.fillText(fit(g,c.title,930),34,115)
     const state=routeState(c,t)
-    g.fillStyle=MUTED;g.font='31px system-ui';g.fillText(`${c.date}    ·    ${Math.round(state.miles).toLocaleString()} mapped miles`,34,171)
+    g.fillStyle=MUTED;g.font=`${this.narrow?40:31}px system-ui`;g.fillText(`${c.date}    ·    ${Math.round(state.miles).toLocaleString()} mapped miles`,34,171)
     g.fillStyle='#82959e';g.font='22px system-ui';g.fillText('SONNY’S ROADTRIP 2025',34,219)
     const pts=this.data!.route,fs=this.data!.routeFractions
     if(pts.length){

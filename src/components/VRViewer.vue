@@ -40,6 +40,7 @@ import { exitVR, makeVideo, playVideo, vrState, type VRItem, type VRState } from
 
 const props = defineProps<{ state: VRState }>()
 const host = ref<HTMLDivElement | null>(null)
+const screenControls = ref<HTMLElement | null>(null)
 const pageStatus = ref('Starting VR…')
 
 const session = props.state.session
@@ -769,6 +770,7 @@ function onResize() {
   renderer.setSize(w, h)
   camera.aspect = w / h
   camera.updateProjectionMatrix()
+  storyHud?.resize(w,h,screenControls.value?.getBoundingClientRect().height || 156)
 }
 function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape') {
@@ -870,7 +872,7 @@ onBeforeUnmount(() => {
       <span v-if="!inHeadset" class="font-pixel text-[11px] text-amber bg-ink/70 rounded px-2 py-1">360° · DRAG TO LOOK</span>
       <button class="btn" @click="exitVR()">{{ inHeadset ? 'Exit VR' : 'Close 360°' }}</button>
     </div>
-    <footer v-if="!inHeadset && isVideo" class="screen-controls absolute bottom-0 inset-x-0 text-ivory">
+    <footer ref="screenControls" v-if="!inHeadset && isVideo" class="screen-controls absolute bottom-0 inset-x-0 text-ivory">
       <div class="flex items-center gap-2 mb-2">
         <label v-if="playlist" class="flex-1 min-w-0"><span class="sr-only">Choose 360 chapter</span>
           <select aria-label="Choose 360 chapter" :value="screenPlayback.index" @change="screenChapter">
