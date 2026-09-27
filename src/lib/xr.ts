@@ -18,6 +18,8 @@ export interface VRItem {
 }
 
 export interface VRSource {
+  /** Timed scene HUD; only set with a matching graphics-free picture. */
+  hud?: string
   kind: 'image' | 'video'
   title: string
   /** image: equirect preview (2048x1024) shown first; video: the equirect mp4 */

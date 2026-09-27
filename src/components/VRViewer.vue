@@ -12,6 +12,7 @@
 // Loaded lazily; the XR session itself is requested in lib/xr.ts inside the click gesture.
 // Without a session (?vr=preview) the same scene renders on screen: drag to look, click to use the panel.
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { StoryHud } from '../lib/storyHud'
 import {
   BufferGeometry,
   CanvasTexture,
@@ -57,6 +58,9 @@ let renderer: WebGLRenderer | null = null
 let disposed = false
 let panelStatus = ''
 const scene = new Scene()
+const hudEnabled = ref(true)
+const storyHud = source.hud ? new StoryHud(source.hud, message => { panelStatus = message }) : null
+if (storyHud) scene.add(storyHud.group)
 const camera = new PerspectiveCamera(75, 1, 0.05, 200)
 camera.rotation.order = 'YXZ'
 
@@ -312,11 +316,13 @@ const CH = isVideo ? 300 : 190
 const PW = 0.9 // metres
 const main = canvasPlane(CW, CH, PW)
 const panel = main.mesh
-panel.visible = inHeadset
+panel.visible = inHeadset && !storyHud
 scene.add(panel)
 const bar = { x: 40, y: 118, w: 944, h: 18 }
 const buttons: Btn[] = !isVideo
   ? [{ id: 'exit', x: 764, y: 72, w: 220, h: 90 }]
+  : storyHud
+    ? ['back', 'play', 'fwd', 'hud', 'exit'].map((id, k) => ({ id, x: 30 + k * 194, y: 170, w: 182, h: 96 }))
   : playlist
     ? ['prev', 'back', 'play', 'fwd', 'next', 'list', 'exit'].map((id, k) => ({ id, x: 30 + k * 136, y: 170, w: 124, h: 96 }))
     : [
@@ -393,7 +399,7 @@ function drawIcon(g: CanvasRenderingContext2D, id: string, cx: number, cy: numbe
     g.textAlign = 'center'
     // the 7-button playlist row is narrower: shorter labels
     const s = playlist ? '' : ' s'
-    const label = id === 'back' ? `« 10${s}` : id === 'fwd' ? `10${s} »` : playlist ? 'EXIT' : 'EXIT VR'
+    const label = id === 'hud' ? (hudEnabled.value ? 'HUD ON' : 'HUD OFF') : id === 'back' ? `« 10${s}` : id === 'fwd' ? `10${s} »` : playlist ? 'EXIT' : 'EXIT VR'
     g.fillText(label, cx, cy + 2)
     g.textAlign = 'left'
   }
@@ -541,19 +547,20 @@ function placePanel() {
   panel.lookAt(head)
 }
 function showPanel() {
-  if (!inHeadset) return
+  if (!inHeadset && !storyHud) return
   if (!panel.visible) placePanel()
   panel.visible = true
 }
 function togglePanel() {
-  if (!inHeadset) return
+  if (!inHeadset && !storyHud) return
   if (panel.visible) panel.visible = false
   else showPanel()
 }
 
 function act(id: string, frac: number) {
   if (cur?.muted) cur.muted = false // any click in VR is a user gesture: restore sound after a muted autoplay
-  if (id === 'exit') exitVR()
+  if (id === 'hud') { hudEnabled.value = !hudEnabled.value; mainSig = '' }
+  else if (id === 'exit') exitVR()
   else if (id === 'play') togglePlay()
   else if (id === 'back') seekBy(-10)
   else if (id === 'fwd') seekBy(10)
@@ -717,6 +724,7 @@ function frame() {
     }
     hover = h
   }
+  storyHud?.tick(cur?.currentTime || 0, renderer.xr.isPresenting ? renderer.xr.getCamera() : camera, panel.visible, hudEnabled.value)
   drawMain()
   drawSide()
   renderer.render(scene, camera)
@@ -830,6 +838,7 @@ onBeforeUnmount(() => {
   cur = null
   pre = null
   renderer?.setAnimationLoop(null)
+  storyHud?.dispose()
   sphereMat.map?.dispose()
   sphereGeo.dispose()
   sphereMat.dispose()
@@ -878,6 +887,8 @@ onBeforeUnmount(() => {
         <button aria-label="Back ten seconds" @click="screenAction('back')">−10</button>
         <button :aria-label="screenPlayback.muted ? 'Enable 360 sound' : screenPlayback.paused ? 'Play 360 film' : 'Pause 360 film'"
           @click="screenPlayback.muted ? (cur && (cur.muted = false)) : screenAction('play')">{{ screenPlayback.muted ? 'Sound on' : screenPlayback.paused ? 'Play' : 'Pause' }}</button>
+        <button v-if="storyHud" aria-label="Show or hide floating playback controls" @click="togglePanel()">Controls</button>
+        <button v-if="storyHud" :aria-pressed="hudEnabled" aria-label="Toggle story HUD" @click="hudEnabled = !hudEnabled">HUD {{ hudEnabled ? 'on' : 'off' }}</button>
         <button aria-label="Forward ten seconds" @click="screenAction('fwd')">+10</button>
         <button v-if="playlist" aria-label="Next 360 chapter" :disabled="screenPlayback.index >= playlist.length - 1" @click="screenAction('next')">▶|</button>
       </div>
