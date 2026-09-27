@@ -29,6 +29,7 @@ function watchVR() {
       <button class="format" :disabled="!ready('9x16')" aria-label="Watch whole film in portrait 9:16" @click="watchFlat('9x16')"><strong>9:16</strong><span>Portrait</span></button>
       <button class="format" :disabled="!ready('vr')" aria-label="Watch whole film in 360 or VR" @click="watchVR"><strong>360° / VR</strong><span>{{ ready('vr') ? (xrSupported ? 'Headset' : 'Look around') : 'Preparing' }}</span></button>
     </div>
+    <a class="methodology-link" href="/methodology/">How this film was made <span aria-hidden="true">&rarr;</span></a>
     <p v-if="error" role="alert" class="text-sm text-ivory mt-2">{{ error }}</p>
   </section>
 </template>
@@ -41,4 +42,7 @@ function watchVR() {
 .format:not(:disabled):hover { background: #394036; }
 .format:disabled { opacity: .42; }
 .format:focus-visible { outline: 2px solid #e6b56a; outline-offset: 2px; }
+.methodology-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin-top: 8px; border-top: 1px solid #43514b; color: #e6b56a; font-family: var(--font-ui); font-size: 15px; text-decoration: none; }
+.methodology-link:hover { color: #fff0cc; }
+.methodology-link:focus-visible { outline: 2px solid #e6b56a; outline-offset: 2px; border-radius: 3px; }
 </style>
