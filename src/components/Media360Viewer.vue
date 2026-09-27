@@ -3,11 +3,12 @@
 // 360 videos: photo-sphere-viewer + equirectangular VIDEO adapter + video plugin.
 // Both: drag / pinch to look around, gyroscope on phones, fullscreen.
 // Loaded lazily (defineAsyncComponent) so none of this ships with the map.
-import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { Viewer } from '@photo-sphere-viewer/core'
 import '@photo-sphere-viewer/core/index.css'
 import type { VideoPlugin as VideoPluginT } from '@photo-sphere-viewer/video-plugin'
 import { mediaUrl, type Media } from '../lib/manifest'
+import { textureUrl } from '../lib/textureUrl'
 import { enterVR, enterVRPlaylist, xrSupported, type VRItem } from '../lib/xr'
 import { useTripStore } from '../stores/trip'
 const store = useTripStore()
@@ -20,6 +21,28 @@ const viewer = shallowRef<Viewer | null>(null)
 const loading = ref(true)
 const failed = ref('')
 let VideoPluginClass: typeof VideoPluginT | null = null
+let generation = 0
+let mediaVideo: HTMLVideoElement | null = null
+let watchdog: ReturnType<typeof setTimeout> | undefined
+const needsPlay = ref(false)
+const canPlay = ref(false)
+const playMessage = ref('')
+const preview = computed(() => props.item.type === 'pano'
+  ? textureUrl(props.item.pano?.preview || props.item.src)
+  : mediaUrl(props.item.poster || props.item.thumb))
+
+function play() {
+  const video = mediaVideo
+  if (!video) return
+  playMessage.value = ''
+  // Keep this synchronous with the tap: iOS requires a user gesture for sound.
+  video.muted = false
+  video.play().catch(() => {
+    if (video !== mediaVideo) return
+    needsPlay.value = true
+    playMessage.value = 'Tap Play to start this video.'
+  })
+}
 
 // ---- headset: hand the current item (and view direction / video position) to the WebXR viewer ----
 const vrError = ref('')
@@ -39,7 +62,7 @@ function onEnterVR() {
     id: x.id,
     label: new Date(`${x.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase(),
     title: titleOf(x),
-    src: mediaUrl(x.src),
+    src: textureUrl(x.src),
     poster: mediaUrl(x.poster) || undefined,
     duration: x.duration,
   }))
@@ -49,10 +72,10 @@ function onEnterVR() {
     : enterVR({
         kind: 'image',
         title,
-        src: mediaUrl(p?.preview || m.src),
+        src: textureUrl(p?.preview || m.src),
         yaw: v?.getPosition().yaw,
         tiles: p
-          ? { cols: p.cols, rows: p.rows, width: p.width, url: (c, r) => mediaUrl(p.tiles.replace('{col}', String(c)).replace('{row}', String(r))) }
+          ? { cols: p.cols, rows: p.rows, width: p.width, url: (c, r) => textureUrl(p.tiles.replace('{col}', String(c)).replace('{row}', String(r))) }
           : undefined,
       })
   )
@@ -67,11 +90,24 @@ function onEnterVR() {
 async function build() {
   destroy()
   if (!host.value) return
+  const token = generation
+  const current = () => token === generation && !!host.value
   loading.value = true
   failed.value = ''
+  canPlay.value = false
+  needsPlay.value = false
+  playMessage.value = ''
   const m = props.item
+  function fail(message: string) {
+    if (!current()) return
+    clearTimeout(watchdog)
+    failed.value = message
+    loading.value = false
+    emit('error', message)
+  }
   try {
     const { GyroscopePlugin } = await import('@photo-sphere-viewer/gyroscope-plugin')
+    if (!current()) return
     if (m.type === 'pano-video') {
       const [{ EquirectangularVideoAdapter }, { VideoPlugin }] = await Promise.all([
         import('@photo-sphere-viewer/equirectangular-video-adapter'),
@@ -79,38 +115,57 @@ async function build() {
       ])
       VideoPluginClass = VideoPlugin
       await import('@photo-sphere-viewer/video-plugin/index.css')
+      if (!current()) return
+      const video = document.createElement('video')
+      mediaVideo = video
+      video.crossOrigin = 'anonymous'
+      video.playsInline = true
+      video.setAttribute('playsinline', '')
+      video.setAttribute('webkit-playsinline', '')
+      video.preload = 'metadata'
+      video.loop = true
+      video.src = textureUrl(m.src)
+      video.addEventListener('playing', () => {
+        if (!current()) return
+        needsPlay.value = false
+        playMessage.value = ''
+      })
+      video.addEventListener('error', () => fail('This 360 video could not load. It may still be uploading.'))
+      needsPlay.value = true
+      canPlay.value = true
       viewer.value = new Viewer({
-        container: host.value,
-        adapter: [EquirectangularVideoAdapter, { autoplay: true, muted: false }],
-        panorama: { source: mediaUrl(m.src) },
+        container: host.value!,
+        adapter: [EquirectangularVideoAdapter, { autoplay: false, muted: false }],
+        panorama: { source: video },
         loadingImg: undefined,
         defaultZoomLvl: 20,
         touchmoveTwoFingers: false,
         mousewheelCtrlKey: false,
         navbar: ['videoPlay', 'videoVolume', 'videoTime', 'zoom', 'gyroscope', 'fullscreen'],
         plugins: [
-          [VideoPlugin, { progressbar: true, bigbutton: true }],
+          [VideoPlugin, { progressbar: true, bigbutton: false }],
           [GyroscopePlugin, { touchmove: true }],
         ],
       })
     } else {
       const { EquirectangularTilesAdapter } = await import('@photo-sphere-viewer/equirectangular-tiles-adapter')
+      if (!current()) return
       const p = m.pano
       const panorama = p
         ? {
             width: p.width,
             cols: p.cols,
             rows: p.rows,
-            baseUrl: mediaUrl(p.preview),
+            baseUrl: textureUrl(p.preview),
             tileUrl: (col: number, row: number) =>
-              mediaUrl(p.tiles.replace('{col}', String(col)).replace('{row}', String(row))),
+              textureUrl(p.tiles.replace('{col}', String(col)).replace('{row}', String(row))),
           }
         : null
       viewer.value = new Viewer({
-        container: host.value,
-        adapter: panorama ? [EquirectangularTilesAdapter, { showErrorTile: true, baseBlur: true }] : undefined,
+        container: host.value!,
+        adapter: panorama ? [EquirectangularTilesAdapter, { showErrorTile: false, baseBlur: false }] : undefined,
         // no tile info → fall back to the plain equirectangular image
-        panorama: panorama ?? mediaUrl(m.src),
+        panorama: panorama ?? textureUrl(m.src),
         defaultZoomLvl: 20,
         touchmoveTwoFingers: false,
         mousewheelCtrlKey: false,
@@ -120,23 +175,35 @@ async function build() {
     }
     // PSV catches a WebGL failure itself (shows an overlay, no throw) and leaves no renderer behind
     if (!(viewer.value as unknown as { renderer?: unknown }).renderer) throw new Error('WebGL unavailable')
-    viewer.value.addEventListener('ready', () => (loading.value = false), { once: true })
-    viewer.value.addEventListener('panorama-error', () => {
-      failed.value = 'Could not load this 360 view.'
+    viewer.value.addEventListener('ready', () => {
+      if (!current()) return
+      clearTimeout(watchdog)
       loading.value = false
-      emit('error', failed.value)
+    }, { once: true })
+    viewer.value.addEventListener('panorama-error', () => {
+      fail('This 360 view could not load. Please retry.')
     })
+    watchdog = setTimeout(() => fail('This 360 view is taking too long to load. Please retry.'), 45000)
   } catch (e) {
-    console.warn('[360] viewer could not start, falling back to flat view', e)
-    destroy()
-    loading.value = false
-    emit('unsupported')
+    if (!current()) return
+    console.warn('[360] viewer could not start', e)
+    fail('The 360 viewer could not start. Please retry.')
+    if (e instanceof Error && /webgl/i.test(e.message)) emit('unsupported')
   }
 }
 
 function destroy() {
+  generation++
+  clearTimeout(watchdog)
   viewer.value?.destroy()
   viewer.value = null
+  if (mediaVideo) {
+    mediaVideo.pause()
+    mediaVideo.removeAttribute('src')
+    mediaVideo.load()
+    mediaVideo.remove()
+    mediaVideo = null
+  }
 }
 
 onMounted(build)
@@ -148,10 +215,19 @@ onBeforeUnmount(destroy)
   <div class="relative w-full h-full bg-black">
     <div ref="host" class="absolute inset-0"></div>
     <div v-if="loading && !failed" class="absolute inset-0 grid place-items-center pointer-events-none">
-      <img v-if="item.pano?.preview || item.poster" :src="mediaUrl(item.pano?.preview || item.poster)" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40" />
+      <img v-if="preview" :src="preview" :crossorigin="item.type === 'pano' ? 'anonymous' : undefined" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40" />
       <span class="relative font-pixel text-xs text-amber bg-ink/80 px-2 py-1 rounded">LOADING 360…</span>
     </div>
-    <div v-if="failed" class="absolute inset-0 grid place-items-center text-center p-6 text-muted">{{ failed }}</div>
+    <div v-if="needsPlay && !failed" class="absolute inset-0 grid place-items-center pointer-events-none">
+      <img v-if="preview" :src="preview" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40" />
+      <div class="relative text-center pointer-events-auto p-4 rounded-xl bg-ink/85">
+        <button class="btn min-h-12" :disabled="!canPlay" @click="play">Play 360 video</button>
+        <p v-if="playMessage" class="text-sm text-ivory mt-2">{{ playMessage }}</p>
+      </div>
+    </div>
+    <div v-if="failed" class="absolute inset-0 grid place-items-center text-center p-6 text-ivory bg-ink">
+      <div><p>{{ failed }}</p><button class="btn mt-4" @click="build">Retry 360 view</button></div>
+    </div>
     <div class="hint absolute left-1/2 top-3 -translate-x-1/2 font-ui text-xs uppercase tracking-widest text-ivory/80 bg-ink/60 rounded-full px-3 py-1 pointer-events-none">
       Drag to look around
     </div>

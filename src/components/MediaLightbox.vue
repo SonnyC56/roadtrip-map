@@ -8,7 +8,7 @@ const dateOnly = (d: string) => (d ? localDateTime(d) : '')
 
 const Media360Viewer = defineAsyncComponent(() => import('./Media360Viewer.vue'))
 import Flat360 from './Flat360.vue'
-import { hasWebGL2, markWebGLUnavailable } from '../lib/webgl'
+import { hasWebGL2 } from '../lib/webgl'
 const StorySplatViewer = defineAsyncComponent(() => import('./StorySplatViewer.vue'))
 const XRGalleryViewer = defineAsyncComponent(() => import('./XRGalleryViewer.vue'))
 
@@ -28,13 +28,13 @@ const legacyList = computed(() => (legacy.value ? [legacy.value] : []))
 // 360 needs WebGL 2; without it (or if the viewer fails to start) show the flat equirect instead
 const flat360 = ref(false)
 function on360Unsupported() {
-  markWebGLUnavailable()
   flat360.value = true
 }
 
 const imgLoaded = ref(false)
 const imgFailed = ref(false)
 watch(item, () => {
+  flat360.value = false
   imgLoaded.value = false
   imgFailed.value = false
   preloadNeighbours()

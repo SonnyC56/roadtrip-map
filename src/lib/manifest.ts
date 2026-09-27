@@ -160,7 +160,7 @@ async function getJson<T>(url: string): Promise<T> {
   return (await res.json()) as T
 }
 
-export async function loadManifest(): Promise<{ manifest: Manifest; media: Media[] }> {
+export async function loadManifest(): Promise<{ manifest: Manifest; media: Media[]; pending360: { photos: number; videos: number } }> {
   const manifest = await getJson<Manifest>(mediaUrl('manifest.json'))
   const raw: RawMedia[] = []
   const extraFiles: string[] = [...(manifest.media_files || [])]
@@ -179,6 +179,23 @@ export async function loadManifest(): Promise<{ manifest: Manifest; media: Media
     )
     for (const p of parts) raw.push(...(Array.isArray(p) ? p : p.media || []))
   }
+  // Raw files are uploaded separately from episode releases. Never advertise missing 360 objects.
+  const pending360 = { photos: 0, videos: 0 }
+  try {
+    const a = await getJson<{ version: number; photos: string[]; videos: string[]; tiledPhotos: string[] }>(mediaUrl('media-availability.json'))
+    if (a.version === 1 && [a.photos, a.videos, a.tiledPhotos].every(v => Array.isArray(v) && v.every(x => typeof x === 'string'))) {
+      const photos = new Set(a.photos), videos = new Set(a.videos), tiled = new Set(a.tiledPhotos)
+      for (const m of raw) {
+        if (m.type === 'pano' && !photos.has(m.id)) { m.ready = false; pending360.photos++ }
+        else if (m.type === 'pano-video' && !videos.has(m.id)) { m.ready = false; pending360.videos++ }
+        else if (m.type === 'pano' && m.pano && !tiled.has(m.id)) {
+          // A complete preview is already a valid sphere; add high-resolution tiles when uploaded.
+          m.src = m.pano.preview
+          m.pano = null
+        }
+      }
+    }
+  } catch { /* older/local asset servers may not have an availability index yet */ }
   // dev-only fixture for the VR edition (dropped from production builds)
   if (import.meta.env.DEV && /[?&]vrfixture\b/.test(location.search)) {
     ;(await import('./vrFixture')).applyVRFixture(manifest, raw)
@@ -201,7 +218,7 @@ export async function loadManifest(): Promise<{ manifest: Manifest; media: Media
     media.push({ ...m, t, day })
   }
   media.sort((a, b) => a.t - b.t)
-  return { manifest, media }
+  return { manifest, media, pending360 }
 }
 
 /** route.json: [[lat, lon, t_unix], ...] */

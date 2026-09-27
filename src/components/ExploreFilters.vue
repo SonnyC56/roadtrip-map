@@ -25,6 +25,10 @@ function onDate(which: 'from' | 'to', e: Event) {
 
 <template>
   <div class="grid gap-5">
+    <p v-if="store.pending360.photos || store.pending360.videos" class="note">
+      More 360 content is uploading: {{ store.pending360.photos }} photos and {{ store.pending360.videos }} videos.
+      The map shows what's ready to view. Refresh later for new arrivals.
+    </p>
     <section>
       <h3 class="label">Layers</h3>
       <LayerChips vertical counts />

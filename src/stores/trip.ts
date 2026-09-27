@@ -61,6 +61,7 @@ export const useTripStore = defineStore('trip', () => {
   const error = ref('')
   const manifestMissing = ref(false)
   const isFixture = ref(false)
+  const pending360 = ref({ photos: 0, videos: 0 })
   const routeSource = ref<'bucket' | 'fallback' | 'none'>('none')
   const trip = ref<TripInfo>({ ...DEFAULT_TRIP })
   const stops = shallowRef<Stop[]>([])
@@ -250,7 +251,8 @@ export const useTripStore = defineStore('trip', () => {
     let routeKey = 'route/route.json'
     let brandKey = 'brand/brand.json'
     try {
-      const { manifest, media: items } = await loadManifest()
+      const { manifest, media: items, pending360: pending } = await loadManifest()
+      pending360.value = pending
       trip.value = { ...DEFAULT_TRIP, ...(manifest.trip || {}) }
       stops.value = (manifest.stops || []).filter((s) => !(s.lat === 0 && s.lon === 0))
       episodes.value = [...(manifest.episodes || [])].sort((a, b) => a.ep - b.ep)
@@ -382,6 +384,7 @@ export const useTripStore = defineStore('trip', () => {
     error,
     manifestMissing,
     isFixture,
+    pending360,
     routeSource,
     trip,
     stops,
