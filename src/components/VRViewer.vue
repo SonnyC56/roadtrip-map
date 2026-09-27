@@ -47,6 +47,11 @@ const source = props.state.source
 const isVideo = source.kind === 'video' && !!props.state.video
 const playlist = isVideo && source.playlist && source.playlist.length > 1 ? source.playlist : null
 const listName = source.listName || 'Playlist'
+const screenPlayback = ref({ index: source.index || 0, time: 0, duration: 0, paused: false, muted: false, status: '' })
+let screenTick = 0
+function screenAction(id: string, fraction = 0) { act(id, fraction) }
+function screenChapter(e: Event) { goTo(Number((e.target as HTMLSelectElement).value)) }
+function screenSeek(e: Event) { screenAction('seek', Number((e.target as HTMLInputElement).value) / 1000) }
 
 let renderer: WebGLRenderer | null = null
 let disposed = false
@@ -307,6 +312,7 @@ const CH = isVideo ? 300 : 190
 const PW = 0.9 // metres
 const main = canvasPlane(CW, CH, PW)
 const panel = main.mesh
+panel.visible = inHeadset
 scene.add(panel)
 const bar = { x: 40, y: 118, w: 944, h: 18 }
 const buttons: Btn[] = !isVideo
@@ -535,10 +541,12 @@ function placePanel() {
   panel.lookAt(head)
 }
 function showPanel() {
+  if (!inHeadset) return
   if (!panel.visible) placePanel()
   panel.visible = true
 }
 function togglePanel() {
+  if (!inHeadset) return
   if (panel.visible) panel.visible = false
   else showPanel()
 }
@@ -687,6 +695,11 @@ function frame() {
   }
   maybePreload()
   if (upNext && performance.now() >= upNext.at) goTo(upNext.i)
+  if (!inHeadset && performance.now() - screenTick >= 200) {
+    screenTick = performance.now()
+    screenPlayback.value = { index: idx, time: cur?.currentTime || 0, duration: cur?.duration || 0,
+      paused: cur?.paused ?? true, muted: cur?.muted ?? false, status: panelStatus }
+  }
   if (inHeadset) {
     pollGamepads()
     let h: string | null = null
@@ -845,8 +858,39 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="absolute right-3 top-3 flex items-center gap-2">
-      <span v-if="!inHeadset" class="font-pixel text-[11px] text-amber bg-ink/70 rounded px-2 py-1">VR PREVIEW</span>
-      <button class="btn" @click="exitVR()">Exit VR</button>
+      <span v-if="!inHeadset" class="font-pixel text-[11px] text-amber bg-ink/70 rounded px-2 py-1">360° · DRAG TO LOOK</span>
+      <button class="btn" @click="exitVR()">{{ inHeadset ? 'Exit VR' : 'Close 360°' }}</button>
     </div>
+    <footer v-if="!inHeadset && isVideo" class="screen-controls absolute bottom-0 inset-x-0 text-ivory">
+      <div class="flex items-center gap-2 mb-2">
+        <label v-if="playlist" class="flex-1 min-w-0"><span class="sr-only">Choose 360 chapter</span>
+          <select aria-label="Choose 360 chapter" :value="screenPlayback.index" @change="screenChapter">
+            <option v-for="(item, i) in playlist" :key="item.id" :value="i">{{ item.label.toUpperCase() === item.title.toUpperCase() ? item.title : `${item.label} · ${item.title}` }}</option>
+          </select>
+        </label>
+        <p v-else class="flex-1 truncate font-display text-lg">{{ source.title }}</p>
+        <span class="font-ui text-xs whitespace-nowrap">{{ fmtT(screenPlayback.time) }} / {{ fmtT(screenPlayback.duration) }}</span>
+      </div>
+      <input class="screen-seek w-full" type="range" min="0" max="1000" step="1" aria-label="360 playback position"
+        :value="Number.isFinite(screenPlayback.duration) && screenPlayback.duration > 0 ? screenPlayback.time / screenPlayback.duration * 1000 : 0" @input="screenSeek" />
+      <div class="flex items-center justify-center gap-2">
+        <button v-if="playlist" aria-label="Previous 360 chapter" :disabled="screenPlayback.index === 0" @click="screenAction('prev')">|◀</button>
+        <button aria-label="Back ten seconds" @click="screenAction('back')">−10</button>
+        <button :aria-label="screenPlayback.muted ? 'Enable 360 sound' : screenPlayback.paused ? 'Play 360 film' : 'Pause 360 film'"
+          @click="screenPlayback.muted ? (cur && (cur.muted = false)) : screenAction('play')">{{ screenPlayback.muted ? 'Sound on' : screenPlayback.paused ? 'Play' : 'Pause' }}</button>
+        <button aria-label="Forward ten seconds" @click="screenAction('fwd')">+10</button>
+        <button v-if="playlist" aria-label="Next 360 chapter" :disabled="screenPlayback.index >= playlist.length - 1" @click="screenAction('next')">▶|</button>
+      </div>
+      <p class="font-ui text-xs text-muted mt-1 text-center" aria-live="polite">{{ screenPlayback.status || (playlist && playlist[screenPlayback.index + 1] ? `Up next: ${playlist[screenPlayback.index + 1]!.title} · plays automatically` : 'Drag the view to look around') }}</p>
+    </footer>
   </div>
 </template>
+
+<style scoped>
+.screen-controls { padding: 12px 12px max(12px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, #101b23 18%); }
+.screen-controls select { width: 100%; min-height: 44px; background: #16242e; color: #f5f1e7; border: 1px solid #43514b; border-radius: 8px; padding: 0 8px; font-size: 16px; }
+.screen-controls button { min-height: 44px; min-width: 44px; padding: 0 10px; border-radius: 8px; background: #22303a; color: #e6b56a; touch-action: manipulation; }
+.screen-controls button:disabled { opacity: .3; }
+.screen-controls button:focus-visible, .screen-controls select:focus-visible, .screen-seek:focus-visible { outline: 2px solid #e6b56a; outline-offset: 2px; }
+.screen-seek { height: 32px; accent-color: #e6b56a; }
+</style>

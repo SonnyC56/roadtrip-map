@@ -11,6 +11,8 @@ import { useTripStore } from './stores/trip'
 import { useViewport } from './composables/useViewport'
 import { logoUrl } from './lib/brand'
 import { vrState } from './lib/xr'
+import { filmState } from './lib/film'
+const FilmPlayer = defineAsyncComponent(() => import('./components/FilmPlayer.vue'))
 // headset view (three.js WebXR), only loaded when someone enters VR
 const VRViewer = defineAsyncComponent(() => import('./components/VRViewer.vue'))
 
@@ -100,6 +102,7 @@ onMounted(async () => {
 
     <EpisodePlayer />
     <MediaLightbox />
+    <FilmPlayer v-if="filmState" />
     <VRViewer v-if="vrState" :state="vrState" />
   </div>
 </template>

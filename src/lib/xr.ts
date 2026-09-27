@@ -96,10 +96,10 @@ export function playVideo(v: HTMLVideoElement): Promise<boolean> {
 }
 
 /** Call directly from a click / tap handler (no awaits before it). */
-export async function enterVR(source: VRSource): Promise<void> {
+export async function enterVR(source: VRSource, onScreen = false): Promise<void> {
   if (vrState.value) return
   let sessionP: Promise<XRSession> | null = null
-  if (!vrPreview) {
+  if (!vrPreview && !onScreen) {
     if (!navigator.xr) throw new Error('WebXR not available')
     sessionP = navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['hand-tracking'] })
   }
@@ -117,11 +117,11 @@ export async function enterVR(source: VRSource): Promise<void> {
 }
 
 /** Play a playlist from `index` inside one immersive session. */
-export function enterVRPlaylist(items: VRItem[], index: number, listName: string, startAt = 0, yaw?: number): Promise<void> {
+export function enterVRPlaylist(items: VRItem[], index: number, listName: string, startAt = 0, yaw?: number, onScreen = false): Promise<void> {
   const it = items[index]
   if (!it) return Promise.reject(new Error('empty playlist'))
   const title = it.label.toUpperCase() === it.title.toUpperCase() ? it.title : `${it.label} · ${it.title}`
-  return enterVR({ kind: 'video', title, src: it.src, poster: it.poster, startAt, yaw, playlist: items, index, listName })
+  return enterVR({ kind: 'video', title, src: it.src, poster: it.poster, startAt, yaw, playlist: items, index, listName }, onScreen)
 }
 
 /** The VR edition: every episode with a playable formats.vr, in film order (intro ... credits). */
