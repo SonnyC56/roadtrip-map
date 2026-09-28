@@ -265,15 +265,9 @@ onBeforeUnmount(destroy)
 <template>
   <div class="relative w-full h-full bg-black">
     <div ref="host" class="absolute inset-0"></div>
-    <div v-if="item.type === 'pano-video' && (loading || needsPlay) && !failed" class="video-gate absolute inset-0 z-[2] grid place-items-center p-6">
-      <div class="max-w-sm text-center">
-        <div class="video-orbit mx-auto mb-5" :class="{ 'is-loading': loading }" aria-hidden="true"><span>360°</span></div>
-        <div role="status" aria-live="polite">
-          <p class="font-display text-2xl text-ivory">{{ loading ? 'Loading your 360° view' : 'Your 360° view is ready' }}</p>
-          <p class="mt-2 text-sm text-muted">{{ loading ? 'Getting the video ready to explore.' : 'Press play, then drag to look around.' }}</p>
-        </div>
-        <button v-if="needsPlay" class="btn min-h-12 mt-5" :disabled="!canPlay" @click="play()">Play 360 video</button>
-      </div>
+    <div v-if="item.type === 'pano-video' && (loading || needsPlay) && !failed" class="video-preview absolute inset-0 z-[2] grid place-items-center bg-black">
+      <img v-if="preview" :src="preview" alt="" class="absolute inset-0 w-full h-full object-cover" />
+      <button v-if="needsPlay" class="btn relative min-h-12" :disabled="!canPlay" @click="play()">Play 360 video</button>
     </div>
     <div v-else-if="item.type === 'pano' && loading && !failed" class="absolute inset-0 grid place-items-center pointer-events-none">
       <img v-if="preview" :src="preview" :crossorigin="item.type === 'pano' ? 'anonymous' : undefined" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40" />
@@ -299,12 +293,6 @@ onBeforeUnmount(destroy)
 </template>
 
 <style scoped>
-.video-gate { background: radial-gradient(ellipse at 50% 42%, #1b3039, #101b23 70%); }
-.video-orbit { position: relative; display: grid; place-items: center; width: 76px; height: 76px; color: #e6b56a; font-size: 18px; font-weight: 600; }
-.video-orbit::before { content: ''; position: absolute; inset: 0; border: 2px solid #43514b; border-radius: 50%; }
-.video-orbit.is-loading::before { border-top-color: #e6b56a; animation: orbit 1.2s linear infinite; }
-@keyframes orbit { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .video-orbit.is-loading::before { animation: none; } }
 .hint {
   animation: hint-out 4s forwards;
 }
