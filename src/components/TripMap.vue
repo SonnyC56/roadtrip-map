@@ -206,9 +206,18 @@ const markerOf = new WeakMap<Media, L.Marker>()
 let shownList: Media[] | null = null
 let shownN = 0
 
+// Panorama thumbnails were uploaded after their photos. A versioned URL avoids
+// cached 404 responses from the earlier upload window.
+function mapPreviewUrl(m: Media): string {
+  const key = m.thumb || m.poster || (m.type === 'pano' ? m.pano?.preview || m.src : m.type === 'photo' ? m.src : '')
+  const url = mediaUrl(key)
+  if (!url || m.type !== 'pano') return url
+  return `${url}${url.includes('?') ? '&' : '?'}pano-thumb=1`
+}
+
 function mediaIcon(m: Media): L.DivIcon {
   const meta = TYPE_META[m.type] || TYPE_META.photo
-  const thumb = mediaUrl(m.thumb || m.poster || (m.type === 'photo' ? m.src : ''))
+  const thumb = mapPreviewUrl(m)
   const g = meta.glyph ? `<span class="rt-mm-g">${meta.glyph}</span>` : ''
   return L.divIcon({
     className: '',
@@ -286,7 +295,7 @@ function clusterIcon(c: L.MarkerCluster): L.DivIcon {
 }
 
 function thumbHtml(m: Media, size: number) {
-  const u = mediaUrl(m.thumb || m.poster || (m.type === 'photo' ? m.src : ''))
+  const u = mapPreviewUrl(m)
   return u ? `<img src="${esc(u)}" width="${size}" height="${size}" alt="" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:6px;display:block">` : ''
 }
 
