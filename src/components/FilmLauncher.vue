@@ -1,12 +1,39 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { startFilm, type FlatFormat } from '../lib/film'
 import { playableFormat, type EpisodeFormatKey } from '../lib/manifest'
 import { enterVRPlaylist, episodePlaylist, xrSupported } from '../lib/xr'
+import { mediaUrl } from '../lib/manifest'
+import { uninterrupted, verifiedMaster, type Master, type MasterFormat } from '../lib/uninterrupted'
 import { fmtDuration } from '../lib/format'
 const store = useTripStore()
 const error = ref('')
+const masters = ref<Partial<Record<MasterFormat, Master>>>({})
+let timer: ReturnType<typeof setTimeout> | undefined
+let disposed = false
+let request: AbortController | undefined
+async function refreshMasters() {
+  request = new AbortController()
+  const timeout = setTimeout(() => request?.abort(), 12000)
+  await Promise.all((['16x9', 'vr'] as const).map(async format => {
+    try {
+      const prefix = format === 'vr' ? 'masters/vr-v06' : 'masters/v06'
+      const response = await fetch(mediaUrl(`${prefix}/index.json`), { cache: 'no-cache', signal: request?.signal })
+      const master = response.ok ? verifiedMaster(await response.json(), format) : null
+      if (!disposed) { if (master) masters.value[format] = master; else delete masters.value[format] }
+    } catch { /* Keep Coming soon when readiness cannot be established. */ }
+  }))
+  clearTimeout(timeout)
+  if (!disposed) timer = setTimeout(refreshMasters, 60000)
+}
+function watchMaster(format: MasterFormat) {
+  const master = masters.value[format]
+  if (!master) return
+  store.showEpisode(null); store.closeMedia(); uninterrupted.value = master
+}
+onMounted(refreshMasters)
+onBeforeUnmount(() => { disposed = true; clearTimeout(timer); request?.abort() })
 const duration = computed(() => store.episodes.reduce((n, e) => n + (e.duration || 0), 0))
 function ready(format: EpisodeFormatKey) { return !!store.episodes.length && store.episodes.every(e => playableFormat(e, format)) }
 function watchFlat(format: FlatFormat) { store.showEpisode(null); store.closeMedia(); startFilm(store.episodes, format) }
@@ -33,6 +60,15 @@ function watchVR() {
       <button class="format" :disabled="!ready('9x16')" aria-label="Watch whole film in portrait 9:16" @click="watchFlat('9x16')"><strong>9:16</strong><span>Portrait</span></button>
       <button class="format" :disabled="!ready('vr')" aria-label="Watch whole film in 360 or VR" @click="watchVR"><strong>360° / VR</strong><span>{{ ready('vr') ? (xrSupported ? 'Headset' : 'Look around') : 'Preparing' }}</span></button>
     </div>
+    <details class="uninterrupted mt-3 font-ui">
+      <summary>Watch uninterrupted <span class="text-muted">· Optional</span></summary>
+      <p class="text-sm text-muted my-2">Single-file playback, without chapter loading breaks. Best on a fast, stable connection.</p>
+      <div class="grid grid-cols-2 gap-2" aria-live="polite">
+        <button class="format" :disabled="!masters['16x9']" @click="watchMaster('16x9')"><strong>16:9 Landscape</strong><span>{{ masters['16x9'] ? 'Watch uninterrupted' : 'Coming soon' }}</span></button>
+        <button class="format" :disabled="!masters.vr" @click="watchMaster('vr')"><strong>360° / VR</strong><span>{{ masters.vr ? 'Watch uninterrupted' : 'Coming soon' }}</span></button>
+      </div>
+      <p class="text-xs text-muted mt-2">Available automatically once each full-film upload is verified. Chapter playback above remains the default.</p>
+    </details>
     <a class="methodology-link" href="/methodology/">How this film was made <span aria-hidden="true">&rarr;</span></a>
     <p v-if="error" role="alert" class="text-sm text-ivory mt-2">{{ error }}</p>
   </section>
@@ -44,7 +80,8 @@ function watchVR() {
 .format strong { color: #e6b56a; font-family: var(--font-ui); font-size: 15px; }
 .format span { font-family: var(--font-ui); font-size: 12px; }
 .format:not(:disabled):hover { background: #394036; }
-.format:disabled { opacity: .42; }
+.format:disabled { opacity: .65; }
+summary { cursor: pointer; min-height: 44px; padding: 12px 0; color: #e6b56a; }
 .format:focus-visible { outline: 2px solid #e6b56a; outline-offset: 2px; }
 .methodology-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin-top: 8px; border-top: 1px solid #43514b; color: #e6b56a; font-family: var(--font-ui); font-size: 15px; text-decoration: none; }
 .methodology-link:hover { color: #fff0cc; }

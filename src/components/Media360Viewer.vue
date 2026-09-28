@@ -13,8 +13,8 @@ import { enterVR, enterVRPlaylist, episodePlaylist, xrSupported, type VRItem } f
 import { useTripStore } from '../stores/trip'
 const store = useTripStore()
 
-const props = defineProps<{ item: Media; continuous?: boolean }>()
-const emit = defineEmits<{ error: [string]; unsupported: []; ended: [id: string]; fullscreen: [] }>()
+const props = defineProps<{ item: Media; continuous?: boolean; singleFile?: boolean }>()
+const emit = defineEmits<{ error: [string]; unsupported: []; ended: [id: string]; fullscreen: []; time: [seconds: number] }>()
 
 const host = ref<HTMLDivElement | null>(null)
 const viewer = shallowRef<Viewer | null>(null)
@@ -57,6 +57,11 @@ function onEnterVR() {
   const v = viewer.value
   const video = m.type === 'pano-video' && v && VideoPluginClass ? v.getPlugin<VideoPluginT>(VideoPluginClass) : null
   const title = titleOf(m)
+  if (props.singleFile) {
+    void enterVR({ kind: 'video', title, src: mediaUrl(m.src), poster: mediaUrl(m.poster), startAt: video?.getTime() || 0, yaw: v?.getPosition().yaw })
+      .then(() => video?.pause()).catch(() => { vrError.value = 'VR could not start.' })
+    return
+  }
   const p = m.pano
   // 360 videos: the lightbox's list (current filters, time order) becomes the in-VR playlist
   const clips = m.type === 'pano-video' ? (store.lightbox?.list || [m]).filter((x) => x.type === 'pano-video') : []
@@ -129,6 +134,7 @@ async function build() {
       video.loop = !props.continuous
       videoEvents = new AbortController()
       const options = { signal: videoEvents.signal }
+      video.addEventListener('timeupdate', () => emit('time', video.currentTime), options)
       video.addEventListener('playing', () => {
         if (!current()) return
         clearTimeout(watchdog)
@@ -257,6 +263,7 @@ function changeItem() {
   }, 45000)
 }
 
+defineExpose({ seek: (seconds: number) => { if (mediaVideo) mediaVideo.currentTime = seconds } })
 onMounted(build)
 watch(() => props.item.id, changeItem)
 onBeforeUnmount(destroy)

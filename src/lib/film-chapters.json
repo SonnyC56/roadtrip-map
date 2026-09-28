@@ -1,0 +1,187 @@
+[
+  {
+    "ep": 0,
+    "title": "INTRO",
+    "start": 0.0
+  },
+  {
+    "ep": 1,
+    "title": "NEW YORK > CHICAGO",
+    "start": 57.0
+  },
+  {
+    "ep": 2,
+    "title": "CHICAGO > MT RUSHMORE",
+    "start": 178.0
+  },
+  {
+    "ep": 3,
+    "title": "RUSHMORE > GRAND TETON",
+    "start": 358.6
+  },
+  {
+    "ep": 4,
+    "title": "GRAND TETON > YELLOWSTONE",
+    "start": 541.2666666666667
+  },
+  {
+    "ep": 5,
+    "title": "YELLOWSTONE > GLACIER",
+    "start": 788.8666666666667
+  },
+  {
+    "ep": 6,
+    "title": "GLACIER > BANFF",
+    "start": 1046.2666666666667
+  },
+  {
+    "ep": 7,
+    "title": "BANFF > KELOWNA",
+    "start": 1463.3333333333333
+  },
+  {
+    "ep": 8,
+    "title": "KELOWNA > VANCOUVER",
+    "start": 1496.1333333333334
+  },
+  {
+    "ep": 9,
+    "title": "VANCOUVER > SAN JUANS",
+    "start": 1806.8666666666666
+  },
+  {
+    "ep": 10,
+    "title": "SAN JUANS > OLYMPIC",
+    "start": 1896.1333333333334
+  },
+  {
+    "ep": 11,
+    "title": "HOH RAINFOREST > RAINIER",
+    "start": 2131.6666666666665
+  },
+  {
+    "ep": 12,
+    "title": "RAINIER > MT ST HELENS",
+    "start": 2322.633333333333
+  },
+  {
+    "ep": 13,
+    "title": "ST HELENS > PORTLAND",
+    "start": 2426.5333333333333
+  },
+  {
+    "ep": 14,
+    "title": "PORTLAND > CRATER LAKE",
+    "start": 2551.7
+  },
+  {
+    "ep": 15,
+    "title": "CRATER LAKE > REDWOODS",
+    "start": 2678.4
+  },
+  {
+    "ep": 16,
+    "title": "REDWOODS > FORT BRAGG",
+    "start": 2968.9
+  },
+  {
+    "ep": 17,
+    "title": "SANTA ROSA > NAPA",
+    "start": 3121.6666666666665
+  },
+  {
+    "ep": 18,
+    "title": "NAPA > SAN FRANCISCO",
+    "start": 3198.0666666666666
+  },
+  {
+    "ep": 19,
+    "title": "SAN FRANCISCO > MONTEREY",
+    "start": 3511.633333333333
+  },
+  {
+    "ep": 20,
+    "title": "BIG SUR > PINNACLES",
+    "start": 3682.6
+  },
+  {
+    "ep": 21,
+    "title": "MORRO BAY > PISMO BEACH",
+    "start": 4070.5333333333333
+  },
+  {
+    "ep": 22,
+    "title": "SOLVANG > SANTA BARBARA",
+    "start": 4239.266666666666
+  },
+  {
+    "ep": 23,
+    "title": "TO THE CHANNEL ISLANDS",
+    "start": 4420.833333333333
+  },
+  {
+    "ep": 24,
+    "title": "VENTURA > LOS ANGELES",
+    "start": 4555.333333333333
+  },
+  {
+    "ep": 25,
+    "title": "LOS ANGELES > SAN DIEGO",
+    "start": 4862.066666666667
+  },
+  {
+    "ep": 26,
+    "title": "SAN DIEGO > JOSHUA TREE",
+    "start": 5110.566666666667
+  },
+  {
+    "ep": 27,
+    "title": "LAS VEGAS > DEATH VALLEY",
+    "start": 5240.666666666667
+  },
+  {
+    "ep": 28,
+    "title": "HOOVER DAM > GRAND CANYON",
+    "start": 5448.166666666667
+  },
+  {
+    "ep": 29,
+    "title": "GRAND CANYON > ZION",
+    "start": 5651.566666666667
+  },
+  {
+    "ep": 30,
+    "title": "ZION > BRYCE CANYON",
+    "start": 5940.433333333333
+  },
+  {
+    "ep": 31,
+    "title": "BRYCE > SALT LAKE CITY",
+    "start": 6221.1
+  },
+  {
+    "ep": 32,
+    "title": "SALT LAKE CITY > ARCHES",
+    "start": 6419.3
+  },
+  {
+    "ep": 33,
+    "title": "THE LONG ROAD HOME",
+    "start": 6619.1
+  },
+  {
+    "ep": 34,
+    "title": "ST LOUIS > NEW RIVER GORGE",
+    "start": 6763.833333333333
+  },
+  {
+    "ep": 35,
+    "title": "BALTIMORE > HOME",
+    "start": 6951.533333333334
+  },
+  {
+    "ep": 36,
+    "title": "EPILOGUE: ROAD TRIP BEARD SHAVING",
+    "start": 7111.933333333333
+  }
+]
