@@ -273,7 +273,6 @@ onBeforeUnmount(destroy)
           <p class="mt-2 text-sm text-muted">{{ loading ? 'Getting the video ready to explore.' : 'Press play, then drag to look around.' }}</p>
         </div>
         <button v-if="needsPlay" class="btn min-h-12 mt-5" :disabled="!canPlay" @click="play()">Play 360 video</button>
-        <p v-if="playMessage" class="text-sm text-ivory mt-2">{{ playMessage }}</p>
       </div>
     </div>
     <div v-else-if="item.type === 'pano' && loading && !failed" class="absolute inset-0 grid place-items-center pointer-events-none">
