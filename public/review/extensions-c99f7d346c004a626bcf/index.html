@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#101b23">
+  <title>The moments between — Sonny’s Roadtrip review</title>
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <div class="topbar"><a class="wordmark" href="#top">SONNY’S ROADTRIP <span>2025</span></a><span class="tag">UNLISTED REVIEW ROOM</span></div>
+  <header id="top">
+    <p class="eyebrow">THE EXTENDED EPISODES / YOUR CALL</p>
+    <h1>The moments<br><em>between.</em></h1>
+    <p class="lede">Little detours, longer conversations, and a little more of the journey. Watch the suggested moments and decide what belongs in the films.</p>
+    <p class="rule">Your choices build an edit list. Nothing is added to an episode automatically.</p>
+    <div class="stats" aria-label="Review progress">
+      <div><strong id="stat-total">—</strong><span>suggestions</span></div>
+      <div><strong id="stat-ready">—</strong><span>clips ready</span></div>
+      <div><strong id="stat-approved">0</strong><span>approved</span></div>
+      <div><strong id="stat-denied">0</strong><span>denied</span></div>
+      <div><strong id="stat-pending">—</strong><span>undecided</span></div>
+    </div>
+    <div class="progress-track" role="progressbar" aria-label="Suggestions decided" aria-valuemin="0" aria-valuemax="58" aria-valuenow="0"><div id="progress-fill"></div></div>
+    <div class="sync-panel"><div><span id="sync-dot" class="dot"></span><span id="sync-state" role="status">Loading review…</span><p id="sync-detail">Decisions are saved on this device as you go.</p></div><button id="retry-sync" class="quiet" hidden>Retry saving online</button></div>
+    <details class="workflow"><summary>How this review works</summary><p>Each clip is an audition from the original recording, with its original sound. The time range and automatic transcript are a starting point, not a final edit. Notes below each video say what has actually been checked.</p><p>Approve a moment, deny it, or leave it undecided. Add any instructions, or optional trim points measured from the beginning of the preview. We’ll review the full set of decisions before changing the films. Approving a preview does not approve an automatic crop, audio mix, or final cut.</p><p id="save-explanation">Local saves stay in this browser. When online saving is connected, the status above confirms when your choices are also saved online. Use “Download decisions” for your own backup or to share your choices.</p></details>
+  </header>
+  <main>
+    <div class="toolbar">
+      <label class="search-label">Find a moment<input type="search" id="search" placeholder="Place, subject, or a line you remember"></label>
+      <label>Episode<select id="episode-filter"><option value="all">All 36 episodes</option></select></label>
+      <label>Decision<select id="status-filter"><option value="all">All decisions</option><option value="undecided">Undecided</option><option value="approved">Approved</option><option value="denied">Denied</option><option value="commented">With comments</option><option value="conflict">Needs sync review</option></select></label>
+      <label>Clips<select id="clip-filter"><option value="all">All suggestions</option><option value="ready">Ready to watch</option><option value="waiting">Preparing / unavailable</option></select></label>
+    </div>
+    <div class="list-tools"><p id="result-count" aria-live="polite">Loading suggestions…</p><div><button id="next-undecided" class="quiet">Next undecided <span aria-hidden="true">↓</span></button><button id="download" class="quiet">Download decisions for editing</button><button id="import" class="quiet">Import decisions</button><input id="import-file" type="file" accept="application/json,.json" hidden></div></div>
+    <div id="notice" role="status" hidden></div>
+    <section id="cards" aria-label="Suggested additions"></section>
+    <div id="empty" hidden><h2>Nothing in this view.</h2><p id="empty-copy">Try another filter.</p><button id="clear-filters">Reset filters</button></div>
+  </main>
+  <footer><span>Sonny’s Roadtrip 2025</span><p>Original recordings stay untouched. This room is an approval list, not a new cut.</p><a id="launch-link" href="https://www.2025roadtrip.com/review/launch-c99f7d346c004a626bcf/">Launch pack</a><a id="json-link" href="review-data.json">Review data for agents</a></footer>
+  <script src="review-config.js"></script>
+  <script src="review.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1977 @@
+{
+  "schemaVersion": 1,
+  "reviewSet": "episode-extensions-2026-10-02",
+  "created": "2026-10-02",
+  "scope": "Suggestions only. Human review is required before any episode changes.",
+  "screeningPolicy": "Source catalog and automatic transcript supplied these initial suggestions. Preview manifest notes state the additional screening actually performed for each clip. Do not infer a full listen from frame sampling.",
+  "episodes": [
+    {
+      "episode": 1,
+      "place": "Chicago",
+      "title": "Learning as We Go",
+      "notes": "",
+      "candidates": [
+        "E01-L01-0087-01",
+        "E01-L01-0044-02"
+      ]
+    },
+    {
+      "episode": 2,
+      "place": "Mount Rushmore",
+      "title": "Across the Plains",
+      "notes": "",
+      "candidates": [
+        "E02-L02-0135-01",
+        "E02-L02-0131-02"
+      ]
+    },
+    {
+      "episode": 3,
+      "place": "Grand Teton",
+      "title": "From Lake to Stars",
+      "notes": "",
+      "candidates": [
+        "E03-L03-0218-01",
+        "E03-L03-0238-02"
+      ]
+    },
+    {
+      "episode": 4,
+      "place": "Yellowstone",
+      "title": "A World Alive",
+      "notes": "",
+      "candidates": [
+        "E04-L04-0620-01",
+        "E04-L04-0477-02"
+      ]
+    },
+    {
+      "episode": 5,
+      "place": "Glacier",
+      "title": "A Different Way Up",
+      "notes": "",
+      "candidates": [
+        "E05-L05-0470-01",
+        "E05-L05-0442-02"
+      ]
+    },
+    {
+      "episode": 6,
+      "place": "Banff",
+      "title": "Worth the Walk",
+      "notes": "",
+      "candidates": [
+        "E06-L06-1055-01",
+        "E06-L06-1073-02"
+      ]
+    },
+    {
+      "episode": 7,
+      "place": "Kelowna",
+      "title": "Kelowna",
+      "notes": "No strong expansion from the indexed source library. Only two video assets are cataloged: the sculpture and the short evening water view, both already selected. Extending the sculpture orbit would make it longer, not tell a better story. Keep the concise interlude unless fresh source is found; a newly recorded retrospective thought is a separate optional request, not an existing-footage recommendation.",
+      "candidates": []
+    },
+    {
+      "episode": 8,
+      "place": "Vancouver",
+      "title": "Vancouver",
+      "notes": "No strong new addition after the approved revisions. Current plan already includes the full Rockies recap, Wreck Beach anecdote, work photos, and Point Roberts. L08-0103 is an alternate/duplicate recap, so do not insert it again. Extra bridge/harbor seconds are available, but the currently complete city-to-solo transition has more value than padding.",
+      "candidates": []
+    },
+    {
+      "episode": 9,
+      "place": "San Juan Islands",
+      "title": "San Juan Islands",
+      "notes": "",
+      "candidates": [
+        "E09-L09-2029-01",
+        "E09-L09-2044-02"
+      ]
+    },
+    {
+      "episode": 10,
+      "place": "Olympic",
+      "title": "Olympic",
+      "notes": "",
+      "candidates": [
+        "E10-L10-2082-01",
+        "E10-L10-2066-02"
+      ]
+    },
+    {
+      "episode": 11,
+      "place": "Hoh to Mount Rainier",
+      "title": "Hoh to Mount Rainier",
+      "notes": "",
+      "candidates": [
+        "E11-L11-2007-01",
+        "E11-L11-2009-02"
+      ]
+    },
+    {
+      "episode": 12,
+      "place": "Mount St. Helens",
+      "title": "Mount St. Helens",
+      "notes": "",
+      "candidates": [
+        "E12-L12-2012-01"
+      ]
+    },
+    {
+      "episode": 13,
+      "place": "Portland",
+      "title": "Portland",
+      "notes": "",
+      "candidates": [
+        "E13-L13-0060-01",
+        "E13-L13-0062-02"
+      ]
+    },
+    {
+      "episode": 14,
+      "place": "Crater Lake",
+      "title": "Crater Lake",
+      "notes": "",
+      "candidates": [
+        "E14-L14-2045-01",
+        "E14-L14-0204-02"
+      ]
+    },
+    {
+      "episode": 15,
+      "place": "Redwoods",
+      "title": "Redwoods",
+      "notes": "",
+      "candidates": [
+        "E15-L15-0292-01"
+      ]
+    },
+    {
+      "episode": 16,
+      "place": "Fort Bragg",
+      "title": "Fort Bragg to Santa Rosa",
+      "notes": "",
+      "candidates": [
+        "E16-L16-2008-01",
+        "E16-L16-0108-02"
+      ]
+    },
+    {
+      "episode": 17,
+      "place": "Sacramento & Napa",
+      "title": "Sacramento to Napa",
+      "notes": "Evaluate only the regular cut. The user-requested full hotel story already exists in Special Edition v01. Do not turn the standard episode into another extended cut or recommend the explicit/private second account as a new public addition.",
+      "candidates": [
+        "E17-L17-0097-01",
+        "E17-L17-0095-02"
+      ]
+    },
+    {
+      "episode": 18,
+      "place": "San Francisco",
+      "title": "San Francisco and Alcatraz",
+      "notes": "",
+      "candidates": [
+        "E18-L18-2008-01",
+        "E18-L18-2023-02"
+      ]
+    },
+    {
+      "episode": 19,
+      "place": "Santa Cruz",
+      "title": "Santa Cruz and Big Sur",
+      "notes": "",
+      "candidates": [
+        "E19-L19-2021-01",
+        "E19-L19-2031-02"
+      ]
+    },
+    {
+      "episode": 20,
+      "place": "Pinnacles",
+      "title": "Carmel, 17-Mile Drive and Pinnacles",
+      "notes": "",
+      "candidates": [
+        "E20-L20-2016-01",
+        "E20-L20-2024-02"
+      ]
+    },
+    {
+      "episode": 21,
+      "place": "Morro Bay",
+      "title": "Morro Bay to Big Sur",
+      "notes": "",
+      "candidates": [
+        "E21-L21-2014-01",
+        "E21-L21-0085-02"
+      ]
+    },
+    {
+      "episode": 22,
+      "place": "California Coast",
+      "title": "Pismo Beach, Solvang and Santa Barbara",
+      "notes": "",
+      "candidates": [
+        "E22-L22-0130-01"
+      ]
+    },
+    {
+      "episode": 23,
+      "place": "Channel Islands",
+      "title": "Ventura to Santa Cruz Island",
+      "notes": "",
+      "candidates": [
+        "E23-L23-0114-01",
+        "E23-L23-2010-02"
+      ]
+    },
+    {
+      "episode": 24,
+      "place": "Los Angeles",
+      "title": "Santa Monica, Venice and LA",
+      "notes": "",
+      "candidates": [
+        "E24-L24-2032-01",
+        "E24-L24-2025-02"
+      ]
+    },
+    {
+      "episode": 25,
+      "place": "San Diego",
+      "title": "San Diego: City, Zoo, and Surf",
+      "notes": "",
+      "candidates": [
+        "E25-L25-2016-01"
+      ]
+    },
+    {
+      "episode": 26,
+      "place": "Joshua Tree",
+      "title": "Joshua Tree National Park",
+      "notes": "",
+      "candidates": [
+        "E26-L26-2009-01",
+        "E26-L26-2009-02"
+      ]
+    },
+    {
+      "episode": 27,
+      "place": "Las Vegas",
+      "title": "Las Vegas to Death Valley",
+      "notes": "",
+      "candidates": [
+        "E27-L27-2011-01",
+        "E27-L27-0179-02"
+      ]
+    },
+    {
+      "episode": 28,
+      "place": "Hoover Dam + Grand Canyon",
+      "title": "Hoover Dam and the Grand Canyon",
+      "notes": "",
+      "candidates": [
+        "E28-L28-2037-01",
+        "E28-L28-2048-02"
+      ]
+    },
+    {
+      "episode": 29,
+      "place": "Zion + Bryce Canyon",
+      "title": "Zion and Bryce Canyon",
+      "notes": "",
+      "candidates": [
+        "E29-L29-2034-01",
+        "E29-L29-2036-02"
+      ]
+    },
+    {
+      "episode": 30,
+      "place": "Bryce Canyon",
+      "title": "Bryce Canyon",
+      "notes": "",
+      "candidates": [
+        "E30-L30-0190-01",
+        "E30-L30-0181-02"
+      ]
+    },
+    {
+      "episode": 31,
+      "place": "Salt Lake City",
+      "title": "Salt Lake City",
+      "notes": "High-value coverage gap: R31-004/R31-005 raw parts total 39:24.060; the readable L31-2008 export lasts 5:48.915. Duration difference is a lead, not proof all missing minutes are useful or absent: align raw and export before proposing actual additions. R31-005 has no speech detected. Other ride exports are apparent duplicate pairs (2003/2004,2005/2006), not extra scenes.",
+      "candidates": [
+        "E31-R31-004-01"
+      ]
+    },
+    {
+      "episode": 32,
+      "place": "Arches to Red Rocks",
+      "title": "Arches to Red Rocks",
+      "notes": "",
+      "candidates": [
+        "E32-L32-2006-01"
+      ]
+    },
+    {
+      "episode": 33,
+      "place": "Journey Home and Gateway Arch",
+      "title": "Journey Home and Gateway Arch",
+      "notes": "",
+      "candidates": [
+        "E33-L33-2006-01",
+        "E33-L33-2006-02"
+      ]
+    },
+    {
+      "episode": 34,
+      "place": "New River Gorge",
+      "title": "New River Gorge",
+      "notes": "No strong verified new addition beyond the current cut. The apparently omitted homesickness line L34-2003 is actually retained in approved v7 captions at 00:27.900–00:35.860. Map/Arches callback, magnet and final-park reflection are already present. Other unused dialogue is repetitive car logistics, a town-insult rant, or recorded historical-program audio; do not add them merely to increase runtime.",
+      "candidates": []
+    },
+    {
+      "episode": 35,
+      "place": "Baltimore to Home",
+      "title": "Baltimore to Home",
+      "notes": "",
+      "candidates": [
+        "E35-L35-0031-01",
+        "E35-L35-2006-02"
+      ]
+    },
+    {
+      "episode": 36,
+      "place": "The Beard Epilogue",
+      "title": "The Beard Epilogue",
+      "notes": "No verified unused new story. Current v5/v6 captions show the entire before-trim and after-trim speeches, and the approved music/credits montage fills the middle. The older Draft-v01 six-row plan is not the final epilogue; that final-receipt exception was checked. Raw notes show only two readable videos plus an invalid 44-byte placeholder. Do not lengthen the credits to manufacture an expansion.",
+      "candidates": []
+    }
+  ],
+  "candidates": [
+    {
+      "episode": 1,
+      "asset_id": "L01-0087",
+      "source_name": "Snapchat-521131345.mp4",
+      "source_window_seconds": [
+        0,
+        3.63
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:03.63"
+      ],
+      "recommended_added_seconds": [
+        2,
+        3
+      ],
+      "priority": "B",
+      "title": "A tiny night-time toast",
+      "reason": "A real unpolished human button after the city exploration, before leaving Chicago. More personality than another skyline.",
+      "insert_context": "After the pizza/night-city beat; do not replace the intro or repeat the already restored 360 spin.",
+      "classification": "unused source",
+      "source_description": "Close selfie at night with hand near mouth",
+      "is_360": false,
+      "checks": "Listen to original audio; review full-motion picture, horizon, stitching and the exact head/tail. Automatic transcript timing is a scout window, not an approved cut.",
+      "draft_excerpt": "Cheers from Chicago.",
+      "id": "E01-L01-0087-01",
+      "place": "Chicago"
+    },
+    {
+      "episode": 1,
+      "asset_id": "L01-0044",
+      "source_name": "PXL_20250814_203847150.mp4",
+      "source_window_seconds": [
+        1.5,
+        8.0
+      ],
+      "source_window_hms": [
+        "00:00:01.50",
+        "00:00:08.00"
+      ],
+      "recommended_added_seconds": [
+        6,
+        7
+      ],
+      "priority": "B",
+      "title": "The motionless bird detour",
+      "reason": "The puzzled two-person exchange gives this first city stop a small spontaneous story with an actual visible subject.",
+      "insert_context": "Between city landmarks, before the evening montage.",
+      "classification": "unused source",
+      "source_description": "Small bird standing beside wall on pavement",
+      "is_360": false,
+      "checks": "Listen to original audio; review full-motion picture, horizon, stitching and the exact head/tail. Automatic transcript timing is a scout window, not an approved cut.",
+      "draft_excerpt": "You have an idea what is it? No, I have no idea. But it's weird that he's not moving.",
+      "id": "E01-L01-0044-02",
+      "place": "Chicago"
+    },
+    {
+      "episode": 2,
+      "asset_id": "L02-0135",
+      "source_name": "VID_20250816_141250_00_165.mp4",
+      "source_window_seconds": [
+        337.42,
+        364.9
+      ],
+      "source_window_hms": [
+        "00:05:37.42",
+        "00:06:04.90"
+      ],
+      "recommended_added_seconds": [
+        20,
+        28
+      ],
+      "priority": "A",
+      "title": "Beginning the magnet habit",
+      "reason": "The gift-shop/magnet search seeds a recurring collecting story that eventually pays off on the fridge. Stronger connective material than another carving shot.",
+      "insert_context": "After the presidential trail, before leaving Rushmore.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical walk through rock opening, forest boardwalk and visitor buildings",
+      "is_360": true,
+      "checks": "Listen to original audio; review full-motion picture, horizon, stitching and the exact head/tail. Automatic transcript timing is a scout window, not an approved cut.",
+      "draft_excerpt": "I don't know where the gift shop is for this magnet...",
+      "id": "E02-L02-0135-01",
+      "place": "Mount Rushmore"
+    },
+    {
+      "episode": 2,
+      "asset_id": "L02-0131",
+      "source_name": "VID_20250815_140427_00_136.mp4",
+      "source_window_seconds": [
+        5.44,
+        34.09
+      ],
+      "source_window_hms": [
+        "00:00:05.44",
+        "00:00:34.09"
+      ],
+      "recommended_added_seconds": [
+        12,
+        20
+      ],
+      "priority": "B",
+      "title": "The car is today’s office",
+      "reason": "Conversation about the invisible selfie stick and the mobile office ties friends, work and the camera together.",
+      "insert_context": "During the plains drive before the monument.",
+      "classification": "unused source",
+      "source_description": "Spherical view of people travelling in car",
+      "is_360": true,
+      "checks": "Listen and narrow to a complete office/selfie-stick thought; huge ASR window contains pauses and unrelated fragments. Screen/luggage privacy review.",
+      "draft_excerpt": "That's my office for the day.",
+      "id": "E02-L02-0131-02",
+      "place": "Mount Rushmore"
+    },
+    {
+      "episode": 3,
+      "asset_id": "L03-0218",
+      "source_name": "Snapchat-212089628.mp4",
+      "source_window_seconds": [
+        0,
+        17.7
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:17.70"
+      ],
+      "recommended_added_seconds": [
+        8,
+        14
+      ],
+      "priority": "B",
+      "title": "Keep a real walk into the overlook",
+      "reason": "An unselected phone walk offers physical progression into the broad lake view and an alternative to a still montage.",
+      "insert_context": "Immediately before Inspiration Point; use its movement only if smoother than the existing 360 ascent.",
+      "classification": "unused source",
+      "source_description": "Rocky overlook walk with expansive lake view",
+      "is_360": false,
+      "checks": "Visual scout only: scan entire 17.7 seconds to find a stable reveal and confirm matching approach. Do not claim a specific action at an unsampled second. Listen to ambient sound.",
+      "draft_excerpt": "",
+      "id": "E03-L03-0218-01",
+      "place": "Grand Teton"
+    },
+    {
+      "episode": 3,
+      "asset_id": "L03-0238",
+      "source_name": "VID_20250818_205630_00_044.mp4",
+      "source_window_seconds": [
+        0,
+        25.09
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:25.09"
+      ],
+      "recommended_added_seconds": [
+        6,
+        10
+      ],
+      "priority": "B",
+      "title": "Friends in the car after the hike",
+      "reason": "The people together in the car/meadow connect the lake adventure to the Jackson evening and campfire rather than cutting directly between attractions.",
+      "insert_context": "After the lake overlook, before the Jackson performance.",
+      "classification": "unused source",
+      "source_description": "People in car beside open meadow",
+      "is_360": true,
+      "checks": "Find a legible face/road view in full motion; listen for a genuine reaction. No useful indexed speech, so do not invent narration.",
+      "draft_excerpt": "",
+      "id": "E03-L03-0238-02",
+      "place": "Grand Teton"
+    },
+    {
+      "episode": 4,
+      "asset_id": "L04-0620",
+      "source_name": "VID_20250819_161036_00_134.mp4",
+      "source_window_seconds": [
+        0,
+        382.29
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:06:22.29"
+      ],
+      "recommended_added_seconds": [
+        15,
+        25
+      ],
+      "priority": "B",
+      "title": "Step inside the timber lodge",
+      "reason": "A distinct interior changes rhythm and shows the human infrastructure surrounding the outdoor adventure. A short walk/ceiling reveal would add a new place, not another pool.",
+      "insert_context": "During the Old Faithful-area day, before the evening basin.",
+      "classification": "unused source",
+      "source_description": "Walking inside tall timber lodge with balconies and windows",
+      "is_360": true,
+      "checks": "Whole-source visual scout needed; catalog samples show lodge balconies/windows. Verify exact building identity and chronology before labeling; do not use overheard dining instructions as the story.",
+      "draft_excerpt": "",
+      "id": "E04-L04-0620-01",
+      "place": "Yellowstone"
+    },
+    {
+      "episode": 4,
+      "asset_id": "L04-0477",
+      "source_name": "PXL_20250820_202147250.mp4",
+      "source_window_seconds": [
+        0,
+        59.3
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:59.30"
+      ],
+      "recommended_added_seconds": [
+        8,
+        12
+      ],
+      "priority": "A",
+      "title": "Listen to the bubbling mud",
+      "reason": "Adds a different geothermal sensation through actual motion and sound. The current cut is dominated by blue pools, plumes and scenic speech.",
+      "insert_context": "Between two large thermal vistas.",
+      "classification": "unused source",
+      "source_description": "Grey bubbling mud pool beneath rocky opening",
+      "is_360": false,
+      "checks": "Find one sustained clean bubbling cycle; audition natural mud/steam sound and remove incidental voices/music only if needed. This is a whole-source search window, not an exact 12-second cut.",
+      "draft_excerpt": "",
+      "id": "E04-L04-0477-02",
+      "place": "Yellowstone"
+    },
+    {
+      "episode": 5,
+      "asset_id": "L05-0470",
+      "source_name": "VID_20250822_163019_00_073.mp4",
+      "source_window_seconds": [
+        0,
+        11.08
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:11.08"
+      ],
+      "recommended_added_seconds": [
+        7,
+        10
+      ],
+      "priority": "A",
+      "title": "Waterfall after the exposed climb",
+      "reason": "A genuine cool-down reward adds variety and resolves the physical effort of Scenic Point with water and forest.",
+      "insert_context": "After summit/view reactions and before the return-to-lake ending.",
+      "classification": "unused source",
+      "source_description": "Small waterfall rushing over smooth forest rocks",
+      "is_360": false,
+      "checks": "Audition the waterfall; use stable full cascade and a clean beginning/end. Do not mislabel it as a named waterfall without evidence.",
+      "draft_excerpt": "",
+      "id": "E05-L05-0470-01",
+      "place": "Glacier"
+    },
+    {
+      "episode": 5,
+      "asset_id": "L05-0442",
+      "source_name": "VID_20250821_201826_00_018.mp4",
+      "source_window_seconds": [
+        5.9,
+        41.15
+      ],
+      "source_window_hms": [
+        "00:00:05.90",
+        "00:00:41.15"
+      ],
+      "recommended_added_seconds": [
+        10,
+        18
+      ],
+      "priority": "B",
+      "title": "The golden roadside valley pause",
+      "reason": "A person-to-valley reaction from the previous evening establishes why Glacier struck you before the next day’s hike.",
+      "insert_context": "After the mountain-road arrival and before the Aug22 climb; hold the view after the reaction.",
+      "classification": "unused source",
+      "source_description": "Deep valley and warm-lit cliffs from viewpoint",
+      "is_360": false,
+      "checks": "Listen to the loose ASR timing and inspect the actual valley. Preserve truthful Aug21 chronology; avoid treating the long segment as a precisely timed quote.",
+      "draft_excerpt": "That's awesome... Look at the sun.",
+      "id": "E05-L05-0442-02",
+      "place": "Glacier"
+    },
+    {
+      "episode": 6,
+      "asset_id": "L06-1055",
+      "source_name": "VID_20250825_143404_00_167.mp4",
+      "source_window_seconds": [
+        0,
+        75.94
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:01:15.94"
+      ],
+      "recommended_added_seconds": [
+        45,
+        65
+      ],
+      "priority": "A",
+      "title": "The Lake Louise walk to a new office",
+      "reason": "A sustained first-person walk has a goal—round the bend, get the view, find somewhere to work—and a payoff. This is substantial unused 360 story, not another gratitude monologue.",
+      "insert_context": "In the Lake Louise/no-better-office section, after the Moraine hitchhiking return; do not put it before the shuttle/lake story.",
+      "classification": "unused source",
+      "source_description": "Spherical walk near gravel delta, cliffs and trees.",
+      "is_360": true,
+      "checks": "Listen to the whole first 75.94 seconds and identify the view/payoff. Stop before the later phone exchange; show the forward view while walking, then full-body/face at the pause. Do not restore the private gratitude monologue.",
+      "draft_excerpt": "This was just too hard to pass up... as soon as I bank this corner I'm gonna get the view I want...",
+      "id": "E06-L06-1055-01",
+      "place": "Banff"
+    },
+    {
+      "episode": 6,
+      "asset_id": "L06-1073",
+      "source_name": "VID_20250824_154642_00_143.mp4",
+      "source_window_seconds": [
+        0,
+        46.6
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:46.60"
+      ],
+      "recommended_added_seconds": [
+        6,
+        10
+      ],
+      "priority": "B",
+      "title": "Canoes after the long road to Moraine",
+      "reason": "Unselected sign-to-red-canoe coverage gives an additional actual lake activity/detail after the hard-won arrival.",
+      "insert_context": "After the Moraine panorama, before cold water and the ride back.",
+      "classification": "unused source",
+      "source_description": "Lake approach, interpretive board and red canoes.",
+      "is_360": false,
+      "checks": "Find the clean canoe reveal; use minimal sign-reading, preserve lake identity and avoid duplicating L06-0164 still. Motion/audio scout required.",
+      "draft_excerpt": "This place is wild.",
+      "id": "E06-L06-1073-02",
+      "place": "Banff"
+    },
+    {
+      "episode": 9,
+      "asset_id": "L09-2029",
+      "source_name": "VID_20250830_130102_00_003.mp4",
+      "source_window_seconds": [
+        1.94,
+        94.96
+      ],
+      "source_window_hms": [
+        "00:00:01.94",
+        "00:01:34.96"
+      ],
+      "recommended_added_seconds": [
+        10,
+        18
+      ],
+      "priority": "B",
+      "title": "A ferry docks, after missing yours",
+      "reason": "A complete physical docking event makes the transport comedy tangible before the noon crossing.",
+      "insert_context": "After the missed9:01 ferry setup, before finally boarding.",
+      "classification": "unused source",
+      "source_description": "Spherical ferry terminal as another ferry passes close by.",
+      "is_360": true,
+      "checks": "Scout the full docking action; keep horizon level. The recorded line is1.94–4.56; added duration includes a clean visual payoff, not94seconds.",
+      "draft_excerpt": "We're gonna watch a ferry dock.",
+      "id": "E09-L09-2029-01",
+      "place": "San Juan Islands"
+    },
+    {
+      "episode": 9,
+      "asset_id": "L09-2044",
+      "source_name": "VID_20250830_181931_00_024_025.mp4",
+      "source_window_seconds": [
+        945.05,
+        974.78
+      ],
+      "source_window_hms": [
+        "00:15:45.05",
+        "00:16:14.78"
+      ],
+      "recommended_added_seconds": [
+        20,
+        30
+      ],
+      "priority": "A",
+      "title": "The actual excited prey exchange",
+      "reason": "The passenger reaction to the orca throwing the seal has more immediate energy than a later narrated summary. Could add a real moment without more generic boat transit.",
+      "insert_context": "In the whale encounter, adjacent to the actual action and before evening departure.",
+      "classification": "unused source",
+      "source_description": "Long spherical boat journey showing wake, passengers and cabin.",
+      "is_360": true,
+      "checks": "Critical visual/audio review: locate the real action, do not illustrate the line with empty water or invent a breach. If too distant/unreadable, use the real reaction with a clear context wide or skip. Wind and third-party guide intelligibility/permission review.",
+      "draft_excerpt": "I got that one... she had it in her mouth and she did a backflip with it.",
+      "id": "E09-L09-2044-02",
+      "place": "San Juan Islands"
+    },
+    {
+      "episode": 10,
+      "asset_id": "L10-2082",
+      "source_name": "VID_20250831_202553_00_024.mp4",
+      "source_window_seconds": [
+        0,
+        30.83
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:30.83"
+      ],
+      "recommended_added_seconds": [
+        6,
+        10
+      ],
+      "priority": "A",
+      "title": "Sonny climbing across the driftwood",
+      "reason": "An unused physical action turns Rialto from a scenery montage into a place you explore. Strong candidate for a full-body360 reframe.",
+      "insert_context": "During the beach arrival/exploration before the wave mishap.",
+      "classification": "unused source",
+      "source_description": "Spherical person stepping over a large driftwood log.",
+      "is_360": true,
+      "checks": "Whole-source scout: show the complete step over the log with room on both sides of the action, forward vista after it, and legible footing. No speech claim.",
+      "draft_excerpt": "",
+      "id": "E10-L10-2082-01",
+      "place": "Olympic"
+    },
+    {
+      "episode": 10,
+      "asset_id": "L10-2066",
+      "source_name": "VID_20250831_155749_00_057.mp4",
+      "source_window_seconds": [
+        0,
+        23.43
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:23.43"
+      ],
+      "recommended_added_seconds": [
+        12,
+        20
+      ],
+      "priority": "B",
+      "title": "A rockfall remark on the mountain road",
+      "reason": "Adds a small uncertainty/surprise before the summit rather than only describing beauty.",
+      "insert_context": "On the Hurricane Ridge approach, before the overlook.",
+      "classification": "unused source",
+      "source_description": "Spherical drive around mountain bends and rocky slopes.",
+      "is_360": true,
+      "checks": "Only recommend if actual falling/deposited rocks or a clear road context are visible. The transcript says \"I think\"; keep that uncertainty. Remove any background song and verify a complete thought.",
+      "draft_excerpt": "I think we may have just had some rockfall... we just missed some rockfall.",
+      "id": "E10-L10-2066-02",
+      "place": "Olympic"
+    },
+    {
+      "episode": 11,
+      "asset_id": "L11-2007",
+      "source_name": "VID_20250901_110249_00_040.mp4",
+      "source_window_seconds": [
+        0,
+        21.24
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:21.24"
+      ],
+      "recommended_added_seconds": [
+        15,
+        21
+      ],
+      "priority": "A",
+      "title": "The five-dollar car-camp morning",
+      "reason": "A specific, personal overnight success explains the beginning of the solo rainforest day and pays off sleeping in the car.",
+      "insert_context": "Before the Hoh arrival.",
+      "classification": "unused source",
+      "source_description": "Spherical driver and packed vehicle on wooded road.",
+      "is_360": true,
+      "checks": "Listen for \"five bucks\" and toothbrushing wording; windshield/face reframe should establish morning clearly. No unsupported campsite name.",
+      "draft_excerpt": "That was a successful car camp... paid five bucks... slept like a rock.",
+      "id": "E11-L11-2007-01",
+      "place": "Hoh to Mount Rainier"
+    },
+    {
+      "episode": 11,
+      "asset_id": "L11-2009",
+      "source_name": "VID_20250901_125843_00_042_043.mp4",
+      "source_window_seconds": [
+        1161.01,
+        1210.0
+      ],
+      "source_window_hms": [
+        "00:19:21.01",
+        "00:20:10.00"
+      ],
+      "recommended_added_seconds": [
+        20,
+        35
+      ],
+      "priority": "B",
+      "title": "A photograph for fellow travelers",
+      "reason": "A small stranger interaction makes the long rainforest walk social; the thought about enjoying nature and choosing images later matches the actual filmmaking approach.",
+      "insert_context": "Mid-Hoh trail, before departure toward Rainier.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical rainforest walk with huge arching trunk, moss and ferns.",
+      "is_360": true,
+      "checks": "Listen to the exchange, narrow the long merged ASR segment and preserve both speakers. The theme is already stronger in Redwoods, so this is an alternative, not a mandate to duplicate it.",
+      "draft_excerpt": "I sort of get to enjoy nature... worry about the taking photos later.",
+      "id": "E11-L11-2009-02",
+      "place": "Hoh to Mount Rainier"
+    },
+    {
+      "episode": 12,
+      "asset_id": "L12-2012",
+      "source_name": "VID_20250902_154711_00_067.mp4",
+      "source_window_seconds": [
+        0.52,
+        17.05
+      ],
+      "source_window_hms": [
+        "00:00:00.52",
+        "00:00:17.05"
+      ],
+      "recommended_added_seconds": [
+        12,
+        17
+      ],
+      "priority": "B",
+      "title": "The bridge and one more pull-over",
+      "reason": "Explains why you turn back to get a picture: a tiny choice with an immediate mountain payoff. Adds personality and spatial progression.",
+      "insert_context": "Between the first car approach and the stationary camera/photo stop.",
+      "classification": "unused source",
+      "source_description": "Spherical driver and packed vehicle on road.",
+      "is_360": true,
+      "checks": "Audition first; the previous review rejected repetitive logistics, so only use if the actual bridge/pull-over continuity improves the scene. Show the view immediately after \"look at that\".",
+      "draft_excerpt": "That was a good stop... I need to just pull over and take a picture and then I'll be happy.",
+      "id": "E12-L12-2012-01",
+      "place": "Mount St. Helens"
+    },
+    {
+      "episode": 13,
+      "asset_id": "L13-0060",
+      "source_name": "Snapchat-2009695329.mp4",
+      "source_window_seconds": [
+        0.95,
+        64.88
+      ],
+      "source_window_hms": [
+        "00:00:00.95",
+        "00:01:04.88"
+      ],
+      "recommended_added_seconds": [
+        45,
+        65
+      ],
+      "priority": "B",
+      "title": "The purchase that wasn’t what you thought",
+      "reason": "A complete compact comic account of asking for a balm and receiving something else shows a less polished traveling day. It is a new personal story beyond the tree museum.",
+      "insert_context": "After the hotel/evening scenes and before the Friday departure.",
+      "classification": "unused source",
+      "source_description": "Indoor close selfie speaking to camera.",
+      "is_360": false,
+      "checks": "Audience-choice candidate involving cannabis. Keep it a mistaken-purchase anecdote, not a dosage/instruction sequence. Listen for a clear complete story and avoid showing personal messages/screens.",
+      "draft_excerpt": "It is tincture. It's the wrong thing... Not what I was looking for... Sometimes you don't win them all.",
+      "id": "E13-L13-0060-01",
+      "place": "Portland"
+    },
+    {
+      "episode": 13,
+      "asset_id": "L13-0062",
+      "source_name": "Snapchat-59776195.mp4",
+      "source_window_seconds": [
+        0,
+        3.63
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:03.63"
+      ],
+      "recommended_added_seconds": [
+        2,
+        3
+      ],
+      "priority": "B",
+      "title": "A real waving goodbye",
+      "reason": "Tiny original farewell can make the road departure feel personal.",
+      "insert_context": "After the arboretum/bamboo, before Crater Lake.",
+      "classification": "unused source",
+      "source_description": "Highway traffic followed by a waving car selfie.",
+      "is_360": false,
+      "checks": "Verify that it does not duplicate the existing L13-2035 farewell. Use one or the other if identical meaning/picture.",
+      "draft_excerpt": "Goodbye Portland!",
+      "id": "E13-L13-0062-02",
+      "place": "Portland"
+    },
+    {
+      "episode": 14,
+      "asset_id": "L14-2045",
+      "source_name": "VID_20250906_184112_00_113.mp4",
+      "source_window_seconds": [
+        154,
+        185.96
+      ],
+      "source_window_hms": [
+        "00:02:34.00",
+        "00:03:05.96"
+      ],
+      "recommended_added_seconds": [
+        6,
+        12
+      ],
+      "priority": "B",
+      "title": "Let the clear underwater world breathe",
+      "reason": "Existing under-water detail is only4seconds at150–154. Additional source tail could make the lake temperature/clarity tangible without implying a swim.",
+      "insert_context": "Immediately after the existing submerged-camera detail.",
+      "classification": "expand existing scene",
+      "source_description": "Spherical rocky lakeshore with person handling footwear; later camera sees clear water and submerged rocks.",
+      "is_360": true,
+      "checks": "Scout154–185.96 for actual usable water rather than camera retrieval/handling. Keep the spoken feet-only qualification, preserve natural sound, no claim that Sonny swam. Skip if no clean continuation.",
+      "draft_excerpt": "",
+      "id": "E14-L14-2045-01",
+      "place": "Crater Lake"
+    },
+    {
+      "episode": 14,
+      "asset_id": "L14-0204",
+      "source_name": "PXL_20250906_071012223.LS.mp4",
+      "source_window_seconds": [
+        0,
+        31.75
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:31.75"
+      ],
+      "recommended_added_seconds": [
+        6,
+        10
+      ],
+      "priority": "B",
+      "title": "A real night-sky motion alternative",
+      "reason": "May add genuine night atmosphere instead of prolonging or artificially moving the sharp star still.",
+      "insert_context": "Arrival-night coda only; current sharp star photograph remains the quality baseline.",
+      "classification": "unused source",
+      "source_description": "Night sky and stars above conifer silhouettes.",
+      "is_360": false,
+      "checks": "Catalog-only lead: inspect noise, flicker, sharpness and projection. Reject if blurrier than the approved still—the user explicitly asked for sharper skies. Do not slow it simply to add runtime.",
+      "draft_excerpt": "",
+      "id": "E14-L14-0204-02",
+      "place": "Crater Lake"
+    },
+    {
+      "episode": 15,
+      "asset_id": "L15-0292",
+      "source_name": "VID_20250907_174756_00_107.mp4",
+      "source_window_seconds": [
+        605.77,
+        747.18
+      ],
+      "source_window_hms": [
+        "00:10:05.77",
+        "00:12:27.18"
+      ],
+      "recommended_added_seconds": [
+        35,
+        55
+      ],
+      "priority": "A",
+      "title": "A personal decision to put the camera away",
+      "reason": "The Jurassic-forest/ferns reflection ends with enjoying the rest of the walk yourself. It deepens the presence theme after the visitor conversation.",
+      "insert_context": "After the grove exploration, before the last tree/drive-through-tree sequence.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical person walking fern-lined redwood trails and looking into tall canopy.",
+      "is_360": false,
+      "checks": "Merged long ASR window: listen to identify the \"Jurassic\" thought and the full put-camera-away sentence743.6–747.18. Show the ferns/canopy when referenced. Avoid adding all142seconds or repeating the already included origin/53rd-park conversation.",
+      "draft_excerpt": "I feel like I'm in Jurassic... it's the ferns... enjoy this walk myself for the rest until we get back.",
+      "id": "E15-L15-0292-01",
+      "place": "Redwoods"
+    },
+    {
+      "episode": 16,
+      "asset_id": "L16-2008",
+      "source_name": "VID_20250908_202547_00_121.mp4",
+      "source_window_seconds": [
+        32.24,
+        94.55
+      ],
+      "source_window_hms": [
+        "00:00:32.24",
+        "00:01:34.55"
+      ],
+      "recommended_added_seconds": [
+        45,
+        60
+      ],
+      "priority": "A",
+      "title": "What makes this coast feel different",
+      "reason": "A complete East Coast/West Coast comparison is a real authored observation with personal references, not just another \"unreal\" scenic reaction.",
+      "insert_context": "Expand the existing dusk-drive reflection before the night lodging ending.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical packed vehicle interior during dusk travel.",
+      "is_360": true,
+      "checks": "Preserve it as Sonny’s subjective impression, not a geographic fact. Reframe to actual coastline under the commentary and back to face at personal references. Audit exposure and avoid transplanting a different coast. Catalog alias L15-0306 has the same filename, but no selected ranges; keep this Sept8 scene in E16 rather than duplicating it in Redwoods.",
+      "draft_excerpt": "This coastline is so much less developed, more rugged and wild... than the East Coast.",
+      "id": "E16-L16-2008-01",
+      "place": "Fort Bragg"
+    },
+    {
+      "episode": 16,
+      "asset_id": "L16-0108",
+      "source_name": "Snapchat-448577359.mp4",
+      "source_window_seconds": [
+        0,
+        4.37
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:04.37"
+      ],
+      "recommended_added_seconds": [
+        3,
+        4
+      ],
+      "priority": "B",
+      "title": "One wave with its real sound",
+      "reason": "A short sensory pause gives the ocean office sequence a physical environment.",
+      "insert_context": "Between settling with the laptop and the drone pull-away.",
+      "classification": "unused source",
+      "source_description": "Small waves wash around shoreline rocks.",
+      "is_360": false,
+      "checks": "Check for a clean complete wave cycle and uncrowded surf audio. Use the native portrait aspect honestly, no tight blurry landscape crop.",
+      "draft_excerpt": "",
+      "id": "E16-L16-0108-02",
+      "place": "Fort Bragg"
+    },
+    {
+      "episode": 17,
+      "asset_id": "L17-0097",
+      "source_name": "Snapchat-127687417.mp4",
+      "source_window_seconds": [
+        0,
+        3.73
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:03.73"
+      ],
+      "recommended_added_seconds": [
+        3,
+        4
+      ],
+      "priority": "A",
+      "title": "The work pass turns into the field",
+      "reason": "A concise unselected detail-to-stadium reveal explains why this baseball stop belongs in the working roadtrip story.",
+      "insert_context": "Before the second ballpark visit/Raven encounter.",
+      "classification": "unused source",
+      "source_description": "Working pass held up before camera turns to baseball field.",
+      "is_360": false,
+      "checks": "Mask any barcode, name, credential number or private employer details if visible. Preserve field reveal; natural sound only if clean. Do not add the whole private hotel anecdote to regular E17.",
+      "draft_excerpt": "",
+      "id": "E17-L17-0097-01",
+      "place": "Sacramento & Napa"
+    },
+    {
+      "episode": 17,
+      "asset_id": "L17-0095",
+      "source_name": "screen-20250909-185201.mp4",
+      "source_window_seconds": [
+        0,
+        86.1
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:01:26.10"
+      ],
+      "recommended_added_seconds": [
+        6,
+        12
+      ],
+      "priority": "B",
+      "title": "The interactive baseball activity",
+      "reason": "Screen activity/leaderboard could give context to work at the ballpark, instead of showing only stands and a friend.",
+      "insert_context": "After the pass/field reveal, before Raven.",
+      "classification": "unused source",
+      "source_description": "Screen recording of interactive baseball game and leaderboard.",
+      "is_360": false,
+      "checks": "Needs visual review and context confirmation: this is a screen recording, not footage of Sonny playing. Hide account/client details, check permissions on third-party game art and remove copyrighted recording music. Do not imply an action that wasn’t recorded.",
+      "draft_excerpt": "",
+      "id": "E17-L17-0095-02",
+      "place": "Sacramento & Napa"
+    },
+    {
+      "episode": 18,
+      "asset_id": "L18-2008",
+      "source_name": "VID_20250911_153652_00_003.mp4",
+      "source_window_seconds": [
+        0.18,
+        71.97
+      ],
+      "source_window_hms": [
+        "00:00:00.18",
+        "00:01:11.97"
+      ],
+      "recommended_added_seconds": [
+        50,
+        70
+      ],
+      "priority": "A",
+      "title": "An orchard stop and a local conversation",
+      "reason": "The cider farmer, orchard, dog and Upstate New York/apple connection give the coastal approach a distinctive real encounter. A complete new travel mini-story.",
+      "insert_context": "After leaving Napa, before coastal highway/Golden Gate; the stop is Sonoma-area travel, not SF proper.",
+      "classification": "unused source",
+      "source_description": "Spherical person gestures outdoors near roadside trees, then sits in car.",
+      "is_360": true,
+      "checks": "Listen and match source place name/sign; avoid suggesting drinking while driving. Keep the owner description respectful and preserve the correction that \"sweet\" meant cool, not sweet cider.",
+      "draft_excerpt": "The guy running this place... his farm... told them I'm from New York... you're from Apple region, huh?",
+      "id": "E18-L18-2008-01",
+      "place": "San Francisco"
+    },
+    {
+      "episode": 18,
+      "asset_id": "L18-2023",
+      "source_name": "VID_20250912_170619_00_020.mp4",
+      "source_window_seconds": [
+        117.3,
+        189.51
+      ],
+      "source_window_hms": [
+        "00:01:57.30",
+        "00:03:09.51"
+      ],
+      "recommended_added_seconds": [
+        45,
+        65
+      ],
+      "priority": "A",
+      "title": "Why Alcatraz has so many flies",
+      "reason": "A live ranger explanation adds a surprising island/ecology story beside the prison architecture. More distinctive than more silent cells.",
+      "insert_context": "After landing at Alcatraz and before heading up to the cellhouse.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical Alcatraz dock arrival with visitors and pale waterfront building.",
+      "is_360": true,
+      "checks": "Listen for clean public ranger audio and verify guide attribution; use real fly/bird/island context, not invented insect graphics claiming a species. Third-party speech suitability/rights check before public use; verify any factual captions against ranger wording.",
+      "draft_excerpt": "We are in fly season... tens of thousands of nesting seabirds... a sign of a healthy ecosystem.",
+      "id": "E18-L18-2023-02",
+      "place": "San Francisco"
+    },
+    {
+      "episode": 19,
+      "asset_id": "L19-2021",
+      "source_name": "VID_20250913_141305_00_002.mp4",
+      "source_window_seconds": [
+        77.42,
+        152.01
+      ],
+      "source_window_hms": [
+        "00:01:17.42",
+        "00:02:32.01"
+      ],
+      "recommended_added_seconds": [
+        40,
+        65
+      ],
+      "priority": "A",
+      "title": "The fish-fry experiment in full",
+      "reason": "The current cut takes10.5seconds near153.55 but misses the actual taste/texture/aversion story. A specific human challenge could be a complete scene.",
+      "insert_context": "After wharf/sea-lion visit and before leaving Santa Cruz for the coast.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical parked-car interior with person, navigation screen and packed belongings.",
+      "is_360": true,
+      "checks": "Listen and start after the unrelated hair rant; keep it a subjective first-fish experience. Add reaction/result instead of unrelated seafood B-roll. Exact head/tail needs word-level listen.",
+      "draft_excerpt": "It tastes sort of like chicken... softer and flakier... I sort of liked it... repulsed by the fact that it was fish.",
+      "id": "E19-L19-2021-01",
+      "place": "Santa Cruz"
+    },
+    {
+      "episode": 19,
+      "asset_id": "L19-2031",
+      "source_name": "VID_20250913_161200_00_012.mp4",
+      "source_window_seconds": [
+        0.15,
+        50.86
+      ],
+      "source_window_hms": [
+        "00:00:00.15",
+        "00:00:50.86"
+      ],
+      "recommended_added_seconds": [
+        25,
+        40
+      ],
+      "priority": "B",
+      "title": "Every hundred feet is another viewpoint",
+      "reason": "The traveler stopping repeatedly becomes a comic reason for the film’s many beautiful views, with the real next vista as payoff.",
+      "insert_context": "During Big Sur coastal road, near the Bixby/overlook section.",
+      "classification": "unused source",
+      "source_description": "Spherical person at rocky high overlook above blue sea, moving between viewpoints.",
+      "is_360": true,
+      "checks": "Full-motion scout for a coherent person-to-vista reveal and wind. No extra \"look at that\" unless its view is shown. Keep this instead of another generic drive if the sequence already feels long.",
+      "draft_excerpt": "I've literally moved... a hundred feet and I have another vista... every hundred feet there's a new picture to take.",
+      "id": "E19-L19-2031-02",
+      "place": "Santa Cruz"
+    },
+    {
+      "episode": 20,
+      "asset_id": "L20-2016",
+      "source_name": "VID_20250914_161340_00_049.mp4",
+      "source_window_seconds": [
+        45.46,
+        84.76
+      ],
+      "source_window_hms": [
+        "00:00:45.46",
+        "00:01:24.76"
+      ],
+      "recommended_added_seconds": [
+        20,
+        35
+      ],
+      "priority": "A",
+      "title": "Leaving Pebble Beach with a real reaction",
+      "reason": "A complete pro-shop/golf visit payoff connects the Monterey morning to Pinnacles rather than jumping immediately from grounds to navigation.",
+      "insert_context": "After Hole One and before the inland plan.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical walk over lawns and paths outside golf grounds toward parking.",
+      "is_360": true,
+      "checks": "Listen for intelligibility and matching actual location. Do not turn the subjective \"top golf courses\" remark into an official ranking.",
+      "draft_excerpt": "Just in the pro shop. Pretty fucking cool... Let's go.",
+      "id": "E20-L20-2016-01",
+      "place": "Pinnacles"
+    },
+    {
+      "episode": 20,
+      "asset_id": "L20-2024",
+      "source_name": "VID_20250914_182031_00_057.mp4",
+      "source_window_seconds": [
+        912.18,
+        972.94
+      ],
+      "source_window_hms": [
+        "00:15:12.18",
+        "00:16:12.94"
+      ],
+      "recommended_added_seconds": [
+        20,
+        35
+      ],
+      "priority": "B",
+      "title": "Where the hike goes after the cave",
+      "reason": "A brief route decision bridges emerging from the cave to climbing for the reservoir, supplying continuity after the now-restored long cave story.",
+      "insert_context": "After the cave exit, before the climb/teeny stairs.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical long hike through trees, rock passages and large boulders with person reacting.",
+      "is_360": true,
+      "checks": "Listen to map/trail names; the transcript mishears several. Show the actual route/map/forward trail. Do not restore the already-present camera fall or duplicate the existing cave escape dialogue.",
+      "draft_excerpt": "I did the cave. Now I gotta get to the top... Bear Gulch Cave Trail...",
+      "id": "E20-L20-2024-02",
+      "place": "Pinnacles"
+    },
+    {
+      "episode": 21,
+      "asset_id": "L21-2014",
+      "source_name": "VID_20250915_164624_00_060.mp4",
+      "source_window_seconds": [
+        6.04,
+        123.76
+      ],
+      "source_window_hms": [
+        "00:00:06.04",
+        "00:02:03.76"
+      ],
+      "recommended_added_seconds": [
+        20,
+        35
+      ],
+      "priority": "A",
+      "title": "Walking toward the giant Morro rock",
+      "reason": "A goal and reveal introduces the waterfront before the existing brief base-of-rock scene. Good self-in-360 context rather than only aerial sunset.",
+      "insert_context": "Before the Morro Rock base/shore shots.",
+      "classification": "unused source",
+      "source_description": "Spherical walk along Morro waterfront, cafe terrace and harbor overlook.",
+      "is_360": true,
+      "checks": "Merged ASR spans118seconds; find first complete introduction and actual rock reveal. Preserve the place as Morro Bay, not auto-transcribed Maro. Do not use the later unverified bird-guano history.",
+      "draft_excerpt": "There's a big... rock... I'll show you in a minute... right when we get around this turn.",
+      "id": "E21-L21-2014-01",
+      "place": "Morro Bay"
+    },
+    {
+      "episode": 21,
+      "asset_id": "L21-0085",
+      "source_name": "VID_20250915_195439_00_070.mp4",
+      "source_window_seconds": [
+        0,
+        19.17
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:19.17"
+      ],
+      "recommended_added_seconds": [
+        8,
+        12
+      ],
+      "priority": "B",
+      "title": "Sonny enters the sunset",
+      "reason": "Unselected portrait composition can make the celebrated fog sunset personal and help the vertical episode breathe.",
+      "insert_context": "Among the above-the-fog sunset shots, before returning to the car.",
+      "classification": "unused source",
+      "source_description": "Portrait fog sunset composition with person briefly entering frame.",
+      "is_360": false,
+      "checks": "Scout exact entry/expression and highlights. Display native portrait at full height with consistent blurred sides in landscape; do not enlarge a tight facial crop. No invented speech.",
+      "draft_excerpt": "",
+      "id": "E21-L21-0085-02",
+      "place": "Morro Bay"
+    },
+    {
+      "episode": 22,
+      "asset_id": "L22-0130",
+      "source_name": "Snapchat-784941900.mp4",
+      "source_window_seconds": [
+        0.24,
+        43.92
+      ],
+      "source_window_hms": [
+        "00:00:00.24",
+        "00:00:43.92"
+      ],
+      "recommended_added_seconds": [
+        25,
+        40
+      ],
+      "priority": "A",
+      "title": "The Santa Barbara gelato verdict",
+      "reason": "Specific taste reaction, Italy comparison and missing fruit chunks supply humor and a human day-in-town beat.",
+      "insert_context": "After the pier sunset, before the rainy next morning.",
+      "classification": "unused source",
+      "source_description": "Low-angle outdoor sunglasses selfie, with a smoking item held near the face.",
+      "is_360": false,
+      "checks": "Listen for ambient music and clear speech; confirm the item shown is gelato (catalog labels may misidentify hand-held objects). Preserve subjective taste, not an objective quality claim.",
+      "draft_excerpt": "It's actually really good... missing the fresh fruit chunks... not as good as Italy.",
+      "id": "E22-L22-0130-01",
+      "place": "California Coast"
+    },
+    {
+      "episode": 23,
+      "asset_id": "L23-0114",
+      "source_name": "PXL_20250919_215639963.mp4",
+      "source_window_seconds": [
+        0,
+        25.74
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:25.74"
+      ],
+      "recommended_added_seconds": [
+        12,
+        20
+      ],
+      "priority": "A",
+      "title": "Dolphins ride the pressure wave",
+      "reason": "Guide context can turn the current dolphin still into an actual crossing encounter and explain why the animals follow the boat.",
+      "insert_context": "During the boat crossing, before island landing.",
+      "classification": "unused source",
+      "source_description": "Boat-side view with another passenger filming toward distant water.",
+      "is_360": false,
+      "checks": "Crucial: identify visible dolphins in full playback. Catalog samples mostly show water; do not promise wildlife action unless legible. If readable, pair real guide explanation and actual animal movement; wind/guide-rights check.",
+      "draft_excerpt": "",
+      "id": "E23-L23-0114-01",
+      "place": "Channel Islands"
+    },
+    {
+      "episode": 23,
+      "asset_id": "L23-2010",
+      "source_name": "VID_20250919_195604_00_009.mp4",
+      "source_window_seconds": [
+        0.95,
+        7.04
+      ],
+      "source_window_hms": [
+        "00:00:00.95",
+        "00:00:07.04"
+      ],
+      "recommended_added_seconds": [
+        5,
+        7
+      ],
+      "priority": "B",
+      "title": "The passenger’s dolphin recap",
+      "reason": "A short personal payoff after the return explains how the encounter felt.",
+      "insert_context": "After mainland return, before twilight drive.",
+      "classification": "unused source",
+      "source_description": "Spherical coastal-road driving beside rocky hills, with car interior visible in 2010.",
+      "is_360": true,
+      "checks": "Listen to identify the animals meant by \"they\" and keep it tied to the crossing rather than implying foxes surrounded the boat.",
+      "draft_excerpt": "They're all surrounding our boats... they would come with us... they apparently liked it.",
+      "id": "E23-L23-2010-02",
+      "place": "Channel Islands"
+    },
+    {
+      "episode": 24,
+      "asset_id": "L24-2032",
+      "source_name": "VID_20250921_135412_00_039.mp4",
+      "source_window_seconds": [
+        4,
+        20.21
+      ],
+      "source_window_hms": [
+        "00:00:04.00",
+        "00:00:20.21"
+      ],
+      "recommended_added_seconds": [
+        15,
+        18
+      ],
+      "priority": "A",
+      "title": "The stadium entry setback",
+      "reason": "The ten-dollar storage penalty for the stick/lighter gives the baseball day a concrete mini-story with a result, consistent with a roadtrip that has friction.",
+      "insert_context": "Before stadium/game shots.",
+      "classification": "unused source",
+      "source_description": "Spherical approach through roads, gates and parking areas toward the stadium.",
+      "is_360": true,
+      "checks": "Listen and show actual gate/approach context; do not expose gate staff faces in an accusatory frame or infer a policy beyond Sonny’s recorded experience.",
+      "draft_excerpt": "You can't bring in a stick... I have to go pay ten dollars... store them.",
+      "id": "E24-L24-2032-01",
+      "place": "Los Angeles"
+    },
+    {
+      "episode": 24,
+      "asset_id": "L24-2025",
+      "source_name": "VID_20250921_112224_00_032.mp4",
+      "source_window_seconds": [
+        0.12,
+        54.27
+      ],
+      "source_window_hms": [
+        "00:00:00.12",
+        "00:00:54.27"
+      ],
+      "recommended_added_seconds": [
+        25,
+        40
+      ],
+      "priority": "B",
+      "title": "The Biltmore morning and missed robes",
+      "reason": "The ornate hotel and unused robes offer a funny contrast with the rough overnight stays before and after LA.",
+      "insert_context": "Before Sep21 downtown/lobby and baseball.",
+      "classification": "unused source",
+      "source_description": "Spherical hotel-room and bathroom tour with the traveler.",
+      "is_360": true,
+      "checks": "Listen and trim repeated room inspection. Hide booking details/screens; show architectural character and robe payoff. No need to include the whole85-second tour.",
+      "draft_excerpt": "It's bougie... there were some robes in here that I missed out on... I should have used the robe.",
+      "id": "E24-L24-2025-02",
+      "place": "Los Angeles"
+    },
+    {
+      "episode": 25,
+      "asset_id": "L25-2016",
+      "source_name": "VID_20250923_171834_00_059.mp4",
+      "source_window_seconds": [
+        1.11,
+        24.5
+      ],
+      "source_window_hms": [
+        "00:00:01.11",
+        "00:00:24.50"
+      ],
+      "recommended_added_seconds": [
+        10,
+        18
+      ],
+      "priority": "B",
+      "title": "A closer greeting to the tortoises",
+      "reason": "An alternate actual visit can extend the short tortoise motion with Sonny greeting the animals; may be preferable to generic walking.",
+      "insert_context": "Before/after the existing tortoise-on-the-move shot.",
+      "classification": "unused source",
+      "source_description": "Spherical close visit to giant tortoises beside the enclosure rail.",
+      "is_360": true,
+      "checks": "Compare L25-2017 to confirm same encounter and avoid repeating the same action. Main view must show tortoises in the pen, not only the rail/face; keep current v6 reframe quality.",
+      "draft_excerpt": "Whoa. Hey guy. Hey dude.",
+      "id": "E25-L25-2016-01",
+      "place": "San Diego"
+    },
+    {
+      "episode": 26,
+      "asset_id": "L26-2009",
+      "source_name": "VID_20250925_182517_00_001_002.mp4",
+      "source_window_seconds": [
+        637,
+        663.22
+      ],
+      "source_window_hms": [
+        "00:10:37.00",
+        "00:11:03.22"
+      ],
+      "recommended_added_seconds": [
+        20,
+        27
+      ],
+      "priority": "A",
+      "title": "Why now was the time to go",
+      "reason": "Cats cared for at home, few responsibilities and a first real trip West give a direct emotional reason for continuing. Complements existing six-second work remark without repeating the whole Vancouver origin story.",
+      "insert_context": "After joining Ranger Jeff’s walk, before the two-deserts lesson.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical group walk or guided stop among Joshua trees and rocks.",
+      "is_360": true,
+      "checks": "Listen to full context with the fellow visitor; correct ASR names only after listening. Personal family/cat-care details are spoken publicly here, but user should confirm comfort. Avoid restoring unrelated private work calls.",
+      "draft_excerpt": "That's the only thing I have at home... now's the time to do it... first time out west.",
+      "id": "E26-L26-2009-01",
+      "place": "Joshua Tree"
+    },
+    {
+      "episode": 26,
+      "asset_id": "L26-2009",
+      "source_name": "VID_20250925_182517_00_001_002.mp4",
+      "source_window_seconds": [
+        2699.05,
+        2726.07
+      ],
+      "source_window_hms": [
+        "00:44:59.05",
+        "00:45:26.07"
+      ],
+      "recommended_added_seconds": [
+        18,
+        27
+      ],
+      "priority": "B",
+      "title": "Ranger Jeff sets up the stars",
+      "reason": "Practical darkness/moon context gives the already-added night-sky finale a cause and a human guide, instead of jumping from sunset to stills.",
+      "insert_context": "Before the sunset/stargazing ending.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical group walk or guided stop among Joshua trees and rocks.",
+      "is_360": true,
+      "checks": "Listen and verify date-specific moon time/rating before authored overlays; retain as a guide’s recorded comment or omit uncertain numbers. No duplicate of the short existing \"stargazing spots\" question.",
+      "draft_excerpt": "",
+      "id": "E26-L26-2009-02",
+      "place": "Joshua Tree"
+    },
+    {
+      "episode": 27,
+      "asset_id": "L27-2011",
+      "source_name": "VID_20250927_145121_00_010.mp4",
+      "source_window_seconds": [
+        42.16,
+        102.87
+      ],
+      "source_window_hms": [
+        "00:00:42.16",
+        "00:01:42.87"
+      ],
+      "recommended_added_seconds": [
+        40,
+        60
+      ],
+      "priority": "A",
+      "title": "How a quick Vegas night became sunrise",
+      "reason": "The Sphere, blackjack win and a chance conversation explain why the existing departure says almost no sleep. This is a consequence-bearing story beyond spectacle clips.",
+      "insert_context": "At Vegas departure, after the current no-sleep line and before desert closure.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical daytime car discussion and driving into a dry desert landscape.",
+      "is_360": true,
+      "checks": "Listen, no driving-fatigue glorification montage; keep the recorded admission as context. Avoid sensitive details about a private person and do not reinsert copyrighted Sphere audio. A clear face/road reframe is needed.",
+      "draft_excerpt": "Won three hundred bucks... went to take a picture... talked for like five hours...",
+      "id": "E27-L27-2011-01",
+      "place": "Las Vegas"
+    },
+    {
+      "episode": 27,
+      "asset_id": "L27-0179",
+      "source_name": "Snapchat-1709352562.mp4",
+      "source_window_seconds": [
+        0,
+        6.85
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:06.85"
+      ],
+      "recommended_added_seconds": [
+        4,
+        6
+      ],
+      "priority": "B",
+      "title": "Still up on the Strip",
+      "reason": "A tiny real city-to-face gag can bridge the show and departure with personality instead of adding more protected show imagery.",
+      "insert_context": "After the night sequence, before the next day.",
+      "classification": "unused source",
+      "source_description": "Night Strip sweep into a close selfie.",
+      "is_360": false,
+      "checks": "Check actual time/light and listen for a clean line. Remove any background performance audio, avoid advertising protected show content.",
+      "draft_excerpt": "How the fuck am I still up? Who knows?",
+      "id": "E27-L27-0179-02",
+      "place": "Las Vegas"
+    },
+    {
+      "episode": 28,
+      "asset_id": "L28-2037",
+      "source_name": "VID_20250929_132103_00_011.mp4",
+      "source_window_seconds": [
+        543.2,
+        1061.76
+      ],
+      "source_window_hms": [
+        "00:09:03.20",
+        "00:17:41.76"
+      ],
+      "recommended_added_seconds": [
+        20,
+        35
+      ],
+      "priority": "B",
+      "title": "Walking through deep time",
+      "reason": "The Trail of Time/one-step-million-years observation would add an activity at the rim beyond staring at successive viewpoints.",
+      "insert_context": "Between first rim views and the existing putting-the-phone-down scene.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical rim walk past low stone walls, trees and viewpoints.",
+      "is_360": true,
+      "checks": "Broad source search518seconds, NOT a suggested518-second cut. Use word times to find a complete20–35sec segment about the marked trail and show the actual markers/steps; distinguish intentional narration from private call. Geologic numbers/years require sign verification.",
+      "draft_excerpt": "",
+      "id": "E28-L28-2037-01",
+      "place": "Hoover Dam + Grand Canyon"
+    },
+    {
+      "episode": 28,
+      "asset_id": "L28-2048",
+      "source_name": "VID_20250929_185906_00_025.mp4",
+      "source_window_seconds": [
+        240,
+        400
+      ],
+      "source_window_hms": [
+        "00:04:00.00",
+        "00:06:40.00"
+      ],
+      "recommended_added_seconds": [
+        10,
+        20
+      ],
+      "priority": "B",
+      "title": "A longer genuine sunset pause with Sonny in it",
+      "reason": "Unused continuation of the fixed sphere may show a complete physical pause/pose and more light change; a stronger end than extra stills if sharp.",
+      "insert_context": "Extend the existing sunset finale before blue hour.",
+      "classification": "expand existing scene",
+      "source_description": "Long spherical fixed canyon sunset view with rocks in the foreground and occasional traveler movement.",
+      "is_360": true,
+      "checks": "Visual scout only: determine whether Sonny actually enters/poses in this window. Do not claim an action just because catalog says occasional movement. Keep natural speed or a clearly marked time-lapse; avoid private conversation.",
+      "draft_excerpt": "",
+      "id": "E28-L28-2048-02",
+      "place": "Hoover Dam + Grand Canyon"
+    },
+    {
+      "episode": 29,
+      "asset_id": "L29-2034",
+      "source_name": "VID_20251001_135046_00_052.mp4",
+      "source_window_seconds": [
+        68.73,
+        98.16
+      ],
+      "source_window_hms": [
+        "00:01:08.73",
+        "00:01:38.16"
+      ],
+      "recommended_added_seconds": [
+        25,
+        30
+      ],
+      "priority": "A",
+      "title": "A fellow VR viewer asks where to watch",
+      "reason": "The spontaneous visitor asking about posting and your \"mainly for myself\" response pays off the camera/website/VR arc without another scenery reaction.",
+      "insert_context": "Near the existing idea-for-the-map passage during the hike.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical hiking through layered red rock passages and uphill trail sections.",
+      "is_360": true,
+      "checks": "Listen and preserve both speakers; skip98.7–132.78 handle/spelling exchange. Avoid repeating the same camera explanation elsewhere. Genuine self/forward reframes, respectful incidental visitor presentation.",
+      "draft_excerpt": "Do you post your stuff anywhere?... Mainly I'm doing it for myself. But I mean I might as well.",
+      "id": "E29-L29-2034-01",
+      "place": "Zion + Bryce Canyon"
+    },
+    {
+      "episode": 29,
+      "asset_id": "L29-2036",
+      "source_name": "VID_20251001_140309_00_054_055.mp4",
+      "source_window_seconds": [
+        1698.8,
+        1729.84
+      ],
+      "source_window_hms": [
+        "00:28:18.80",
+        "00:28:49.84"
+      ],
+      "recommended_added_seconds": [
+        25,
+        32
+      ],
+      "priority": "A",
+      "title": "Everyone is deciding where the trail ends",
+      "reason": "Another traveler and you agree they wandered to this viewpoint and choose a turnaround. A social moment resolves the uncertainty of the climb before \"we did it\".",
+      "insert_context": "Immediately before the final summit/turnaround.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical hike over exposed layered rock and canyon overlooks.",
+      "is_360": true,
+      "checks": "Listen and show shared view, not side-on torso. Do not invent a named peak or call it Angels Landing; recorded exchange explicitly has no agreed name.",
+      "draft_excerpt": "Is this like a named peak... or did you just wander up here too?... This might be my turnaround point.",
+      "id": "E29-L29-2036-02",
+      "place": "Zion + Bryce Canyon"
+    },
+    {
+      "episode": 30,
+      "asset_id": "L30-0190",
+      "source_name": "Snapchat-2122283414.mp4",
+      "source_window_seconds": [
+        0.21,
+        15.83
+      ],
+      "source_window_hms": [
+        "00:00:00.21",
+        "00:00:15.83"
+      ],
+      "recommended_added_seconds": [
+        15,
+        17
+      ],
+      "priority": "A",
+      "title": "The website plan gets said out loud",
+      "reason": "A complete compact promise to build an interactive map/vlog is now fulfilled by the real release. Strong story callback after Zion’s idea-for-the-map.",
+      "insert_context": "Before/after the hoodoo hike, after the footage-storage problem.",
+      "classification": "unused source",
+      "source_description": "Traveler talking while walking outdoors.",
+      "is_360": false,
+      "checks": "Listen to exact line and confirm not already supplied by VO/current captions. Show the actual present-day traveler; optional final-site link belongs outside this recommendations-only pass.",
+      "draft_excerpt": "A whole interactive website that plots my whole journey... like an interactive vlog.",
+      "id": "E30-L30-0190-01",
+      "place": "Bryce Canyon"
+    },
+    {
+      "episode": 30,
+      "asset_id": "L30-0181",
+      "source_name": "PXL_20251002_192540751.mp4",
+      "source_window_seconds": [
+        0,
+        26.47
+      ],
+      "source_window_hms": [
+        "00:00:00.00",
+        "00:00:26.47"
+      ],
+      "recommended_added_seconds": [
+        5,
+        8
+      ],
+      "priority": "B",
+      "title": "Finish one complete black-bird movement",
+      "reason": "The current bird shot lasts7seconds from L30-0180. Alternate phone coverage could show a distinct head turn/hop with real sound as a short breather.",
+      "insert_context": "Beside the existing bird beat, before hiking down.",
+      "classification": "unused source",
+      "source_description": "Large black bird moving and turning on a wooden railing near visitors.",
+      "is_360": false,
+      "checks": "Compare alternate source to avoid same recorded action twice. Add only a genuinely different behavior; no unsupported raven/crow identification.",
+      "draft_excerpt": "",
+      "id": "E30-L30-0181-02",
+      "place": "Bryce Canyon"
+    },
+    {
+      "episode": 31,
+      "asset_id": "R31-004",
+      "source_name": "LRV_20251003_171412_01_004.lrv",
+      "source_window_seconds": [
+        1318.57,
+        1361.58
+      ],
+      "source_window_hms": [
+        "00:21:58.57",
+        "00:22:41.58"
+      ],
+      "recommended_added_seconds": [
+        30,
+        43
+      ],
+      "priority": "A",
+      "title": "Potential rock-crawling exchange beyond the short export",
+      "reason": "The full raw ride has a clear exchange about needing a friend to spot, ducking trees and rock-crawling pace. This adds activity-specific stakes and coworkers talking together, rather than more music-only driving.",
+      "insert_context": "Mid-off-road ride, in the narrow forest-track portion.",
+      "classification": "potentially unused raw coverage: export alignment required",
+      "source_description": "Full raw off-road ride: camera proxy audio; original INSV picture requires stitching",
+      "is_360": true,
+      "checks": "LRV audio timestamps relative to raw part004. Original INSV must be stitched/reframed to compare against L31-2008 (only348.915s), which may be condensed. Prove it is not already a sped-up/short selected interval; listen to the raw audio, show riders and actual low-clearance track. No new export requested by this report.",
+      "draft_excerpt": "You definitely need a friend to spot you... literally ducking under trees... rock-crawling pace.",
+      "id": "E31-R31-004-01",
+      "place": "Salt Lake City"
+    },
+    {
+      "episode": 32,
+      "asset_id": "L32-2006",
+      "source_name": "VID_20251004_103113_00_006.mp4",
+      "source_window_seconds": [
+        292.22,
+        333.23
+      ],
+      "source_window_hms": [
+        "00:04:52.22",
+        "00:05:33.23"
+      ],
+      "recommended_added_seconds": [
+        30,
+        42
+      ],
+      "priority": "A",
+      "title": "The missing paper map and possible mailed payoff",
+      "reason": "A stranger’s shutdown question leads to your disappointment with a collecting ritual and the plan to get the map later. Supports the New River Gorge/Arches callback already in E34.",
+      "insert_context": "Within the Arches visitor conversation, before leaving for the concert.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical traveler approaching and standing beneath large connected arches with other visitors.",
+      "is_360": true,
+      "checks": "Listen; preserve it as your dated experience, not a current government-policy statement. Show the actual map/visitor interaction. Do not restore concert performance audio/images removed for the approved copyright gag.",
+      "draft_excerpt": "I've been collecting maps... if I email them... they'll mail me.",
+      "id": "E32-L32-2006-01",
+      "place": "Arches to Red Rocks"
+    },
+    {
+      "episode": 33,
+      "asset_id": "L33-2006",
+      "source_name": "VID_20251006_134802_00_014.mp4",
+      "source_window_seconds": [
+        121.65,
+        180.81
+      ],
+      "source_window_hms": [
+        "00:02:01.65",
+        "00:03:00.81"
+      ],
+      "recommended_added_seconds": [
+        35,
+        55
+      ],
+      "priority": "A",
+      "title": "What the drive home actually felt like",
+      "reason": "Truck-stop/car-charge sleep and changing clocks make the fast homeward montage a lived journey rather than an unexplained jump across several states.",
+      "insert_context": "After plains drive, before StLouis/Gateway Arch.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical traveler speaking and handling the camera in a parked car.",
+      "is_360": true,
+      "checks": "Listen and retain uncertainty about exact hours/clocks. Start after unverified bass/noise-ordinance claim; stop before financial/account conversation. Scene is candid travel logistics, not an instruction to drive without sleep.",
+      "draft_excerpt": "Slept... at a Love’s truck stop... charged my car... clocks changed at some point.",
+      "id": "E33-L33-2006-01",
+      "place": "Journey Home and Gateway Arch"
+    },
+    {
+      "episode": 33,
+      "asset_id": "L33-2006",
+      "source_name": "VID_20251006_134802_00_014.mp4",
+      "source_window_seconds": [
+        339.7,
+        362.44
+      ],
+      "source_window_hms": [
+        "00:05:39.70",
+        "00:06:02.44"
+      ],
+      "recommended_added_seconds": [
+        20,
+        24
+      ],
+      "priority": "B",
+      "title": "Storytelling is what brings the road home",
+      "reason": "Your history-podcast praise explicitly states storytelling matters to you. It could support the film’s reflective ending without generic new VO.",
+      "insert_context": "Toward the end of the home drive, before the final sign-off.",
+      "classification": "unused window of used source",
+      "source_description": "Spherical traveler speaking and handling the camera in a parked car.",
+      "is_360": true,
+      "checks": "Only Sonny’s review/commentary, no actual podcast audio. Confirm name by listening; stop before the unrelated Yankees rant. Compare existing final VO so the same idea does not repeat.",
+      "draft_excerpt": "Storytelling is so important to me... this guy nails it with history.",
+      "id": "E33-L33-2006-02",
+      "place": "Journey Home and Gateway Arch"
+    },
+    {
+      "episode": 35,
+      "asset_id": "L35-0031",
+      "source_name": "Snapchat-957320570.mp4",
+      "source_window_seconds": [
+        0.31,
+        34.42
+      ],
+      "source_window_hms": [
+        "00:00:00.31",
+        "00:00:34.42"
+      ],
+      "recommended_added_seconds": [
+        25,
+        35
+      ],
+      "priority": "A",
+      "title": "The magnet pile before the fridge payoff",
+      "reason": "A full souvenir-pile reaction is the tangible cost/scale/payoff of the running collecting habit, rather than only a6-second sort.",
+      "insert_context": "Before the final fridge reveal, preserving the fridge as the actual payoff.",
+      "classification": "unused dialogue around an existing souvenir scene",
+      "source_description": "Hands sorting trip souvenirs and small keepsakes on a counter.",
+      "is_360": false,
+      "checks": "Listen and preserve uncertainty about spending; do not invent total or count. Show each object clearly and avoid personal paperwork on the counter.",
+      "draft_excerpt": "Look at my magnet pile... really massive... how many hundreds is the question.",
+      "id": "E35-L35-0031-01",
+      "place": "Baltimore to Home"
+    },
+    {
+      "episode": 35,
+      "asset_id": "L35-2006",
+      "source_name": "VID_20251008_203600_00_025_026(1).mp4",
+      "source_window_seconds": [
+        398.23,
+        470.35
+      ],
+      "source_window_hms": [
+        "00:06:38.23",
+        "00:07:50.35"
+      ],
+      "recommended_added_seconds": [
+        20,
+        35
+      ],
+      "priority": "B",
+      "title": "The cats get dinner and Cookie remembers you",
+      "reason": "An unselected domestic care action and head-licking remark can deepen the homecoming after the brief reunion.",
+      "insert_context": "After reunion, before souvenirs/fridge.",
+      "classification": "unused window of used source",
+      "source_description": "Long spherical living-room recording with cats and traveler relaxing on the couch.",
+      "is_360": true,
+      "checks": "Listen and narrow to feeding/cat reaction. The full39-minute recording contains private calls/financial material later; exclude it. Verify Cookie/Truffle correctly, respect household voice privacy, no home address/detail overlay.",
+      "draft_excerpt": "You guys want your food?... Cookie was very happy... he came and licked my head.",
+      "id": "E35-L35-2006-02",
+      "place": "Baltimore to Home"
+    }
+  ]
+}
