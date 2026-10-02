@@ -271,7 +271,7 @@ onBeforeUnmount(destroy)
 
 <template>
   <div class="relative w-full h-full bg-black">
-    <div ref="host" class="absolute inset-0"></div>
+    <div ref="host" class="absolute inset-0 z-0"></div>
     <div v-if="item.type === 'pano-video' && (loading || needsPlay) && !failed" class="video-preview absolute inset-0 z-[2] grid place-items-center bg-black">
       <img v-if="preview" :src="preview" alt="" class="absolute inset-0 w-full h-full object-cover" />
       <button v-if="needsPlay" class="btn relative min-h-12" :disabled="!canPlay" @click="play()">Play 360 video</button>

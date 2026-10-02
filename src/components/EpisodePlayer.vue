@@ -4,7 +4,6 @@ import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
 import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
-import { enterVRPlaylist, episodePlaylist, xrSupported } from '../lib/xr'
 
 const store = useTripStore()
 const { isMobile, isPortrait } = useViewport()
@@ -25,7 +24,6 @@ const fmt = computed<Fmt>(() => {
 })
 const source = computed(() => playableFormat(episode.value, fmt.value))
 const posterFallback = computed(() => episode.value?.formats[fmt.value]?.poster || episode.value?.formats['16x9']?.poster)
-const hasBoth = computed(() => !!(playableFormat(episode.value, '16x9') && playableFormat(episode.value, '9x16')))
 const video = ref<HTMLVideoElement | null>(null)
 const failed = ref(false)
 
@@ -33,11 +31,12 @@ const stops = computed(() =>
   (episode.value?.stops || []).map((id) => store.stopById.get(id)).filter((s): s is NonNullable<typeof s> => !!s),
 )
 
-async function toggleFmt() {
+async function selectFmt(want: Fmt) {
+  if (want === fmt.value || !playableFormat(episode.value, want)) return
   const v = video.value
   const at = v?.currentTime || 0
   const wasPlaying = v && !v.paused
-  override.value = fmt.value === '16x9' ? '9x16' : '16x9'
+  override.value = want
   await nextTick()
   const nv = video.value
   if (nv) {
@@ -54,26 +53,11 @@ function close() {
   store.showEpisode(null)
 }
 
-// ---- VR edition (episodes[].formats.vr: mono equirect 360 MP4). Button appears only when the manifest has it. ----
+// 360 is an on-screen format. Headset entry is an explicit action inside that viewer.
 const vrFormat = computed(() => playableFormat(episode.value, 'vr'))
-const vrError = ref('')
-function watchVR() {
+function watch360() {
   const e = episode.value
-  const f = vrFormat.value
-  if (!e || !f) return
-  if (xrSupported.value) {
-    // headset: straight into an immersive session (requested inside this click) that plays on
-    // through the rest of the VR edition, up to the credits
-    const items = episodePlaylist(store.episodes)
-    enterVRPlaylist(items, Math.max(0, items.findIndex((x) => x.id === `ep${e.ep}`)), 'Episodes').catch((err) => {
-      console.warn('[vr] session failed', err)
-      vrError.value = 'VR could not start.'
-      setTimeout(() => (vrError.value = ''), 3000)
-    })
-    video.value?.pause()
-    return
-  }
-  // Desktop and phone use the regular 360 player with the complete chapter list.
+  if (!e || !vrFormat.value) return
   video.value?.pause()
   store.openEpisode360(e.ep)
 }
@@ -149,22 +133,13 @@ watch(
             <span class="text-amber">{{ dateSpan(episode.start, episode.end) }}</span>
             <span v-if="episode.duration" class="text-muted">{{ fmtDuration(episode.duration) }}</span>
             <span v-if="epKind(episode) === 'epilogue'" class="text-muted">Epilogue · at home</span>
-            <button
-              v-if="vrFormat"
-              class="chip vr-chip ml-auto !py-1"
-              :title="xrSupported ? 'Watch the VR edition in your headset' : 'Watch the 360° VR edition (drag to look around)'"
-              @click="watchVR"
-            >
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M3 7h18a1 1 0 011 1v8a1 1 0 01-1 1h-5.2l-2-2.6a2.25 2.25 0 00-3.6 0L8.2 17H3a1 1 0 01-1-1V8a1 1 0 011-1zm4.5 3a2 2 0 100 4 2 2 0 000-4zm9 0a2 2 0 100 4 2 2 0 000-4z" /></svg>
-              {{ xrSupported ? 'Watch in VR' : 'Watch in 360°' }}
-            </button>
-            <span v-if="vrError" class="text-ivory normal-case text-xs">{{ vrError }}</span>
-            <button v-if="hasBoth" class="chip !py-1" :class="{ 'ml-auto': !vrFormat }" :aria-pressed="fmt === '9x16'" :title="`Switch to ${fmt === '16x9' ? 'vertical 9:16' : 'wide 16:9'}`" @click="toggleFmt">
-              <svg v-if="fmt === '16x9'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2" /></svg>
-              <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2" /></svg>
-              {{ fmt === '16x9' ? '9:16' : '16:9' }}
-            </button>
           </div>
+          <div class="episode-formats" role="group" aria-label="Episode viewing format">
+            <button class="format-choice" :disabled="!playableFormat(episode, '16x9')" :aria-pressed="fmt === '16x9'" @click="selectFmt('16x9')"><strong>16:9</strong><span>Landscape</span></button>
+            <button class="format-choice" :disabled="!playableFormat(episode, '9x16')" :aria-pressed="fmt === '9x16'" @click="selectFmt('9x16')"><strong>9:16</strong><span>Portrait</span></button>
+            <button class="format-choice" :disabled="!vrFormat" aria-label="Watch episode in 360" @click="watch360"><strong>360°</strong><span>Look around</span></button>
+          </div>
+          <p v-if="vrFormat" class="font-ui text-xs text-muted">Drag or swipe in 360°. Enter VR inside the viewer to use a headset.</p>
           <div v-if="stops.length" class="flex flex-wrap gap-1.5">
             <button
               v-for="s in stops"
@@ -226,10 +201,12 @@ watch(
     max-height: none !important;
   }
 }
-.vr-chip {
-  color: #e6b56a;
-  border-color: #e6b56a;
-}
+.episode-formats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.format-choice { min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 1px solid #8c7147; border-radius: 9px; color: #e6b56a; font-family: var(--font-ui); touch-action: manipulation; }
+.format-choice span { font-size: 12px; color: #f5f1e7; }
+.format-choice[aria-pressed='true'] { background: #394036; border-color: #e6b56a; }
+.format-choice:disabled { opacity: .4; }
+.format-choice:focus-visible { outline: 2px solid #e6b56a; outline-offset: 2px; }
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.18s;

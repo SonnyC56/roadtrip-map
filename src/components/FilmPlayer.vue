@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { closeFilm, filmState, type FlatFormat } from '../lib/film'
+import { useTripStore } from '../stores/trip'
 import { epLabel, mediaUrl, playableFormat, type Episode } from '../lib/manifest'
 function title(e: Episode) { return epLabel(e).toUpperCase() === e.title.toUpperCase() ? e.title : `${epLabel(e)} · ${e.title}` }
+const store = useTripStore()
 const video = ref<HTMLVideoElement | null>(null)
 const episode = computed(() => filmState.value?.episodes[filmState.value.index])
 const source = computed(() => playableFormat(episode.value, filmState.value?.format || '16x9'))
@@ -38,6 +40,10 @@ function format(fmt: FlatFormat) {
   shouldPlay = !!video.value && !video.value.paused
   failed.value = false; needsPlay.value = false
   filmState.value = { ...s, format: fmt }
+}
+function watch360() {
+  if (!episode.value || !playableFormat(episode.value, 'vr')) return
+  if (store.openEpisode360(episode.value.ep)) closeFilm()
 }
 function retry() { failed.value = false; shouldPlay = true; video.value?.load() }
 function key(e: KeyboardEvent) { if (e.key === 'Escape') closeFilm() }
@@ -75,8 +81,9 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', key); video.value?
         </label>
         <button class="control" :disabled="!next" aria-label="Next chapter" @click="go(filmState.index + 1)">→</button>
         <div class="flex gap-1" role="group" aria-label="Film format">
-          <button class="control text-sm" :aria-pressed="filmState.format === '16x9'" @click="format('16x9')">16:9</button>
-          <button class="control text-sm" :aria-pressed="filmState.format === '9x16'" @click="format('9x16')">9:16</button>
+          <button class="control text-sm" :aria-pressed="filmState.format === '16x9'" aria-label="Watch film in landscape" @click="format('16x9')">16:9</button>
+          <button class="control text-sm" :aria-pressed="filmState.format === '9x16'" aria-label="Watch film in portrait" @click="format('9x16')">9:16</button>
+          <button class="control text-sm" :disabled="!playableFormat(episode, 'vr')" aria-label="Watch film in 360" @click="watch360">360°</button>
         </div>
       </div>
       <p class="font-ui text-xs text-muted mt-2 truncate" aria-live="polite">{{ next ? `Up next: ${next.title} · plays automatically` : 'The final chapter' }}</p>

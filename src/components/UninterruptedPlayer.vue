@@ -42,7 +42,7 @@ onBeforeUnmount(() => { video.value?.pause(); window.removeEventListener('keydow
 </script>
 <template>
   <section ref="dialog" class="master-player" role="dialog" aria-modal="true" aria-label="Watch uninterrupted" tabindex="-1">
-    <header><span>Whole journey · {{ master.format === 'vr' ? '360° / VR' : '16:9' }} · Uninterrupted</span><button class="btn" @click="close">Close</button></header>
+    <header><span>Whole journey · {{ master.format === 'vr' ? '360°' : '16:9' }} · Uninterrupted</span><button class="btn" @click="close">Close</button></header>
     <div class="picture">
       <Media360Viewer v-if="master.format === 'vr'" ref="sphere" :item="item" continuous single-file @time="time = $event" @fullscreen="fullscreen" />
       <video v-else ref="video" controls playsinline autoplay preload="metadata" crossorigin="anonymous" :src="mediaUrl(master.src)" :poster="mediaUrl(poster)" @timeupdate="time = video?.currentTime || 0" @error="error = 'The film could not load. Close this player to use chapter playback instead.'">
