@@ -2,7 +2,7 @@
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { startFilm, type FlatFormat } from '../lib/film'
-import { playableFormat, type EpisodeFormatKey } from '../lib/manifest'
+import { playableFormat, epKind, type EpisodeFormatKey } from '../lib/manifest'
 import { mediaUrl } from '../lib/manifest'
 import { uninterrupted, verifiedMaster, type Master, type MasterFormat } from '../lib/uninterrupted'
 import { fmtDuration } from '../lib/format'
@@ -14,9 +14,9 @@ let request: AbortController | undefined
 async function refreshMasters() {
   request = new AbortController()
   const timeout = setTimeout(() => request?.abort(), 12000)
-  await Promise.all((['16x9', 'vr'] as const).map(async format => {
+  await Promise.all((['16x9', '9x16', 'vr'] as const).map(async format => {
     try {
-      const prefix = format === 'vr' ? 'masters/vr-v06' : 'masters/v06'
+      const prefix = format === 'vr' ? 'masters/vr-v06' : format === '9x16' ? 'masters/portrait-v08' : 'masters/v06'
       const response = await fetch(mediaUrl(`${prefix}/index.json`), { cache: 'no-cache', signal: request?.signal })
       const master = response.ok ? verifiedMaster(await response.json(), format) : null
       if (!disposed) { if (master) masters.value[format] = master; else delete masters.value[format] }
@@ -32,9 +32,10 @@ function watchMaster(format: MasterFormat) {
 }
 onMounted(refreshMasters)
 onBeforeUnmount(() => { disposed = true; clearTimeout(timer); request?.abort() })
-const duration = computed(() => store.episodes.reduce((n, e) => n + (e.duration || 0), 0))
-function ready(format: EpisodeFormatKey) { return !!store.episodes.length && store.episodes.every(e => playableFormat(e, format)) }
-function watchFlat(format: FlatFormat) { store.showEpisode(null); store.closeMedia(); startFilm(store.episodes, format) }
+const mainEpisodes = computed(() => store.episodes.filter(e => epKind(e) !== 'epilogue'))
+const duration = computed(() => mainEpisodes.value.reduce((n, e) => n + (e.duration || 0), 0))
+function ready(format: EpisodeFormatKey) { return !!mainEpisodes.value.length && mainEpisodes.value.every(e => playableFormat(e, format)) }
+function watchFlat(format: FlatFormat) { store.showEpisode(null); store.closeMedia(); startFilm(mainEpisodes.value, format) }
 function watch360() {
   store.showEpisode(null)
   store.closeMedia()
@@ -48,7 +49,7 @@ function watch360() {
       <h2 class="font-display text-2xl text-ivory">Watch the whole film</h2>
       <span class="font-ui text-xs text-muted">{{ fmtDuration(duration) }}</span>
     </div>
-    <p class="font-ui text-sm text-muted mb-2">Intro to credits. Chapters play automatically.</p>
+    <p class="font-ui text-sm text-muted mb-2">Intro to the fridge finale. Chapters play automatically. The epilogue remains a separate chapter.</p>
     <div class="grid grid-cols-3 gap-2">
       <button class="format" :disabled="!ready('16x9')" aria-label="Watch whole film in landscape 16:9" @click="watchFlat('16x9')"><strong>16:9</strong><span>Landscape</span></button>
       <button class="format" :disabled="!ready('9x16')" aria-label="Watch whole film in portrait 9:16" @click="watchFlat('9x16')"><strong>9:16</strong><span>Portrait</span></button>
@@ -58,8 +59,9 @@ function watch360() {
     <details class="uninterrupted mt-3 font-ui">
       <summary>Watch uninterrupted <span class="text-muted">· Optional</span></summary>
       <p class="text-sm text-muted my-2">Single-file playback, without chapter loading breaks. Best on a fast, stable connection.</p>
-      <div class="grid grid-cols-2 gap-2" aria-live="polite">
+      <div class="grid grid-cols-3 gap-2" aria-live="polite">
         <button class="format" :disabled="!masters['16x9']" @click="watchMaster('16x9')"><strong>16:9 Landscape</strong><span>{{ masters['16x9'] ? 'Watch uninterrupted' : 'Coming soon' }}</span></button>
+        <button class="format" :disabled="!masters['9x16']" @click="watchMaster('9x16')"><strong>9:16 Portrait</strong><span>{{ masters['9x16'] ? 'Watch uninterrupted' : 'Coming soon' }}</span></button>
         <button class="format" :disabled="!masters.vr" @click="watchMaster('vr')"><strong>360° Look around</strong><span>{{ masters.vr ? 'Watch uninterrupted' : 'Coming soon' }}</span></button>
       </div>
       <p class="text-xs text-muted mt-2">Available automatically once each full-film upload is verified. Chapter playback above remains the default.</p>

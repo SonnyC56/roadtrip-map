@@ -357,7 +357,8 @@ export const useTripStore = defineStore('trip', () => {
   }
 
   function openEpisode360(ep?: number): boolean {
-    const list = episode360Media(episodes.value, stops.value)
+    const selected = ep === 36 ? episodes.value.filter(e => e.ep === 36) : episodes.value.filter(e => epKind(e) !== 'epilogue')
+    const list = episode360Media(selected, stops.value)
     const index = chapterIndex(list, ep)
     if (index < 0) return false
     lightbox.value = { list, index, film: true }

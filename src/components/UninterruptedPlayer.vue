@@ -3,10 +3,11 @@ import { computed, defineAsyncComponent, onMounted, onBeforeUnmount, ref } from 
 import { uninterrupted } from '../lib/uninterrupted'
 import { mediaUrl, type Media } from '../lib/manifest'
 import { useTripStore } from '../stores/trip'
-import chapters from '../lib/film-chapters.json'
+import legacyChapters from '../lib/film-chapters.json'
 const Media360Viewer = defineAsyncComponent(() => import('./Media360Viewer.vue'))
 const store = useTripStore()
 const master = uninterrupted.value!
+const chapters = master.version === 'v08' ? master.chapters! : legacyChapters
 const dialog = ref<HTMLElement | null>(null)
 const video = ref<HTMLVideoElement | null>(null)
 const sphere = ref<{ seek: (seconds: number) => void } | null>(null)
@@ -15,7 +16,7 @@ const error = ref('')
 const previousFocus = document.activeElement as HTMLElement | null
 const chapter = computed(() => Math.max(0, chapters.reduce((found, c, i) => c.start <= time.value ? i : found, 0)))
 const poster = store.episodes.find(e => e.ep === 0)?.formats[master.format]?.poster
-const item: Media = { id: 'whole-journey-v06', type: 'pano-video', src: master.src, poster,
+const item: Media = { id: `whole-journey-${master.version}`, type: 'pano-video', src: master.src, poster,
   caption: "Sonny's Roadtrip 2025 — uninterrupted", duration: master.duration, time_utc: null,
   lat: 0, lon: 0, t: 0, day: '2025-08-13' }
 function seek(index: number) {
@@ -42,7 +43,7 @@ onBeforeUnmount(() => { video.value?.pause(); window.removeEventListener('keydow
 </script>
 <template>
   <section ref="dialog" class="master-player" role="dialog" aria-modal="true" aria-label="Watch uninterrupted" tabindex="-1">
-    <header><span>Whole journey · {{ master.format === 'vr' ? '360°' : '16:9' }} · Uninterrupted</span><button class="btn" @click="close">Close</button></header>
+    <header><span>Whole journey · {{ master.format === 'vr' ? '360°' : master.format === '9x16' ? '9:16' : '16:9' }} · Uninterrupted</span><button class="btn" @click="close">Close</button></header>
     <div class="picture">
       <Media360Viewer v-if="master.format === 'vr'" ref="sphere" :item="item" continuous single-file @time="time = $event" @fullscreen="fullscreen" />
       <video v-else ref="video" controls playsinline autoplay preload="metadata" crossorigin="anonymous" :src="mediaUrl(master.src)" :poster="mediaUrl(poster)" @timeupdate="time = video?.currentTime || 0" @error="error = 'The film could not load. Close this player to use chapter playback instead.'">
