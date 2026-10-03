@@ -2,8 +2,11 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { closeFilm, filmState, type FlatFormat } from '../lib/film'
 import { useTripStore } from '../stores/trip'
-import { epLabel, mediaUrl, playableFormat, type Episode } from '../lib/manifest'
-function title(e: Episode) { return epLabel(e).toUpperCase() === e.title.toUpperCase() ? e.title : `${epLabel(e)} · ${e.title}` }
+import { epLabel, episodeVersionLabel, mediaUrl, playableFormat, type Episode } from '../lib/manifest'
+function title(e: Episode) {
+  const name = epLabel(e).toUpperCase() === e.title.toUpperCase() ? e.title : `${epLabel(e)} · ${e.title}`
+  return episodeVersionLabel(e, filmState.value?.format || '16x9') ? `${name} · V8` : name
+}
 const store = useTripStore()
 const video = ref<HTMLVideoElement | null>(null)
 const episode = computed(() => filmState.value?.episodes[filmState.value.index])

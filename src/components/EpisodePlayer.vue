@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { useViewport } from '../composables/useViewport'
-import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
+import { epKind, epLabel, episodeVersionLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
 
 const store = useTripStore()
@@ -96,7 +96,7 @@ watch(
         <!-- header -->
         <div class="flex items-start gap-3 px-4 pt-3 pb-2">
           <div class="min-w-0 flex-1">
-            <div class="font-pixel text-[11px] text-brass-4"><template v-if="epKind(episode) === 'intro'">THE INTRO</template><template v-else>EPISODE {{ pad2(episode.ep) }}<span class="text-brass-2"> / {{ store.episodeCount }}</span></template></div>
+            <div class="font-pixel text-[11px] text-brass-4"><template v-if="epKind(episode) === 'intro'">THE INTRO</template><template v-else>EPISODE {{ pad2(episode.ep) }}<span class="text-brass-2"> / {{ store.episodeCount }}</span></template><span v-if="episodeVersionLabel(episode, fmt)" class="text-amber" aria-label="Version 8"> · V8</span></div>
             <h2 class="font-display text-[1.9rem] sm:text-[2.3rem] leading-none text-ivory mt-0.5">{{ episode.title }}</h2>
           </div>
           <button class="btn btn-icon shrink-0" aria-label="Close" title="Close (Esc)" @click="close">

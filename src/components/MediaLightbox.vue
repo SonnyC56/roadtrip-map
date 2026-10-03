@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
-import { mediaUrl, toLegacyItem } from '../lib/manifest'
+import { episodeVersionLabel, mediaUrl, playableFormat, toLegacyItem } from '../lib/manifest'
 import { TYPE_META, LOC_NOTE } from '../lib/typeMeta'
 import { localDateTime, pad2 } from '../lib/format'
 import { vrState } from '../lib/xr'
@@ -25,6 +25,7 @@ const hasNext = computed(() => !!lb.value && lb.value.index < lb.value.list.leng
 const following = computed(() => lb.value?.list[lb.value.index + 1])
 const stop = computed(() => (item.value?.stop != null ? store.stopById.get(item.value.stop) : undefined))
 const episode = computed(() => (item.value?.episode != null ? store.episodeByNum.get(item.value.episode) : undefined))
+const edition = computed(() => playableFormat(episode.value, 'vr')?.src === item.value?.src ? episodeVersionLabel(episode.value, 'vr') : null)
 const locNote = computed(() => (item.value && item.value.loc && item.value.loc !== 'gps' ? LOC_NOTE[item.value.loc] || 'Approximate location' : ''))
 const isImmersive = computed(() => item.value?.type === 'splat' || item.value?.type === 'xr-scene')
 const legacy = computed(() => (item.value && isImmersive.value ? toLegacyItem(item.value) : null))
@@ -156,6 +157,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
         <span class="chip !py-1" :style="{ color: meta?.color }"><span class="dot" :style="{ background: meta?.color }"></span>{{ meta?.short }}</span>
         <span class="font-pixel text-[11px] text-muted">{{ (lb!.index + 1).toLocaleString('en-US') }} / {{ lb!.list.length.toLocaleString('en-US') }}</span>
         <span v-if="lb?.film" class="font-ui text-xs text-muted uppercase tracking-wide truncate">The whole journey</span>
+        <span v-if="edition" class="font-ui text-xs text-amber" aria-label="Version 8">V8</span>
         <button class="btn btn-icon ml-auto" aria-label="Close" title="Close (Esc)" @click="close">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>

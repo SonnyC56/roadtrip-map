@@ -1,4 +1,4 @@
-import type { Episode, Media, Stop } from './manifest'
+import { episodeVersionLabel, type Episode, type Media, type Stop } from './manifest'
 
 /** The same ordered, playable 360 chapters for either on-screen entry point. */
 export function episode360Media(episodes: Episode[], stops: Stop[]): Media[] {
@@ -14,7 +14,7 @@ export function episode360Media(episodes: Episode[], stops: Stop[]): Media[] {
       id: `e${e.ep}-vr`, type: 'pano-video', episode: e.ep, stop: stop?.id ?? null,
       time_utc: null, lat: stop?.lat ?? 0, lon: stop?.lon ?? 0,
       src: f.src, poster: f.poster ?? null, thumb: f.poster ?? null,
-      caption: title, duration: f.duration ?? e.duration,
+      caption: episodeVersionLabel(e, 'vr') ? `${title} · V8` : title, duration: f.duration ?? e.duration,
       t: Date.parse(`${e.start}T12:00:00Z`), day: e.start,
     } satisfies Media]
   })

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
-import { epKind, epLabel, mediaUrl, playableFormat } from '../lib/manifest'
+import { epKind, epLabel, episodeVersionLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration } from '../lib/format'
 import FilmLauncher from './FilmLauncher.vue'
 
@@ -50,6 +50,7 @@ watch(
         <div class="thumb relative shrink-0 w-[92px] aspect-video rounded-lg overflow-hidden bg-ink-3 border border-line">
           <img v-if="poster(e.ep)" :src="poster(e.ep)" alt="" loading="lazy" decoding="async" class="w-full h-full object-cover" @error="($event.target as HTMLImageElement).style.display = 'none'" />
           <span class="absolute left-1 top-1 font-pixel text-[10px] px-1 rounded bg-ink/85 text-brass-5">{{ epLabel(e) }}</span>
+          <span v-if="episodeVersionLabel(e)" class="absolute right-1 top-1 font-ui text-[10px] px-1 rounded bg-ink/85 text-amber" aria-label="Version 8">V8</span>
           <span v-if="e.duration" class="absolute right-1 bottom-1 font-ui text-[11px] px-1 rounded bg-ink/85 text-ivory">{{ fmtDuration(e.duration) }}</span>
         </div>
         <div class="min-w-0 flex-1">

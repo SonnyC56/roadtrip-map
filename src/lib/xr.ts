@@ -4,7 +4,7 @@
 // click handler must call navigator.xr.requestSession() (and video.play()) synchronously inside the
 // user gesture, so it runs here, before any dynamic import.
 import { ref, shallowRef } from 'vue'
-import { epKind, epLabel, mediaUrl, playableFormat, type Episode } from './manifest'
+import { epKind, epLabel, episodeVersionLabel, mediaUrl, playableFormat, type Episode } from './manifest'
 
 /** One video in an in-VR playlist (an episode of the VR edition, or a raw 360 clip). */
 export interface VRItem {
@@ -134,7 +134,7 @@ export function episodePlaylist(episodes: Episode[]): VRItem[] {
     if (!f) continue
     out.push({
       id: `ep${e.ep}`,
-      label: epKind(e) === 'intro' ? 'INTRO' : epLabel(e),
+      label: [epKind(e) === 'intro' ? 'INTRO' : epLabel(e), episodeVersionLabel(e, 'vr')].filter(Boolean).join(' · '),
       title: e.title,
       src: mediaUrl(f.src),
       poster: mediaUrl(f.poster) || undefined,

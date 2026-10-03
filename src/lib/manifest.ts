@@ -76,6 +76,13 @@ export function playableFormat(e: Episode | null | undefined, k: EpisodeFormatKe
   return f && f.src && f.ready !== false ? f : null
 }
 
+/** A V8 badge follows the playable format; mixed or unpublished episodes stay unlabelled. */
+export function episodeVersionLabel(e: Episode | null | undefined, k?: EpisodeFormatKey): string | null {
+  if (!e) return null
+  const formats = k ? [playableFormat(e, k)] : (['16x9', '9x16', 'vr'] as const).map(key => playableFormat(e, key))
+  return formats.every(f => f?.version === 'v08') ? 'V8' : null
+}
+
 export interface PanoInfo {
   preview: string
   tiles: string
