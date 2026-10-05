@@ -1,6 +1,7 @@
 // Data contract: D:/RoadTrip-Production/site/manifest-schema.md (v1).
 // Everything is read relative to VITE_MEDIA_BASE (R2 public URL in prod, local static server in dev).
 import type { MediaItem as LegacyItem, SplatConfig, XRSceneConfig } from './legacyViewer'
+import { applyPublishedEpisodeCorrections } from './publishedEpisodeCorrections'
 
 export const MEDIA_BASE = String(import.meta.env.VITE_MEDIA_BASE || '').replace(/\/+$/, '')
 
@@ -35,6 +36,9 @@ export interface Stop {
 export type EpisodeFormatKey = '16x9' | '9x16' | 'vr'
 
 export interface EpisodeFormat {
+  sha256?: string
+  captions?: string
+  frames?: number
   src: string
   poster?: string
   w?: number
@@ -45,6 +49,7 @@ export interface EpisodeFormat {
 }
 
 export interface Episode {
+  captions?: string
   ep: number
   title: string
   start: string
@@ -169,6 +174,7 @@ async function getJson<T>(url: string): Promise<T> {
 
 export async function loadManifest(): Promise<{ manifest: Manifest; media: Media[]; pending360: { photos: number; videos: number } }> {
   const manifest = await getJson<Manifest>(mediaUrl('manifest.json'))
+  applyPublishedEpisodeCorrections(manifest.episodes || [])
   const raw: RawMedia[] = []
   const extraFiles: string[] = [...(manifest.media_files || [])]
   for (const m of manifest.media || []) {
