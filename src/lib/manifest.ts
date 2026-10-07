@@ -2,6 +2,7 @@
 // Everything is read relative to VITE_MEDIA_BASE (R2 public URL in prod, local static server in dev).
 import type { MediaItem as LegacyItem, SplatConfig, XRSceneConfig } from './legacyViewer'
 import { applyPublishedEpisodeCorrections } from './publishedEpisodeCorrections'
+import { applyReadyV8Intro } from './readyV8'
 
 export const MEDIA_BASE = String(import.meta.env.VITE_MEDIA_BASE || '').replace(/\/+$/, '')
 
@@ -174,6 +175,7 @@ async function getJson<T>(url: string): Promise<T> {
 
 export async function loadManifest(): Promise<{ manifest: Manifest; media: Media[]; pending360: { photos: number; videos: number } }> {
   const manifest = await getJson<Manifest>(mediaUrl('manifest.json'))
+  applyReadyV8Intro(manifest.episodes || [])
   applyPublishedEpisodeCorrections(manifest.episodes || [])
   const raw: RawMedia[] = []
   const extraFiles: string[] = [...(manifest.media_files || [])]

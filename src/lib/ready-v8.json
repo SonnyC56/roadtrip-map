@@ -1,0 +1,2098 @@
+{
+  "release": "v08-ready-2026-10-07",
+  "intro": {
+    "previous": {
+      "ep": 0,
+      "title": "INTRO",
+      "kind": "intro",
+      "start": "2025-08-12",
+      "end": "2025-08-12",
+      "stops": [],
+      "path": [],
+      "duration": 57.0,
+      "version": "v06",
+      "formats": {
+        "16x9": {
+          "src": "episodes/e00/16x9-v06-b4ffc558.mp4",
+          "poster": "episodes/e00/poster-16x9-v06-b4ffc558.jpg",
+          "w": 1920,
+          "h": 1080,
+          "version": "v06",
+          "duration": 57.0,
+          "ready": true
+        },
+        "9x16": {
+          "src": "episodes/e00/9x16-v06-b0e6f501.mp4",
+          "poster": "episodes/e00/poster-9x16-v06-b0e6f501.jpg",
+          "w": 1080,
+          "h": 1920,
+          "version": "v06",
+          "duration": 57.0,
+          "ready": true
+        },
+        "vr": {
+          "src": "vr/v06/e00.mp4",
+          "poster": "vr/v06/e00-poster.jpg",
+          "w": 3840,
+          "h": 1920,
+          "version": "v06",
+          "duration": 57.0,
+          "ready": true
+        }
+      },
+      "ready": true
+    },
+    "current": {
+      "ep": 0,
+      "title": "INTRO",
+      "kind": "intro",
+      "start": "2025-08-12",
+      "end": "2025-08-12",
+      "stops": [],
+      "path": [],
+      "duration": 57.0,
+      "version": "v08",
+      "formats": {
+        "16x9": {
+          "src": "episodes/e00/16x9-v08-d140e5be5ea0.mp4",
+          "poster": "episodes/e00/16x9-v08-d140e5be5ea0-poster-39049794a103.jpg",
+          "w": 3840,
+          "h": 2160,
+          "version": "v08",
+          "duration": 57.0,
+          "frames": 1710,
+          "ready": true,
+          "sha256": "d140e5be5ea032841ee76e6f551f99d83253da9876949abc4e8b6ca6c4b462ef",
+          "captions": "captions/v08/e00-16x9-21e6053d7a8f.vtt"
+        },
+        "9x16": {
+          "src": "episodes/e00/9x16-v08-3bf3f86fb6c5.mp4",
+          "poster": "episodes/e00/9x16-v08-3bf3f86fb6c5-poster-cb3e0c6b4cd2.jpg",
+          "w": 2160,
+          "h": 3840,
+          "version": "v08",
+          "duration": 57.0,
+          "frames": 1710,
+          "ready": true,
+          "sha256": "3bf3f86fb6c5f68dbfc7f567fae5ed43241fc0439b4133bb6cbf75fc7ae413f4",
+          "captions": "captions/v08/e00-9x16-21e6053d7a8f.vtt"
+        },
+        "vr": {
+          "src": "vr/v08/e00-585b0c6e4270.mp4",
+          "poster": "vr/v08/e00-585b0c6e4270-poster-25ed2f98afa6.jpg",
+          "w": 3840,
+          "h": 1920,
+          "version": "v08",
+          "duration": 57.0,
+          "frames": 1710,
+          "ready": true,
+          "sha256": "585b0c6e427058d6888ec0487559f773569823e87da5e27ca0ac241d165b97e4",
+          "captions": "captions/v08/e00-vr-21e6053d7a8f.vtt"
+        }
+      },
+      "ready": true,
+      "captions": "captions/v08/e00-16x9-21e6053d7a8f.vtt",
+      "review_state": "technical-draft",
+      "listening_verified": false,
+      "headset_review_verified": false
+    }
+  },
+  "masters": {
+    "16x9": {
+      "version": "v08",
+      "status": "ready",
+      "format": "16x9",
+      "src": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_Opening-v01_Clock-v18-ff1137078117.mp4",
+      "captions": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_Opening-v01_Clock-v18-ff1137078117.srt",
+      "vtt": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_Opening-v01_Clock-v18-ff1137078117.vtt",
+      "duration": 10799.366666666667,
+      "bytes": 81418465164,
+      "sha256": "ff11370781177e8f53f2a4fca9314290e16d47fddefe30541e75f0fb5fecf175",
+      "frames": 323981,
+      "width": 3840,
+      "height": 2160,
+      "audio": [
+        "5.1 surround",
+        "stereo"
+      ],
+      "chapters": [
+        {
+          "ep": 0,
+          "title": "INTRO",
+          "kind": "intro",
+          "start": 0.0,
+          "end": 57.0,
+          "start_frame": 0,
+          "end_frame": 1710
+        },
+        {
+          "ep": 1,
+          "title": "NEW YORK > CHICAGO",
+          "kind": "episode",
+          "start": 57.0,
+          "end": 190.13333333333333,
+          "start_frame": 1710,
+          "end_frame": 5704
+        },
+        {
+          "ep": 2,
+          "title": "CHICAGO > MT RUSHMORE",
+          "kind": "episode",
+          "start": 190.13333333333333,
+          "end": 463.4,
+          "start_frame": 5704,
+          "end_frame": 13902
+        },
+        {
+          "ep": 3,
+          "title": "RUSHMORE > GRAND TETON",
+          "kind": "episode",
+          "start": 463.4,
+          "end": 671.1333333333333,
+          "start_frame": 13902,
+          "end_frame": 20134
+        },
+        {
+          "ep": 4,
+          "title": "GRAND TETON > YELLOWSTONE",
+          "kind": "episode",
+          "start": 671.1333333333333,
+          "end": 1062.9333333333334,
+          "start_frame": 20134,
+          "end_frame": 31888
+        },
+        {
+          "ep": 5,
+          "title": "YELLOWSTONE > GLACIER",
+          "kind": "episode",
+          "start": 1062.9333333333334,
+          "end": 1454.6333333333334,
+          "start_frame": 31888,
+          "end_frame": 43639
+        },
+        {
+          "ep": 6,
+          "title": "GLACIER > BANFF",
+          "kind": "episode",
+          "start": 1454.6333333333334,
+          "end": 2140.1,
+          "start_frame": 43639,
+          "end_frame": 64203
+        },
+        {
+          "ep": 7,
+          "title": "BANFF > KELOWNA",
+          "kind": "episode",
+          "start": 2140.1,
+          "end": 2172.9,
+          "start_frame": 64203,
+          "end_frame": 65187
+        },
+        {
+          "ep": 8,
+          "title": "KELOWNA > VANCOUVER",
+          "kind": "episode",
+          "start": 2172.9,
+          "end": 2483.633333333333,
+          "start_frame": 65187,
+          "end_frame": 74509
+        },
+        {
+          "ep": 9,
+          "title": "VANCOUVER > SAN JUANS",
+          "kind": "episode",
+          "start": 2483.633333333333,
+          "end": 2652.8,
+          "start_frame": 74509,
+          "end_frame": 79584
+        },
+        {
+          "ep": 10,
+          "title": "SAN JUANS > OLYMPIC",
+          "kind": "episode",
+          "start": 2652.8,
+          "end": 2943.866666666667,
+          "start_frame": 79584,
+          "end_frame": 88316
+        },
+        {
+          "ep": 11,
+          "title": "HOH RAINFOREST > RAINIER",
+          "kind": "episode",
+          "start": 2943.866666666667,
+          "end": 3319.733333333333,
+          "start_frame": 88316,
+          "end_frame": 99592
+        },
+        {
+          "ep": 12,
+          "title": "RAINIER > MT ST HELENS",
+          "kind": "episode",
+          "start": 3319.733333333333,
+          "end": 3444.0333333333333,
+          "start_frame": 99592,
+          "end_frame": 103321
+        },
+        {
+          "ep": 13,
+          "title": "ST HELENS > PORTLAND",
+          "kind": "episode",
+          "start": 3444.0333333333333,
+          "end": 3722.0333333333333,
+          "start_frame": 103321,
+          "end_frame": 111661
+        },
+        {
+          "ep": 14,
+          "title": "PORTLAND > CRATER LAKE",
+          "kind": "episode",
+          "start": 3722.0333333333333,
+          "end": 3908.0333333333333,
+          "start_frame": 111661,
+          "end_frame": 117241
+        },
+        {
+          "ep": 15,
+          "title": "CRATER LAKE > REDWOODS",
+          "kind": "episode",
+          "start": 3908.0333333333333,
+          "end": 4340.933333333333,
+          "start_frame": 117241,
+          "end_frame": 130228
+        },
+        {
+          "ep": 16,
+          "title": "REDWOODS > FORT BRAGG",
+          "kind": "episode",
+          "start": 4340.933333333333,
+          "end": 4683.733333333334,
+          "start_frame": 130228,
+          "end_frame": 140512
+        },
+        {
+          "ep": 17,
+          "title": "SANTA ROSA > NAPA",
+          "kind": "episode",
+          "start": 4683.733333333334,
+          "end": 4773.866666666667,
+          "start_frame": 140512,
+          "end_frame": 143216
+        },
+        {
+          "ep": 18,
+          "title": "NAPA > SAN FRANCISCO",
+          "kind": "episode",
+          "start": 4773.866666666667,
+          "end": 5247.9,
+          "start_frame": 143216,
+          "end_frame": 157437
+        },
+        {
+          "ep": 19,
+          "title": "SAN FRANCISCO > MONTEREY",
+          "kind": "episode",
+          "start": 5247.9,
+          "end": 5607.633333333333,
+          "start_frame": 157437,
+          "end_frame": 168229
+        },
+        {
+          "ep": 20,
+          "title": "BIG SUR > PINNACLES",
+          "kind": "episode",
+          "start": 5607.633333333333,
+          "end": 6164.633333333333,
+          "start_frame": 168229,
+          "end_frame": 184939
+        },
+        {
+          "ep": 21,
+          "title": "MORRO BAY > PISMO BEACH",
+          "kind": "episode",
+          "start": 6164.633333333333,
+          "end": 6494.266666666666,
+          "start_frame": 184939,
+          "end_frame": 194828
+        },
+        {
+          "ep": 22,
+          "title": "SOLVANG > SANTA BARBARA",
+          "kind": "episode",
+          "start": 6494.266666666666,
+          "end": 6803.1,
+          "start_frame": 194828,
+          "end_frame": 204093
+        },
+        {
+          "ep": 23,
+          "title": "TO THE CHANNEL ISLANDS",
+          "kind": "episode",
+          "start": 6803.1,
+          "end": 6980.866666666667,
+          "start_frame": 204093,
+          "end_frame": 209426
+        },
+        {
+          "ep": 24,
+          "title": "VENTURA > LOS ANGELES",
+          "kind": "episode",
+          "start": 6980.866666666667,
+          "end": 7417.6,
+          "start_frame": 209426,
+          "end_frame": 222528
+        },
+        {
+          "ep": 25,
+          "title": "LOS ANGELES > SAN DIEGO",
+          "kind": "episode",
+          "start": 7417.6,
+          "end": 7697.533333333334,
+          "start_frame": 222528,
+          "end_frame": 230926
+        },
+        {
+          "ep": 26,
+          "title": "SAN DIEGO > JOSHUA TREE",
+          "kind": "episode",
+          "start": 7697.533333333334,
+          "end": 8191.7,
+          "start_frame": 230926,
+          "end_frame": 245751
+        },
+        {
+          "ep": 27,
+          "title": "LAS VEGAS > DEATH VALLEY",
+          "kind": "episode",
+          "start": 8191.7,
+          "end": 8516.833333333334,
+          "start_frame": 245751,
+          "end_frame": 255505
+        },
+        {
+          "ep": 28,
+          "title": "HOOVER DAM > GRAND CANYON",
+          "kind": "episode",
+          "start": 8516.833333333334,
+          "end": 8861.5,
+          "start_frame": 255505,
+          "end_frame": 265845
+        },
+        {
+          "ep": 29,
+          "title": "GRAND CANYON > ZION",
+          "kind": "episode",
+          "start": 8861.5,
+          "end": 9244.833333333334,
+          "start_frame": 265845,
+          "end_frame": 277345
+        },
+        {
+          "ep": 30,
+          "title": "ZION > BRYCE CANYON",
+          "kind": "episode",
+          "start": 9244.833333333334,
+          "end": 9567.766666666666,
+          "start_frame": 277345,
+          "end_frame": 287033
+        },
+        {
+          "ep": 31,
+          "title": "BRYCE > SALT LAKE CITY",
+          "kind": "episode",
+          "start": 9567.766666666666,
+          "end": 9909.866666666667,
+          "start_frame": 287033,
+          "end_frame": 297296
+        },
+        {
+          "ep": 32,
+          "title": "SALT LAKE CITY > ARCHES",
+          "kind": "episode",
+          "start": 9909.866666666667,
+          "end": 10117.866666666667,
+          "start_frame": 297296,
+          "end_frame": 303536
+        },
+        {
+          "ep": 33,
+          "title": "THE LONG ROAD HOME",
+          "kind": "episode",
+          "start": 10117.866666666667,
+          "end": 10344.633333333333,
+          "start_frame": 303536,
+          "end_frame": 310339
+        },
+        {
+          "ep": 34,
+          "title": "ST LOUIS > NEW RIVER GORGE",
+          "kind": "episode",
+          "start": 10344.633333333333,
+          "end": 10551.933333333332,
+          "start_frame": 310339,
+          "end_frame": 316558
+        },
+        {
+          "ep": 35,
+          "title": "BALTIMORE > HOME",
+          "kind": "episode",
+          "start": 10551.933333333332,
+          "end": 10799.366666666667,
+          "start_frame": 316558,
+          "end_frame": 323981
+        }
+      ],
+      "main_film_ends_on_E35_fridge": true,
+      "E36_separate": true
+    },
+    "9x16": {
+      "version": "v08",
+      "status": "ready",
+      "format": "9x16",
+      "src": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_Opening-v01_Clock-v18-7b3c5f7dbd2d.mp4",
+      "captions": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_Opening-v01_Clock-v18-7b3c5f7dbd2d.srt",
+      "vtt": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_Opening-v01_Clock-v18-7b3c5f7dbd2d.vtt",
+      "duration": 10799.366666666667,
+      "bytes": 81832149393,
+      "sha256": "7b3c5f7dbd2dbfdc5e7c3563af8596ef54f513022d0ebc315a191900dc80e8ba",
+      "frames": 323981,
+      "width": 2160,
+      "height": 3840,
+      "audio": [
+        "stereo"
+      ],
+      "chapters": [
+        {
+          "ep": 0,
+          "title": "INTRO",
+          "kind": "intro",
+          "start": 0.0,
+          "end": 57.0,
+          "start_frame": 0,
+          "end_frame": 1710
+        },
+        {
+          "ep": 1,
+          "title": "NEW YORK > CHICAGO",
+          "kind": "episode",
+          "start": 57.0,
+          "end": 190.13333333333333,
+          "start_frame": 1710,
+          "end_frame": 5704
+        },
+        {
+          "ep": 2,
+          "title": "CHICAGO > MT RUSHMORE",
+          "kind": "episode",
+          "start": 190.13333333333333,
+          "end": 463.4,
+          "start_frame": 5704,
+          "end_frame": 13902
+        },
+        {
+          "ep": 3,
+          "title": "RUSHMORE > GRAND TETON",
+          "kind": "episode",
+          "start": 463.4,
+          "end": 671.1333333333333,
+          "start_frame": 13902,
+          "end_frame": 20134
+        },
+        {
+          "ep": 4,
+          "title": "GRAND TETON > YELLOWSTONE",
+          "kind": "episode",
+          "start": 671.1333333333333,
+          "end": 1062.9333333333334,
+          "start_frame": 20134,
+          "end_frame": 31888
+        },
+        {
+          "ep": 5,
+          "title": "YELLOWSTONE > GLACIER",
+          "kind": "episode",
+          "start": 1062.9333333333334,
+          "end": 1454.6333333333334,
+          "start_frame": 31888,
+          "end_frame": 43639
+        },
+        {
+          "ep": 6,
+          "title": "GLACIER > BANFF",
+          "kind": "episode",
+          "start": 1454.6333333333334,
+          "end": 2140.1,
+          "start_frame": 43639,
+          "end_frame": 64203
+        },
+        {
+          "ep": 7,
+          "title": "BANFF > KELOWNA",
+          "kind": "episode",
+          "start": 2140.1,
+          "end": 2172.9,
+          "start_frame": 64203,
+          "end_frame": 65187
+        },
+        {
+          "ep": 8,
+          "title": "KELOWNA > VANCOUVER",
+          "kind": "episode",
+          "start": 2172.9,
+          "end": 2483.633333333333,
+          "start_frame": 65187,
+          "end_frame": 74509
+        },
+        {
+          "ep": 9,
+          "title": "VANCOUVER > SAN JUANS",
+          "kind": "episode",
+          "start": 2483.633333333333,
+          "end": 2652.8,
+          "start_frame": 74509,
+          "end_frame": 79584
+        },
+        {
+          "ep": 10,
+          "title": "SAN JUANS > OLYMPIC",
+          "kind": "episode",
+          "start": 2652.8,
+          "end": 2943.866666666667,
+          "start_frame": 79584,
+          "end_frame": 88316
+        },
+        {
+          "ep": 11,
+          "title": "HOH RAINFOREST > RAINIER",
+          "kind": "episode",
+          "start": 2943.866666666667,
+          "end": 3319.733333333333,
+          "start_frame": 88316,
+          "end_frame": 99592
+        },
+        {
+          "ep": 12,
+          "title": "RAINIER > MT ST HELENS",
+          "kind": "episode",
+          "start": 3319.733333333333,
+          "end": 3444.0333333333333,
+          "start_frame": 99592,
+          "end_frame": 103321
+        },
+        {
+          "ep": 13,
+          "title": "ST HELENS > PORTLAND",
+          "kind": "episode",
+          "start": 3444.0333333333333,
+          "end": 3722.0333333333333,
+          "start_frame": 103321,
+          "end_frame": 111661
+        },
+        {
+          "ep": 14,
+          "title": "PORTLAND > CRATER LAKE",
+          "kind": "episode",
+          "start": 3722.0333333333333,
+          "end": 3908.0333333333333,
+          "start_frame": 111661,
+          "end_frame": 117241
+        },
+        {
+          "ep": 15,
+          "title": "CRATER LAKE > REDWOODS",
+          "kind": "episode",
+          "start": 3908.0333333333333,
+          "end": 4340.933333333333,
+          "start_frame": 117241,
+          "end_frame": 130228
+        },
+        {
+          "ep": 16,
+          "title": "REDWOODS > FORT BRAGG",
+          "kind": "episode",
+          "start": 4340.933333333333,
+          "end": 4683.733333333334,
+          "start_frame": 130228,
+          "end_frame": 140512
+        },
+        {
+          "ep": 17,
+          "title": "SANTA ROSA > NAPA",
+          "kind": "episode",
+          "start": 4683.733333333334,
+          "end": 4773.866666666667,
+          "start_frame": 140512,
+          "end_frame": 143216
+        },
+        {
+          "ep": 18,
+          "title": "NAPA > SAN FRANCISCO",
+          "kind": "episode",
+          "start": 4773.866666666667,
+          "end": 5247.9,
+          "start_frame": 143216,
+          "end_frame": 157437
+        },
+        {
+          "ep": 19,
+          "title": "SAN FRANCISCO > MONTEREY",
+          "kind": "episode",
+          "start": 5247.9,
+          "end": 5607.633333333333,
+          "start_frame": 157437,
+          "end_frame": 168229
+        },
+        {
+          "ep": 20,
+          "title": "BIG SUR > PINNACLES",
+          "kind": "episode",
+          "start": 5607.633333333333,
+          "end": 6164.633333333333,
+          "start_frame": 168229,
+          "end_frame": 184939
+        },
+        {
+          "ep": 21,
+          "title": "MORRO BAY > PISMO BEACH",
+          "kind": "episode",
+          "start": 6164.633333333333,
+          "end": 6494.266666666666,
+          "start_frame": 184939,
+          "end_frame": 194828
+        },
+        {
+          "ep": 22,
+          "title": "SOLVANG > SANTA BARBARA",
+          "kind": "episode",
+          "start": 6494.266666666666,
+          "end": 6803.1,
+          "start_frame": 194828,
+          "end_frame": 204093
+        },
+        {
+          "ep": 23,
+          "title": "TO THE CHANNEL ISLANDS",
+          "kind": "episode",
+          "start": 6803.1,
+          "end": 6980.866666666667,
+          "start_frame": 204093,
+          "end_frame": 209426
+        },
+        {
+          "ep": 24,
+          "title": "VENTURA > LOS ANGELES",
+          "kind": "episode",
+          "start": 6980.866666666667,
+          "end": 7417.6,
+          "start_frame": 209426,
+          "end_frame": 222528
+        },
+        {
+          "ep": 25,
+          "title": "LOS ANGELES > SAN DIEGO",
+          "kind": "episode",
+          "start": 7417.6,
+          "end": 7697.533333333334,
+          "start_frame": 222528,
+          "end_frame": 230926
+        },
+        {
+          "ep": 26,
+          "title": "SAN DIEGO > JOSHUA TREE",
+          "kind": "episode",
+          "start": 7697.533333333334,
+          "end": 8191.7,
+          "start_frame": 230926,
+          "end_frame": 245751
+        },
+        {
+          "ep": 27,
+          "title": "LAS VEGAS > DEATH VALLEY",
+          "kind": "episode",
+          "start": 8191.7,
+          "end": 8516.833333333334,
+          "start_frame": 245751,
+          "end_frame": 255505
+        },
+        {
+          "ep": 28,
+          "title": "HOOVER DAM > GRAND CANYON",
+          "kind": "episode",
+          "start": 8516.833333333334,
+          "end": 8861.5,
+          "start_frame": 255505,
+          "end_frame": 265845
+        },
+        {
+          "ep": 29,
+          "title": "GRAND CANYON > ZION",
+          "kind": "episode",
+          "start": 8861.5,
+          "end": 9244.833333333334,
+          "start_frame": 265845,
+          "end_frame": 277345
+        },
+        {
+          "ep": 30,
+          "title": "ZION > BRYCE CANYON",
+          "kind": "episode",
+          "start": 9244.833333333334,
+          "end": 9567.766666666666,
+          "start_frame": 277345,
+          "end_frame": 287033
+        },
+        {
+          "ep": 31,
+          "title": "BRYCE > SALT LAKE CITY",
+          "kind": "episode",
+          "start": 9567.766666666666,
+          "end": 9909.866666666667,
+          "start_frame": 287033,
+          "end_frame": 297296
+        },
+        {
+          "ep": 32,
+          "title": "SALT LAKE CITY > ARCHES",
+          "kind": "episode",
+          "start": 9909.866666666667,
+          "end": 10117.866666666667,
+          "start_frame": 297296,
+          "end_frame": 303536
+        },
+        {
+          "ep": 33,
+          "title": "THE LONG ROAD HOME",
+          "kind": "episode",
+          "start": 10117.866666666667,
+          "end": 10344.633333333333,
+          "start_frame": 303536,
+          "end_frame": 310339
+        },
+        {
+          "ep": 34,
+          "title": "ST LOUIS > NEW RIVER GORGE",
+          "kind": "episode",
+          "start": 10344.633333333333,
+          "end": 10551.933333333332,
+          "start_frame": 310339,
+          "end_frame": 316558
+        },
+        {
+          "ep": 35,
+          "title": "BALTIMORE > HOME",
+          "kind": "episode",
+          "start": 10551.933333333332,
+          "end": 10799.366666666667,
+          "start_frame": 316558,
+          "end_frame": 323981
+        }
+      ],
+      "main_film_ends_on_E35_fridge": true,
+      "E36_separate": true
+    }
+  },
+  "collections": [
+    {
+      "id": "01-08-With-Intro",
+      "title": "Episodes 1\u20138 + intro",
+      "episodes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "formats": {
+        "16x9": {
+          "version": "v08",
+          "status": "ready",
+          "format": "16x9",
+          "src": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_Opening-v01_Clock-v18-0c08b9f2ce30.mp4",
+          "captions": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_Opening-v01_Clock-v18-0c08b9f2ce30.srt",
+          "vtt": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_Opening-v01_Clock-v18-0c08b9f2ce30.vtt",
+          "duration": 2483.633333333333,
+          "bytes": 20860612895,
+          "sha256": "0c08b9f2ce30a6b2d2442368f6f60365545a77f39d05318ccc3e81742af249e9",
+          "frames": 74509,
+          "width": 3840,
+          "height": 2160,
+          "audio": [
+            "5.1 surround",
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 0,
+              "title": "INTRO",
+              "kind": "intro",
+              "start": 0.0,
+              "end": 57.0,
+              "start_frame": 0,
+              "end_frame": 1710
+            },
+            {
+              "ep": 1,
+              "title": "NEW YORK > CHICAGO",
+              "kind": "episode",
+              "start": 57.0,
+              "end": 190.13333333333333,
+              "start_frame": 1710,
+              "end_frame": 5704
+            },
+            {
+              "ep": 2,
+              "title": "CHICAGO > MT RUSHMORE",
+              "kind": "episode",
+              "start": 190.13333333333333,
+              "end": 463.4,
+              "start_frame": 5704,
+              "end_frame": 13902
+            },
+            {
+              "ep": 3,
+              "title": "RUSHMORE > GRAND TETON",
+              "kind": "episode",
+              "start": 463.4,
+              "end": 671.1333333333333,
+              "start_frame": 13902,
+              "end_frame": 20134
+            },
+            {
+              "ep": 4,
+              "title": "GRAND TETON > YELLOWSTONE",
+              "kind": "episode",
+              "start": 671.1333333333333,
+              "end": 1062.9333333333334,
+              "start_frame": 20134,
+              "end_frame": 31888
+            },
+            {
+              "ep": 5,
+              "title": "YELLOWSTONE > GLACIER",
+              "kind": "episode",
+              "start": 1062.9333333333334,
+              "end": 1454.6333333333334,
+              "start_frame": 31888,
+              "end_frame": 43639
+            },
+            {
+              "ep": 6,
+              "title": "GLACIER > BANFF",
+              "kind": "episode",
+              "start": 1454.6333333333334,
+              "end": 2140.1,
+              "start_frame": 43639,
+              "end_frame": 64203
+            },
+            {
+              "ep": 7,
+              "title": "BANFF > KELOWNA",
+              "kind": "episode",
+              "start": 2140.1,
+              "end": 2172.9,
+              "start_frame": 64203,
+              "end_frame": 65187
+            },
+            {
+              "ep": 8,
+              "title": "KELOWNA > VANCOUVER",
+              "kind": "episode",
+              "start": 2172.9,
+              "end": 2483.633333333333,
+              "start_frame": 65187,
+              "end_frame": 74509
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        },
+        "9x16": {
+          "version": "v08",
+          "status": "ready",
+          "format": "9x16",
+          "src": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_Opening-v01_Clock-v18-523705af9b71.mp4",
+          "captions": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_Opening-v01_Clock-v18-523705af9b71.srt",
+          "vtt": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_Opening-v01_Clock-v18-523705af9b71.vtt",
+          "duration": 2483.633333333333,
+          "bytes": 19542787518,
+          "sha256": "523705af9b71c939fb21157a2ee09116020f9599f061e7ba27f0f6356a304d0d",
+          "frames": 74509,
+          "width": 2160,
+          "height": 3840,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 0,
+              "title": "INTRO",
+              "kind": "intro",
+              "start": 0.0,
+              "end": 57.0,
+              "start_frame": 0,
+              "end_frame": 1710
+            },
+            {
+              "ep": 1,
+              "title": "NEW YORK > CHICAGO",
+              "kind": "episode",
+              "start": 57.0,
+              "end": 190.13333333333333,
+              "start_frame": 1710,
+              "end_frame": 5704
+            },
+            {
+              "ep": 2,
+              "title": "CHICAGO > MT RUSHMORE",
+              "kind": "episode",
+              "start": 190.13333333333333,
+              "end": 463.4,
+              "start_frame": 5704,
+              "end_frame": 13902
+            },
+            {
+              "ep": 3,
+              "title": "RUSHMORE > GRAND TETON",
+              "kind": "episode",
+              "start": 463.4,
+              "end": 671.1333333333333,
+              "start_frame": 13902,
+              "end_frame": 20134
+            },
+            {
+              "ep": 4,
+              "title": "GRAND TETON > YELLOWSTONE",
+              "kind": "episode",
+              "start": 671.1333333333333,
+              "end": 1062.9333333333334,
+              "start_frame": 20134,
+              "end_frame": 31888
+            },
+            {
+              "ep": 5,
+              "title": "YELLOWSTONE > GLACIER",
+              "kind": "episode",
+              "start": 1062.9333333333334,
+              "end": 1454.6333333333334,
+              "start_frame": 31888,
+              "end_frame": 43639
+            },
+            {
+              "ep": 6,
+              "title": "GLACIER > BANFF",
+              "kind": "episode",
+              "start": 1454.6333333333334,
+              "end": 2140.1,
+              "start_frame": 43639,
+              "end_frame": 64203
+            },
+            {
+              "ep": 7,
+              "title": "BANFF > KELOWNA",
+              "kind": "episode",
+              "start": 2140.1,
+              "end": 2172.9,
+              "start_frame": 64203,
+              "end_frame": 65187
+            },
+            {
+              "ep": 8,
+              "title": "KELOWNA > VANCOUVER",
+              "kind": "episode",
+              "start": 2172.9,
+              "end": 2483.633333333333,
+              "start_frame": 65187,
+              "end_frame": 74509
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        },
+        "vr": {
+          "version": "v08",
+          "status": "ready",
+          "format": "vr",
+          "src": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_Opening-v01_Clock-v18-4245c6ef825a.mp4",
+          "captions": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_Opening-v01_Clock-v18-4245c6ef825a.srt",
+          "vtt": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_Opening-v01_Clock-v18-4245c6ef825a.vtt",
+          "duration": 2483.633333333333,
+          "bytes": 10178863422,
+          "sha256": "4245c6ef825a876b6dbb25265dddc2ff2478fe7b782d54df679c05dd3d2e9bf3",
+          "frames": 74509,
+          "width": 3840,
+          "height": 1920,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 0,
+              "title": "INTRO",
+              "kind": "intro",
+              "start": 0.0,
+              "end": 57.0,
+              "start_frame": 0,
+              "end_frame": 1710
+            },
+            {
+              "ep": 1,
+              "title": "NEW YORK > CHICAGO",
+              "kind": "episode",
+              "start": 57.0,
+              "end": 190.13333333333333,
+              "start_frame": 1710,
+              "end_frame": 5704
+            },
+            {
+              "ep": 2,
+              "title": "CHICAGO > MT RUSHMORE",
+              "kind": "episode",
+              "start": 190.13333333333333,
+              "end": 463.4,
+              "start_frame": 5704,
+              "end_frame": 13902
+            },
+            {
+              "ep": 3,
+              "title": "RUSHMORE > GRAND TETON",
+              "kind": "episode",
+              "start": 463.4,
+              "end": 671.1333333333333,
+              "start_frame": 13902,
+              "end_frame": 20134
+            },
+            {
+              "ep": 4,
+              "title": "GRAND TETON > YELLOWSTONE",
+              "kind": "episode",
+              "start": 671.1333333333333,
+              "end": 1062.9333333333334,
+              "start_frame": 20134,
+              "end_frame": 31888
+            },
+            {
+              "ep": 5,
+              "title": "YELLOWSTONE > GLACIER",
+              "kind": "episode",
+              "start": 1062.9333333333334,
+              "end": 1454.6333333333334,
+              "start_frame": 31888,
+              "end_frame": 43639
+            },
+            {
+              "ep": 6,
+              "title": "GLACIER > BANFF",
+              "kind": "episode",
+              "start": 1454.6333333333334,
+              "end": 2140.1,
+              "start_frame": 43639,
+              "end_frame": 64203
+            },
+            {
+              "ep": 7,
+              "title": "BANFF > KELOWNA",
+              "kind": "episode",
+              "start": 2140.1,
+              "end": 2172.9,
+              "start_frame": 64203,
+              "end_frame": 65187
+            },
+            {
+              "ep": 8,
+              "title": "KELOWNA > VANCOUVER",
+              "kind": "episode",
+              "start": 2172.9,
+              "end": 2483.633333333333,
+              "start_frame": 65187,
+              "end_frame": 74509
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        }
+      }
+    },
+    {
+      "id": "09-15",
+      "title": "Episodes 9\u201315",
+      "episodes": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "formats": {
+        "16x9": {
+          "version": "v08",
+          "status": "ready",
+          "format": "16x9",
+          "src": "supercuts/v08/09-15/16x9/Sonnys_Roadtrip_2025_09-15_16x9_V08_Collection-v06_Clock-v18-9be7b4afca1d.mp4",
+          "captions": "supercuts/v08/09-15/16x9/Sonnys_Roadtrip_2025_09-15_16x9_V08_Collection-v06_Clock-v18-9be7b4afca1d.srt",
+          "vtt": "supercuts/v08/09-15/16x9/Sonnys_Roadtrip_2025_09-15_16x9_V08_Collection-v06_Clock-v18-9be7b4afca1d.vtt",
+          "duration": 1857.3,
+          "bytes": 13833302511,
+          "sha256": "9be7b4afca1d4c9c150cb466da2563146b237099294930da074ec4630d0f9b19",
+          "frames": 55719,
+          "width": 3840,
+          "height": 2160,
+          "audio": [
+            "5.1 surround",
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 9,
+              "title": "VANCOUVER > SAN JUANS",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 169.16666666666666,
+              "start_frame": 0,
+              "end_frame": 5075
+            },
+            {
+              "ep": 10,
+              "title": "SAN JUANS > OLYMPIC",
+              "kind": "episode",
+              "start": 169.16666666666666,
+              "end": 460.23333333333335,
+              "start_frame": 5075,
+              "end_frame": 13807
+            },
+            {
+              "ep": 11,
+              "title": "HOH RAINFOREST > RAINIER",
+              "kind": "episode",
+              "start": 460.23333333333335,
+              "end": 836.1,
+              "start_frame": 13807,
+              "end_frame": 25083
+            },
+            {
+              "ep": 12,
+              "title": "RAINIER > MT ST HELENS",
+              "kind": "episode",
+              "start": 836.1,
+              "end": 960.4,
+              "start_frame": 25083,
+              "end_frame": 28812
+            },
+            {
+              "ep": 13,
+              "title": "ST HELENS > PORTLAND",
+              "kind": "episode",
+              "start": 960.4,
+              "end": 1238.4,
+              "start_frame": 28812,
+              "end_frame": 37152
+            },
+            {
+              "ep": 14,
+              "title": "PORTLAND > CRATER LAKE",
+              "kind": "episode",
+              "start": 1238.4,
+              "end": 1424.4,
+              "start_frame": 37152,
+              "end_frame": 42732
+            },
+            {
+              "ep": 15,
+              "title": "CRATER LAKE > REDWOODS",
+              "kind": "episode",
+              "start": 1424.4,
+              "end": 1857.3,
+              "start_frame": 42732,
+              "end_frame": 55719
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        },
+        "9x16": {
+          "version": "v08",
+          "status": "ready",
+          "format": "9x16",
+          "src": "supercuts/v08/09-15/9x16/Sonnys_Roadtrip_2025_09-15_9x16_V08_Collection-v06_Clock-v18-31a50e03848b.mp4",
+          "captions": "supercuts/v08/09-15/9x16/Sonnys_Roadtrip_2025_09-15_9x16_V08_Collection-v06_Clock-v18-31a50e03848b.srt",
+          "vtt": "supercuts/v08/09-15/9x16/Sonnys_Roadtrip_2025_09-15_9x16_V08_Collection-v06_Clock-v18-31a50e03848b.vtt",
+          "duration": 1857.3,
+          "bytes": 14122643307,
+          "sha256": "31a50e03848b1a290beecac2a2e65fc5a731de5da232639fe3c6f8ed6855a80a",
+          "frames": 55719,
+          "width": 2160,
+          "height": 3840,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 9,
+              "title": "VANCOUVER > SAN JUANS",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 169.16666666666666,
+              "start_frame": 0,
+              "end_frame": 5075
+            },
+            {
+              "ep": 10,
+              "title": "SAN JUANS > OLYMPIC",
+              "kind": "episode",
+              "start": 169.16666666666666,
+              "end": 460.23333333333335,
+              "start_frame": 5075,
+              "end_frame": 13807
+            },
+            {
+              "ep": 11,
+              "title": "HOH RAINFOREST > RAINIER",
+              "kind": "episode",
+              "start": 460.23333333333335,
+              "end": 836.1,
+              "start_frame": 13807,
+              "end_frame": 25083
+            },
+            {
+              "ep": 12,
+              "title": "RAINIER > MT ST HELENS",
+              "kind": "episode",
+              "start": 836.1,
+              "end": 960.4,
+              "start_frame": 25083,
+              "end_frame": 28812
+            },
+            {
+              "ep": 13,
+              "title": "ST HELENS > PORTLAND",
+              "kind": "episode",
+              "start": 960.4,
+              "end": 1238.4,
+              "start_frame": 28812,
+              "end_frame": 37152
+            },
+            {
+              "ep": 14,
+              "title": "PORTLAND > CRATER LAKE",
+              "kind": "episode",
+              "start": 1238.4,
+              "end": 1424.4,
+              "start_frame": 37152,
+              "end_frame": 42732
+            },
+            {
+              "ep": 15,
+              "title": "CRATER LAKE > REDWOODS",
+              "kind": "episode",
+              "start": 1424.4,
+              "end": 1857.3,
+              "start_frame": 42732,
+              "end_frame": 55719
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        },
+        "vr": {
+          "version": "v08",
+          "status": "ready",
+          "format": "vr",
+          "src": "supercuts/v08/09-15/vr/Sonnys_Roadtrip_2025_09-15_vr_V08_Collection-v06_Clock-v18-4a72cc040387.mp4",
+          "captions": "supercuts/v08/09-15/vr/Sonnys_Roadtrip_2025_09-15_vr_V08_Collection-v06_Clock-v18-4a72cc040387.srt",
+          "vtt": "supercuts/v08/09-15/vr/Sonnys_Roadtrip_2025_09-15_vr_V08_Collection-v06_Clock-v18-4a72cc040387.vtt",
+          "duration": 1857.3,
+          "bytes": 12183809738,
+          "sha256": "4a72cc0403874aac33fc125713eb70ebee57d9f731c8e567cb52e941fa3995f7",
+          "frames": 55719,
+          "width": 3840,
+          "height": 1920,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 9,
+              "title": "VANCOUVER > SAN JUANS",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 169.16666666666666,
+              "start_frame": 0,
+              "end_frame": 5075
+            },
+            {
+              "ep": 10,
+              "title": "SAN JUANS > OLYMPIC",
+              "kind": "episode",
+              "start": 169.16666666666666,
+              "end": 460.23333333333335,
+              "start_frame": 5075,
+              "end_frame": 13807
+            },
+            {
+              "ep": 11,
+              "title": "HOH RAINFOREST > RAINIER",
+              "kind": "episode",
+              "start": 460.23333333333335,
+              "end": 836.1,
+              "start_frame": 13807,
+              "end_frame": 25083
+            },
+            {
+              "ep": 12,
+              "title": "RAINIER > MT ST HELENS",
+              "kind": "episode",
+              "start": 836.1,
+              "end": 960.4,
+              "start_frame": 25083,
+              "end_frame": 28812
+            },
+            {
+              "ep": 13,
+              "title": "ST HELENS > PORTLAND",
+              "kind": "episode",
+              "start": 960.4,
+              "end": 1238.4,
+              "start_frame": 28812,
+              "end_frame": 37152
+            },
+            {
+              "ep": 14,
+              "title": "PORTLAND > CRATER LAKE",
+              "kind": "episode",
+              "start": 1238.4,
+              "end": 1424.4,
+              "start_frame": 37152,
+              "end_frame": 42732
+            },
+            {
+              "ep": 15,
+              "title": "CRATER LAKE > REDWOODS",
+              "kind": "episode",
+              "start": 1424.4,
+              "end": 1857.3,
+              "start_frame": 42732,
+              "end_frame": 55719
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        }
+      }
+    },
+    {
+      "id": "16-25",
+      "title": "Episodes 16\u201325",
+      "episodes": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "formats": {
+        "16x9": {
+          "version": "v08",
+          "status": "ready",
+          "format": "16x9",
+          "src": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_Collection-v06_Clock-v18-84648e0f564c.mp4",
+          "captions": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_Collection-v06_Clock-v18-84648e0f564c.srt",
+          "vtt": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_Collection-v06_Clock-v18-84648e0f564c.vtt",
+          "duration": 3356.6,
+          "bytes": 25569734104,
+          "sha256": "84648e0f564cfeadf839107c5b15ac74945a394a76d0d08e8d7a4e7d7b1941b8",
+          "frames": 100698,
+          "width": 3840,
+          "height": 2160,
+          "audio": [
+            "5.1 surround",
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 16,
+              "title": "REDWOODS > FORT BRAGG",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 342.8,
+              "start_frame": 0,
+              "end_frame": 10284
+            },
+            {
+              "ep": 17,
+              "title": "SANTA ROSA > NAPA",
+              "kind": "episode",
+              "start": 342.8,
+              "end": 432.93333333333334,
+              "start_frame": 10284,
+              "end_frame": 12988
+            },
+            {
+              "ep": 18,
+              "title": "NAPA > SAN FRANCISCO",
+              "kind": "episode",
+              "start": 432.93333333333334,
+              "end": 906.9666666666667,
+              "start_frame": 12988,
+              "end_frame": 27209
+            },
+            {
+              "ep": 19,
+              "title": "SAN FRANCISCO > MONTEREY",
+              "kind": "episode",
+              "start": 906.9666666666667,
+              "end": 1266.7,
+              "start_frame": 27209,
+              "end_frame": 38001
+            },
+            {
+              "ep": 20,
+              "title": "BIG SUR > PINNACLES",
+              "kind": "episode",
+              "start": 1266.7,
+              "end": 1823.7,
+              "start_frame": 38001,
+              "end_frame": 54711
+            },
+            {
+              "ep": 21,
+              "title": "MORRO BAY > PISMO BEACH",
+              "kind": "episode",
+              "start": 1823.7,
+              "end": 2153.3333333333335,
+              "start_frame": 54711,
+              "end_frame": 64600
+            },
+            {
+              "ep": 22,
+              "title": "SOLVANG > SANTA BARBARA",
+              "kind": "episode",
+              "start": 2153.3333333333335,
+              "end": 2462.1666666666665,
+              "start_frame": 64600,
+              "end_frame": 73865
+            },
+            {
+              "ep": 23,
+              "title": "TO THE CHANNEL ISLANDS",
+              "kind": "episode",
+              "start": 2462.1666666666665,
+              "end": 2639.9333333333334,
+              "start_frame": 73865,
+              "end_frame": 79198
+            },
+            {
+              "ep": 24,
+              "title": "VENTURA > LOS ANGELES",
+              "kind": "episode",
+              "start": 2639.9333333333334,
+              "end": 3076.6666666666665,
+              "start_frame": 79198,
+              "end_frame": 92300
+            },
+            {
+              "ep": 25,
+              "title": "LOS ANGELES > SAN DIEGO",
+              "kind": "episode",
+              "start": 3076.6666666666665,
+              "end": 3356.6,
+              "start_frame": 92300,
+              "end_frame": 100698
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        },
+        "9x16": {
+          "version": "v08",
+          "status": "ready",
+          "format": "9x16",
+          "src": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_Collection-v06_Clock-v18-b9849411f7d6.mp4",
+          "captions": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_Collection-v06_Clock-v18-b9849411f7d6.srt",
+          "vtt": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_Collection-v06_Clock-v18-b9849411f7d6.vtt",
+          "duration": 3356.6,
+          "bytes": 26133440162,
+          "sha256": "b9849411f7d627c9914295517af18fd90737c33b909994ee16751af27f5d539d",
+          "frames": 100698,
+          "width": 2160,
+          "height": 3840,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 16,
+              "title": "REDWOODS > FORT BRAGG",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 342.8,
+              "start_frame": 0,
+              "end_frame": 10284
+            },
+            {
+              "ep": 17,
+              "title": "SANTA ROSA > NAPA",
+              "kind": "episode",
+              "start": 342.8,
+              "end": 432.93333333333334,
+              "start_frame": 10284,
+              "end_frame": 12988
+            },
+            {
+              "ep": 18,
+              "title": "NAPA > SAN FRANCISCO",
+              "kind": "episode",
+              "start": 432.93333333333334,
+              "end": 906.9666666666667,
+              "start_frame": 12988,
+              "end_frame": 27209
+            },
+            {
+              "ep": 19,
+              "title": "SAN FRANCISCO > MONTEREY",
+              "kind": "episode",
+              "start": 906.9666666666667,
+              "end": 1266.7,
+              "start_frame": 27209,
+              "end_frame": 38001
+            },
+            {
+              "ep": 20,
+              "title": "BIG SUR > PINNACLES",
+              "kind": "episode",
+              "start": 1266.7,
+              "end": 1823.7,
+              "start_frame": 38001,
+              "end_frame": 54711
+            },
+            {
+              "ep": 21,
+              "title": "MORRO BAY > PISMO BEACH",
+              "kind": "episode",
+              "start": 1823.7,
+              "end": 2153.3333333333335,
+              "start_frame": 54711,
+              "end_frame": 64600
+            },
+            {
+              "ep": 22,
+              "title": "SOLVANG > SANTA BARBARA",
+              "kind": "episode",
+              "start": 2153.3333333333335,
+              "end": 2462.1666666666665,
+              "start_frame": 64600,
+              "end_frame": 73865
+            },
+            {
+              "ep": 23,
+              "title": "TO THE CHANNEL ISLANDS",
+              "kind": "episode",
+              "start": 2462.1666666666665,
+              "end": 2639.9333333333334,
+              "start_frame": 73865,
+              "end_frame": 79198
+            },
+            {
+              "ep": 24,
+              "title": "VENTURA > LOS ANGELES",
+              "kind": "episode",
+              "start": 2639.9333333333334,
+              "end": 3076.6666666666665,
+              "start_frame": 79198,
+              "end_frame": 92300
+            },
+            {
+              "ep": 25,
+              "title": "LOS ANGELES > SAN DIEGO",
+              "kind": "episode",
+              "start": 3076.6666666666665,
+              "end": 3356.6,
+              "start_frame": 92300,
+              "end_frame": 100698
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        },
+        "vr": {
+          "version": "v08",
+          "status": "ready",
+          "format": "vr",
+          "src": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_Collection-v06_Clock-v18-b13ff5a32353.mp4",
+          "captions": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_Collection-v06_Clock-v18-b13ff5a32353.srt",
+          "vtt": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_Collection-v06_Clock-v18-b13ff5a32353.vtt",
+          "duration": 3356.6,
+          "bytes": 23068203716,
+          "sha256": "b13ff5a32353803ccb45066c63678dabebcdb73b8ef64712827ce3660839f309",
+          "frames": 100698,
+          "width": 3840,
+          "height": 1920,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 16,
+              "title": "REDWOODS > FORT BRAGG",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 342.8,
+              "start_frame": 0,
+              "end_frame": 10284
+            },
+            {
+              "ep": 17,
+              "title": "SANTA ROSA > NAPA",
+              "kind": "episode",
+              "start": 342.8,
+              "end": 432.93333333333334,
+              "start_frame": 10284,
+              "end_frame": 12988
+            },
+            {
+              "ep": 18,
+              "title": "NAPA > SAN FRANCISCO",
+              "kind": "episode",
+              "start": 432.93333333333334,
+              "end": 906.9666666666667,
+              "start_frame": 12988,
+              "end_frame": 27209
+            },
+            {
+              "ep": 19,
+              "title": "SAN FRANCISCO > MONTEREY",
+              "kind": "episode",
+              "start": 906.9666666666667,
+              "end": 1266.7,
+              "start_frame": 27209,
+              "end_frame": 38001
+            },
+            {
+              "ep": 20,
+              "title": "BIG SUR > PINNACLES",
+              "kind": "episode",
+              "start": 1266.7,
+              "end": 1823.7,
+              "start_frame": 38001,
+              "end_frame": 54711
+            },
+            {
+              "ep": 21,
+              "title": "MORRO BAY > PISMO BEACH",
+              "kind": "episode",
+              "start": 1823.7,
+              "end": 2153.3333333333335,
+              "start_frame": 54711,
+              "end_frame": 64600
+            },
+            {
+              "ep": 22,
+              "title": "SOLVANG > SANTA BARBARA",
+              "kind": "episode",
+              "start": 2153.3333333333335,
+              "end": 2462.1666666666665,
+              "start_frame": 64600,
+              "end_frame": 73865
+            },
+            {
+              "ep": 23,
+              "title": "TO THE CHANNEL ISLANDS",
+              "kind": "episode",
+              "start": 2462.1666666666665,
+              "end": 2639.9333333333334,
+              "start_frame": 73865,
+              "end_frame": 79198
+            },
+            {
+              "ep": 24,
+              "title": "VENTURA > LOS ANGELES",
+              "kind": "episode",
+              "start": 2639.9333333333334,
+              "end": 3076.6666666666665,
+              "start_frame": 79198,
+              "end_frame": 92300
+            },
+            {
+              "ep": 25,
+              "title": "LOS ANGELES > SAN DIEGO",
+              "kind": "episode",
+              "start": 3076.6666666666665,
+              "end": 3356.6,
+              "start_frame": 92300,
+              "end_frame": 100698
+            }
+          ],
+          "main_film_ends_on_E35_fridge": false,
+          "E36_separate": true
+        }
+      }
+    },
+    {
+      "id": "26-35",
+      "title": "Episodes 26\u201335",
+      "episodes": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "formats": {
+        "16x9": {
+          "version": "v08",
+          "status": "ready",
+          "format": "16x9",
+          "src": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_Collection-v06_Clock-v18-64a0f010f7fa.mp4",
+          "captions": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_Collection-v06_Clock-v18-64a0f010f7fa.srt",
+          "vtt": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_Collection-v06_Clock-v18-64a0f010f7fa.vtt",
+          "duration": 3101.8333333333335,
+          "bytes": 21155539556,
+          "sha256": "64a0f010f7fa135b41d124cb6ef2b003fffcd7f006dac1bcc80e60e4e8ca070e",
+          "frames": 93055,
+          "width": 3840,
+          "height": 2160,
+          "audio": [
+            "5.1 surround",
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 26,
+              "title": "SAN DIEGO > JOSHUA TREE",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 494.1666666666667,
+              "start_frame": 0,
+              "end_frame": 14825
+            },
+            {
+              "ep": 27,
+              "title": "LAS VEGAS > DEATH VALLEY",
+              "kind": "episode",
+              "start": 494.1666666666667,
+              "end": 819.3,
+              "start_frame": 14825,
+              "end_frame": 24579
+            },
+            {
+              "ep": 28,
+              "title": "HOOVER DAM > GRAND CANYON",
+              "kind": "episode",
+              "start": 819.3,
+              "end": 1163.9666666666667,
+              "start_frame": 24579,
+              "end_frame": 34919
+            },
+            {
+              "ep": 29,
+              "title": "GRAND CANYON > ZION",
+              "kind": "episode",
+              "start": 1163.9666666666667,
+              "end": 1547.3,
+              "start_frame": 34919,
+              "end_frame": 46419
+            },
+            {
+              "ep": 30,
+              "title": "ZION > BRYCE CANYON",
+              "kind": "episode",
+              "start": 1547.3,
+              "end": 1870.2333333333333,
+              "start_frame": 46419,
+              "end_frame": 56107
+            },
+            {
+              "ep": 31,
+              "title": "BRYCE > SALT LAKE CITY",
+              "kind": "episode",
+              "start": 1870.2333333333333,
+              "end": 2212.3333333333335,
+              "start_frame": 56107,
+              "end_frame": 66370
+            },
+            {
+              "ep": 32,
+              "title": "SALT LAKE CITY > ARCHES",
+              "kind": "episode",
+              "start": 2212.3333333333335,
+              "end": 2420.3333333333335,
+              "start_frame": 66370,
+              "end_frame": 72610
+            },
+            {
+              "ep": 33,
+              "title": "THE LONG ROAD HOME",
+              "kind": "episode",
+              "start": 2420.3333333333335,
+              "end": 2647.1,
+              "start_frame": 72610,
+              "end_frame": 79413
+            },
+            {
+              "ep": 34,
+              "title": "ST LOUIS > NEW RIVER GORGE",
+              "kind": "episode",
+              "start": 2647.1,
+              "end": 2854.4,
+              "start_frame": 79413,
+              "end_frame": 85632
+            },
+            {
+              "ep": 35,
+              "title": "BALTIMORE > HOME",
+              "kind": "episode",
+              "start": 2854.4,
+              "end": 3101.8333333333335,
+              "start_frame": 85632,
+              "end_frame": 93055
+            }
+          ],
+          "main_film_ends_on_E35_fridge": true,
+          "E36_separate": true
+        },
+        "9x16": {
+          "version": "v08",
+          "status": "ready",
+          "format": "9x16",
+          "src": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_Collection-v06_Clock-v18-1425b3ff616b.mp4",
+          "captions": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_Collection-v06_Clock-v18-1425b3ff616b.srt",
+          "vtt": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_Collection-v06_Clock-v18-1425b3ff616b.vtt",
+          "duration": 3101.8333333333335,
+          "bytes": 22034020087,
+          "sha256": "1425b3ff616b036dcd01451055109fb0de5cf2db7eaf0b01ed3ddd6ffd35e4d8",
+          "frames": 93055,
+          "width": 2160,
+          "height": 3840,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 26,
+              "title": "SAN DIEGO > JOSHUA TREE",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 494.1666666666667,
+              "start_frame": 0,
+              "end_frame": 14825
+            },
+            {
+              "ep": 27,
+              "title": "LAS VEGAS > DEATH VALLEY",
+              "kind": "episode",
+              "start": 494.1666666666667,
+              "end": 819.3,
+              "start_frame": 14825,
+              "end_frame": 24579
+            },
+            {
+              "ep": 28,
+              "title": "HOOVER DAM > GRAND CANYON",
+              "kind": "episode",
+              "start": 819.3,
+              "end": 1163.9666666666667,
+              "start_frame": 24579,
+              "end_frame": 34919
+            },
+            {
+              "ep": 29,
+              "title": "GRAND CANYON > ZION",
+              "kind": "episode",
+              "start": 1163.9666666666667,
+              "end": 1547.3,
+              "start_frame": 34919,
+              "end_frame": 46419
+            },
+            {
+              "ep": 30,
+              "title": "ZION > BRYCE CANYON",
+              "kind": "episode",
+              "start": 1547.3,
+              "end": 1870.2333333333333,
+              "start_frame": 46419,
+              "end_frame": 56107
+            },
+            {
+              "ep": 31,
+              "title": "BRYCE > SALT LAKE CITY",
+              "kind": "episode",
+              "start": 1870.2333333333333,
+              "end": 2212.3333333333335,
+              "start_frame": 56107,
+              "end_frame": 66370
+            },
+            {
+              "ep": 32,
+              "title": "SALT LAKE CITY > ARCHES",
+              "kind": "episode",
+              "start": 2212.3333333333335,
+              "end": 2420.3333333333335,
+              "start_frame": 66370,
+              "end_frame": 72610
+            },
+            {
+              "ep": 33,
+              "title": "THE LONG ROAD HOME",
+              "kind": "episode",
+              "start": 2420.3333333333335,
+              "end": 2647.1,
+              "start_frame": 72610,
+              "end_frame": 79413
+            },
+            {
+              "ep": 34,
+              "title": "ST LOUIS > NEW RIVER GORGE",
+              "kind": "episode",
+              "start": 2647.1,
+              "end": 2854.4,
+              "start_frame": 79413,
+              "end_frame": 85632
+            },
+            {
+              "ep": 35,
+              "title": "BALTIMORE > HOME",
+              "kind": "episode",
+              "start": 2854.4,
+              "end": 3101.8333333333335,
+              "start_frame": 85632,
+              "end_frame": 93055
+            }
+          ],
+          "main_film_ends_on_E35_fridge": true,
+          "E36_separate": true
+        },
+        "vr": {
+          "version": "v08",
+          "status": "ready",
+          "format": "vr",
+          "src": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_Collection-v06_Clock-v18-9e345e705654.mp4",
+          "captions": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_Collection-v06_Clock-v18-9e345e705654.srt",
+          "vtt": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_Collection-v06_Clock-v18-9e345e705654.vtt",
+          "duration": 3101.8333333333335,
+          "bytes": 19218003307,
+          "sha256": "9e345e705654615406f94e828f6b0c3d702a1561ecb264b7b6afebe4aaeac787",
+          "frames": 93055,
+          "width": 3840,
+          "height": 1920,
+          "audio": [
+            "stereo"
+          ],
+          "chapters": [
+            {
+              "ep": 26,
+              "title": "SAN DIEGO > JOSHUA TREE",
+              "kind": "episode",
+              "start": 0.0,
+              "end": 494.1666666666667,
+              "start_frame": 0,
+              "end_frame": 14825
+            },
+            {
+              "ep": 27,
+              "title": "LAS VEGAS > DEATH VALLEY",
+              "kind": "episode",
+              "start": 494.1666666666667,
+              "end": 819.3,
+              "start_frame": 14825,
+              "end_frame": 24579
+            },
+            {
+              "ep": 28,
+              "title": "HOOVER DAM > GRAND CANYON",
+              "kind": "episode",
+              "start": 819.3,
+              "end": 1163.9666666666667,
+              "start_frame": 24579,
+              "end_frame": 34919
+            },
+            {
+              "ep": 29,
+              "title": "GRAND CANYON > ZION",
+              "kind": "episode",
+              "start": 1163.9666666666667,
+              "end": 1547.3,
+              "start_frame": 34919,
+              "end_frame": 46419
+            },
+            {
+              "ep": 30,
+              "title": "ZION > BRYCE CANYON",
+              "kind": "episode",
+              "start": 1547.3,
+              "end": 1870.2333333333333,
+              "start_frame": 46419,
+              "end_frame": 56107
+            },
+            {
+              "ep": 31,
+              "title": "BRYCE > SALT LAKE CITY",
+              "kind": "episode",
+              "start": 1870.2333333333333,
+              "end": 2212.3333333333335,
+              "start_frame": 56107,
+              "end_frame": 66370
+            },
+            {
+              "ep": 32,
+              "title": "SALT LAKE CITY > ARCHES",
+              "kind": "episode",
+              "start": 2212.3333333333335,
+              "end": 2420.3333333333335,
+              "start_frame": 66370,
+              "end_frame": 72610
+            },
+            {
+              "ep": 33,
+              "title": "THE LONG ROAD HOME",
+              "kind": "episode",
+              "start": 2420.3333333333335,
+              "end": 2647.1,
+              "start_frame": 72610,
+              "end_frame": 79413
+            },
+            {
+              "ep": 34,
+              "title": "ST LOUIS > NEW RIVER GORGE",
+              "kind": "episode",
+              "start": 2647.1,
+              "end": 2854.4,
+              "start_frame": 79413,
+              "end_frame": 85632
+            },
+            {
+              "ep": 35,
+              "title": "BALTIMORE > HOME",
+              "kind": "episode",
+              "start": 2854.4,
+              "end": 3101.8333333333335,
+              "start_frame": 85632,
+              "end_frame": 93055
+            }
+          ],
+          "main_film_ends_on_E35_fridge": true,
+          "E36_separate": true
+        }
+      }
+    }
+  ],
+  "pending360": {
+    "src": "masters/vr-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_vr_V08_Opening-v01_Clock-v18-fa9303344feb.mp4",
+    "sha256": "fa9303344feb51a77688e05dabd42e9e8f5ba4caf07996d1e15fac8b2be976f2",
+    "bytes": 64648135273,
+    "frames": 323981,
+    "duration": 10799.366666666667
+  }
+}
