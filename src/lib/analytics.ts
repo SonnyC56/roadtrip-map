@@ -42,7 +42,7 @@ export function initAnalytics(): void {
   const view = () => {
     if (!analyticsEnabled()) return
     const path = analyticsUrl(location.href)
-    if (path) pageview({ path, route: location.pathname })
+    if (path) pageview({ path: new URL(path).pathname, route: location.pathname })
   }
   view()
   window.addEventListener('pageshow', e => { if (e.persisted) view() })

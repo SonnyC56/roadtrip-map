@@ -103,7 +103,7 @@ scripts/serve-media.mjs            local static server with CORS + Range
 
 Dashboard: https://vercel.com/sonny-cirasuolos-projects/roadtrip-map/analytics
 
-Standard Vercel Web Analytics was enabled on October 7, 2026. No Analytics Plus or Speed Insights subscription was added. The public app and methodology page use `@vercel/analytics`; `web-vitals` reports performance as custom events. Pageviews include Vercel's device, browser, country, referrer and campaign breakdowns. Collection begins after deployment; past visits cannot be recovered.
+The custom domain also has existing Cloudflare RUM injected at the CDN; the opt-out below controls Vercel, not Cloudflare. Standard Vercel Web Analytics was enabled on October 7, 2026. No Analytics Plus or Speed Insights subscription was added. The public app and methodology page use `@vercel/analytics`; `web-vitals` reports performance as custom events. Pageviews include Vercel's device, browser, country, referrer and campaign breakdowns. Collection begins after deployment; past visits cannot be recovered.
 
 Only the production domains `www.2025roadtrip.com`, `2025roadtrip.com` and `roadtrip-map.vercel.app` and paths `/` and `/methodology/` send events. Local development, preview deployments, VR preview mode, private review paths and `?analytics_off=1` are excluded. DNT, Global Privacy Control and the local opt-out at `/privacy/` are honored. Hidden review/recording pages do not initialize the SDK or send analytics. URLs strip hashes and query data except restricted public `utm_source`, `utm_medium`, `utm_campaign`, and `utm_content` tags (letters, numbers, dash, underscore; maximum 64 characters). Do not put personal data in campaign labels.
 
