@@ -5,6 +5,8 @@ import { useViewport } from '../composables/useViewport'
 import { epKind, epLabel, episodeVersionLabel, mediaUrl, playableFormat } from '../lib/manifest'
 import { dateSpan, fmtDuration, pad2 } from '../lib/format'
 
+import { trackEvent, episodeContent } from '../lib/analytics'
+import { useVideoAnalytics } from '../composables/useVideoAnalytics'
 const store = useTripStore()
 const { isMobile, isPortrait } = useViewport()
 
@@ -26,6 +28,9 @@ const source = computed(() => playableFormat(episode.value, fmt.value))
 const posterFallback = computed(() => episode.value?.formats[fmt.value]?.poster || episode.value?.formats['16x9']?.poster)
 const video = ref<HTMLVideoElement | null>(null)
 const failed = ref(false)
+useVideoAnalytics(video, computed(() => episode.value && source.value ? {
+  content: episodeContent(episode.value.ep, fmt.value, source.value.version), mode: 'episode',
+} : null))
 
 const stops = computed(() =>
   (episode.value?.stops || []).map((id) => store.stopById.get(id)).filter((s): s is NonNullable<typeof s> => !!s),
@@ -36,6 +41,7 @@ async function selectFmt(want: Fmt) {
   const v = video.value
   const at = v?.currentTime || 0
   const wasPlaying = v && !v.paused
+  trackEvent('format_change', { from: fmt.value, to: want })
   override.value = want
   await nextTick()
   const nv = video.value
@@ -58,6 +64,7 @@ const vrFormat = computed(() => playableFormat(episode.value, 'vr'))
 function watch360() {
   const e = episode.value
   if (!e || !vrFormat.value) return
+  trackEvent('format_change', { from: fmt.value, to: '360' })
   video.value?.pause()
   store.openEpisode360(e.ep)
 }

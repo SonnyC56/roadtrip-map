@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { trackEvent, trackFailure } from '../lib/analytics'
 import { computed, reactive, ref, shallowRef } from 'vue'
 import {
   loadFallbackRoute,
@@ -264,6 +265,7 @@ export const useTripStore = defineStore('trip', () => {
     } catch (e) {
       console.warn('[trip] manifest unavailable:', e)
       manifestMissing.value = true
+      trackFailure('data', 'manifest')
     }
 
     try {
@@ -273,9 +275,11 @@ export const useTripStore = defineStore('trip', () => {
       try {
         route.value = await loadFallbackRoute()
         routeSource.value = 'fallback'
+        trackFailure('data', 'route_fallback')
       } catch (e) {
         console.error('[trip] no route available', e)
         routeSource.value = 'none'
+        trackFailure('data', 'route')
       }
     }
     computeRouteMiles()
@@ -294,6 +298,7 @@ export const useTripStore = defineStore('trip', () => {
   }
 
   function setLayer(key: LayerKey, on: boolean) {
+    if (layers[key] !== on) trackEvent('map_layer', { layer: key, enabled: on })
     layers[key] = on
   }
 
@@ -312,6 +317,7 @@ export const useTripStore = defineStore('trip', () => {
   }
 
   function showEpisode(ep: number | null) {
+    if (ep != null && ep !== openEpisode.value && episodeByNum.value.has(ep)) trackEvent('episode_select', { episode: ep })
     openEpisode.value = ep
     const e = ep != null ? episodeByNum.value.get(ep) : undefined
     if (e && epKind(e) !== 'intro') focusEpisode(e.ep)
@@ -361,6 +367,7 @@ export const useTripStore = defineStore('trip', () => {
     const list = episode360Media(selected, stops.value)
     const index = chapterIndex(list, ep)
     if (index < 0) return false
+    trackEvent('episode_select', { episode: list[index]!.episode ?? 0, format: '360' })
     lightbox.value = { list, index, film: true }
     return true
   }
@@ -370,6 +377,7 @@ export const useTripStore = defineStore('trip', () => {
   }
 
   function setStop(id: number | null) {
+    trackEvent('map_stop', { stop: id ?? 'all' })
     stopFilter.value = id
     if (id == null) return
     const s = stopById.value.get(id)
@@ -379,6 +387,7 @@ export const useTripStore = defineStore('trip', () => {
   }
 
   function resetFilters() {
+    trackEvent('map_filter_reset')
     dateFrom.value = null
     dateTo.value = null
     stopFilter.value = null

@@ -7,6 +7,7 @@ import { mediaUrl } from '../lib/manifest'
 import { uninterrupted, type Master, type MasterFormat } from '../lib/uninterrupted'
 import { readyMasters, readyCollections, verifiedPending360 } from '../lib/readyV8'
 import { fmtDuration } from '../lib/format'
+import { trackEvent } from '../lib/analytics'
 const store = useTripStore()
 const masters = ref<Partial<Record<MasterFormat, Master>>>({ ...readyMasters })
 const collectionId = ref(readyCollections[0]!.id)
@@ -28,11 +29,13 @@ async function refreshMasters() {
 function watchCollection(format: MasterFormat) {
   const movie = selectedCollection.value.formats[format]
   if (!movie) return
+  trackEvent('collection_select', { collection: selectedCollection.value.id, format: format === 'vr' ? '360' : format })
   store.showEpisode(null); store.closeMedia(); uninterrupted.value = movie
 }
 function watchMaster(format: MasterFormat) {
   const master = masters.value[format]
   if (!master) return
+  trackEvent('film_select', { format: format === 'vr' ? '360' : format, mode: 'single-file' })
   store.showEpisode(null); store.closeMedia(); uninterrupted.value = master
 }
 onMounted(refreshMasters)
@@ -42,6 +45,7 @@ const duration = computed(() => mainEpisodes.value.reduce((n, e) => n + (e.durat
 function ready(format: EpisodeFormatKey) { return !!mainEpisodes.value.length && mainEpisodes.value.every(e => playableFormat(e, format)) }
 function watchFlat(format: FlatFormat) { store.showEpisode(null); store.closeMedia(); startFilm(mainEpisodes.value, format) }
 function watch360() {
+  trackEvent('film_select', { format: '360', mode: 'film-queue' })
   store.showEpisode(null)
   store.closeMedia()
   store.openEpisode360()
@@ -86,6 +90,7 @@ function watch360() {
       </div>
     </details>
     <a class="methodology-link" href="/methodology/">How this film was made <span aria-hidden="true">&rarr;</span></a>
+    <a class="methodology-link" href="/privacy/">Privacy &amp; analytics</a>
   </section>
 </template>
 

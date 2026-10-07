@@ -4,10 +4,13 @@
 // click handler must call navigator.xr.requestSession() (and video.play()) synchronously inside the
 // user gesture, so it runs here, before any dynamic import.
 import { ref, shallowRef } from 'vue'
+import { trackEvent, episodeContent } from './analytics'
+import type { PlaybackContext } from './videoTelemetry'
 import { epKind, epLabel, episodeVersionLabel, mediaUrl, playableFormat, type Episode } from './manifest'
 
 /** One video in an in-VR playlist (an episode of the VR edition, or a raw 360 clip). */
 export interface VRItem {
+  analytics?: PlaybackContext
   id: string
   /** short tag, e.g. "E07", "INTRO" */
   label: string
@@ -18,6 +21,7 @@ export interface VRItem {
 }
 
 export interface VRSource {
+  analytics?: PlaybackContext
   /** Timed scene HUD; only set with a matching graphics-free picture. */
   hud?: string
   kind: 'image' | 'video'
@@ -100,9 +104,10 @@ export function playVideo(v: HTMLVideoElement): Promise<boolean> {
 /** Call directly from a click / tap handler (no awaits before it). */
 export async function enterVR(source: VRSource, onScreen = false): Promise<void> {
   if (vrState.value) return
+  trackEvent('vr_request', { content: source.analytics?.content || '360', mode: vrPreview || onScreen ? 'preview' : 'headset' })
   let sessionP: Promise<XRSession> | null = null
   if (!vrPreview && !onScreen) {
-    if (!navigator.xr) throw new Error('WebXR not available')
+    if (!navigator.xr) { trackEvent('vr_error', { reason: 'unsupported' }); throw new Error('WebXR not available') }
     sessionP = navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['hand-tracking'] })
   }
   // start playback inside the same gesture so the headset browser allows sound
@@ -111,7 +116,9 @@ export async function enterVR(source: VRSource, onScreen = false): Promise<void>
   try {
     const session = sessionP ? await sessionP : null
     vrState.value = { source, session, video }
+    trackEvent('vr_enter', { content: source.analytics?.content || '360', mode: session ? 'headset' : 'preview' })
   } catch (e) {
+    trackEvent('vr_error', { reason: 'session_request' })
     video?.pause()
     video?.removeAttribute('src')
     throw e
@@ -123,7 +130,7 @@ export function enterVRPlaylist(items: VRItem[], index: number, listName: string
   const it = items[index]
   if (!it) return Promise.reject(new Error('empty playlist'))
   const title = it.label.toUpperCase() === it.title.toUpperCase() ? it.title : `${it.label} · ${it.title}`
-  return enterVR({ kind: 'video', title, src: it.src, poster: it.poster, startAt, yaw, playlist: items, index, listName }, onScreen)
+  return enterVR({ analytics: it.analytics, kind: 'video', title, src: it.src, poster: it.poster, startAt, yaw, playlist: items, index, listName }, onScreen)
 }
 
 /** The VR edition: every episode with a playable formats.vr, in film order (intro ... credits). */
@@ -134,6 +141,7 @@ export function episodePlaylist(episodes: Episode[]): VRItem[] {
     if (!f) continue
     out.push({
       id: `ep${e.ep}`,
+      analytics: { content: episodeContent(e.ep, '360', f.version), mode: 'film-queue' },
       label: [epKind(e) === 'intro' ? 'INTRO' : epLabel(e), episodeVersionLabel(e, 'vr')].filter(Boolean).join(' · '),
       title: e.title,
       src: mediaUrl(f.src),

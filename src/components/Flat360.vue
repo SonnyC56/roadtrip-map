@@ -1,12 +1,18 @@
 <script setup lang="ts">
 // Fallback when 360 can't run (no WebGL 2 / viewer failed): the equirectangular image or video shown flat.
 // Photos are full-height and pan horizontally (scroll, swipe or drag); videos play in a normal <video>.
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useVideoAnalytics } from '../composables/useVideoAnalytics'
+import { mediaContext } from '../lib/mediaAnalytics'
+import { useTripStore } from '../stores/trip'
 import { mediaUrl, type Media } from '../lib/manifest'
 
 const props = defineProps<{ item: Media; continuous?: boolean }>()
 const emit = defineEmits<{ ended: [id: string] }>()
 const scroller = ref<HTMLDivElement | null>(null)
+const video = ref<HTMLVideoElement | null>(null)
+const store = useTripStore()
+useVideoAnalytics(video, computed(() => ({ ...mediaContext(props.item, store.episodes, props.continuous), mode: 'fallback' })))
 
 function center() {
   const el = scroller.value
@@ -37,6 +43,7 @@ function up() {
   <div class="relative w-full h-full bg-black flex flex-col">
     <video
       v-if="item.type === 'pano-video'"
+      ref="video"
       :key="continuous ? 'film360' : item.id"
       class="flex-1 min-h-0 w-full object-contain bg-black"
       :src="mediaUrl(item.src)"

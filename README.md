@@ -97,3 +97,37 @@ src/components/MediaLightbox.vue   photo / video / 360 lightbox
 src/components/Media360Viewer.vue  photo-sphere-viewer (tiles + video adapters), lazy-loaded
 scripts/serve-media.mjs            local static server with CORS + Range
 ```
+
+
+## Production analytics
+
+Dashboard: https://vercel.com/sonny-cirasuolos-projects/roadtrip-map/analytics
+
+Standard Vercel Web Analytics was enabled on October 7, 2026. No Analytics Plus or Speed Insights subscription was added. The public app and methodology page use `@vercel/analytics`; `web-vitals` reports performance as custom events. Pageviews include Vercel's device, browser, country, referrer and campaign breakdowns. Collection begins after deployment; past visits cannot be recovered.
+
+Only the production domains `www.2025roadtrip.com`, `2025roadtrip.com` and `roadtrip-map.vercel.app` and paths `/` and `/methodology/` send events. Local development, preview deployments, VR preview mode, private review paths and `?analytics_off=1` are excluded. DNT, Global Privacy Control and the local opt-out at `/privacy/` are honored. Hidden review/recording pages do not initialize the SDK or send analytics. URLs strip hashes and query data except restricted public `utm_source`, `utm_medium`, `utm_campaign`, and `utm_content` tags (letters, numbers, dash, underscore; maximum 64 characters). Do not put personal data in campaign labels.
+
+No session replay, advertising identifiers, DOM text, captions, error messages/stacks, media URLs, microphone recordings or review responses are sent. `analytics.ts` accepts at most two bounded properties per event, matching standard Pro. Error categories are deduplicated; media timeupdate itself never becomes an event. Collection failure does not block playback. Ad blockers and network interruptions can prevent analytics; these numbers are estimates, not a census.
+
+| Event | Meaning / properties |
+| --- | --- |
+| `episode_select`, `film_select`, `collection_select` | Intent to open a title, viewing format and queue vs single-file mode |
+| `player_open`, `video_start` | Player opened vs actual playing; `content`, `mode` |
+| `video_watch_seconds` | Non-cumulative actual playing seconds; sum `seconds`, grouped by `content` |
+| `video_progress` | Unique source coverage reaches 25/50/75/90%; `content`, `percent` |
+| `video_end` | End-of-file reached, which alone does not mean every scene was watched |
+| `player_exit` | Close/source switch and unique percentage watched; `content`, `percent` |
+| `video_start_delay_ms`, `video_buffer_seconds` | Delay from play request to playing; total rebuffer duration in flushed batches |
+| `video_error`, `viewer_error`, `viewer_fallback`, `image_error`, `playback_blocked` | Decode/network/unsupported, viewer load or timeout, fallback and autoplay outcomes |
+| `vr_request`, `vr_enter`, `vr_exit`, `vr_error` | Headset request, successful entry, duration and failure; preview separated |
+| `media_open`, `map_layer`, `map_stop`, `map_timeline`, `map_filter_reset`, `map_date_filter`, `navigation`, `chapter_jump`, `format_change`, `outbound_link` | Gallery and navigation usage (no user input text) |
+| `web_vital` | `metric` as NAME:rating, plus numeric `value`; LCP/INP/FCP/TTFB in ms, CLS unitless |
+| `site_error` | Bounded app/data error categories |
+
+Content example `E02:v08:16x9`; on-screen 360 is `:360`, actual headset playback is `:vr`. Modes distinguish `episode`, `film-queue`, `single-file`, `gallery`, `fallback` and `headset`. Full films and collections use `film:<collection/version>:<format>`. Do not compare all opens with unique visitors as if they were the same thing.
+
+Watching time excludes pauses, seeking, rebuffering and hidden browser tabs; active headset sessions remain eligible when their 2D page is hidden. Rewatching counts as time spent but does not inflate unique progress coverage. A minute-of-watching heartbeat and pause/pagehide/unmount flushes protect most partial sessions. Abrupt crashes can lose a partial minute. Preloaded VR videos are never attached until selected. At most 1,500 events per page lifetime; a blocked SDK queue is capped. Native SDK pageviews are sent once per public document load (and BFCache restore), not for map ticks, hashes, modal opens, or iframe activity.
+
+Use the dashboard's custom-event filters for completion and format comparisons. The [Vercel Analytics API](https://vercel.com/docs/analytics/api) supports aggregate event queries; numeric properties are grouped values, so a report should sum watch seconds times each group's event count rather than count heartbeat events as seconds. Metrics appear under Custom Events rather than the separate Speed Insights dashboard. Standard Pro currently bills analytics at $0.03/1,000 events; check https://vercel.com/docs/analytics/limits-and-pricing for current pricing.
+
+Verification: `node scripts/check-analytics.mjs`, `npm run build`, existing episode/release checks, and browser smoke tests. Before deployment, mock Vercel requests when exercising many UI paths. After deployment confirm SDK HTTP 200 and event ingestion HTTP 200/204; verify actual aggregate data through the authenticated Vercel API. Never commit credentials or add tokens to the browser bundle.

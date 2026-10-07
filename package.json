@@ -21,6 +21,7 @@
     "@photo-sphere-viewer/gyroscope-plugin": "^5.14.0",
     "@photo-sphere-viewer/video-plugin": "^5.14.0",
     "@tailwindcss/postcss": "^4.1.15",
+    "@vercel/analytics": "^2.0.1",
     "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
@@ -28,7 +29,8 @@
     "playcanvas": "^2.15.1",
     "storysplat-viewer": "^2.10.12",
     "three": "^0.179.1",
-    "vue": "^3.5.22"
+    "vue": "^3.5.22",
+    "web-vitals": "^6.2.3"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",

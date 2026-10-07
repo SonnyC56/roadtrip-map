@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, watch } from 'vue'
 import { useTripStore } from '../stores/trip'
 import { shortDate, pad2 } from '../lib/format'
 
+import { trackEvent } from '../lib/analytics'
 const store = useTripStore()
 
 const SPEEDS = [0.5, 1, 2, 4]
@@ -51,6 +52,7 @@ function pause() {
   cancelAnimationFrame(raf)
 }
 function toggle() {
+  trackEvent('map_timeline', { action: store.playing ? 'pause' : 'play' })
   if (store.playing) pause()
   else play()
 }
@@ -58,6 +60,7 @@ function restart() {
   store.setTime(store.tStart)
 }
 function showAll() {
+  trackEvent('map_timeline', { action: 'show_all' })
   pause()
   store.setTime(store.tEnd)
 }

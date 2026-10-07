@@ -4,6 +4,7 @@ import { useTripStore } from '../stores/trip'
 import LayerChips from './LayerChips.vue'
 import { dateSpan } from '../lib/format'
 
+import { trackEvent } from '../lib/analytics'
 const store = useTripStore()
 
 const shown = computed(() => store.visibleCount)
@@ -17,6 +18,7 @@ function onStop(e: Event) {
   store.setStop(v === '' ? null : Number(v))
 }
 function onDate(which: 'from' | 'to', e: Event) {
+  trackEvent('map_date_filter', { boundary: which })
   const v = (e.target as HTMLInputElement).value || null
   if (which === 'from') store.dateFrom = v
   else store.dateTo = v

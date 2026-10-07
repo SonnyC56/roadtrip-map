@@ -37,6 +37,8 @@ import {
   type Group,
 } from 'three'
 import { exitVR, makeVideo, playVideo, vrState, type VRItem, type VRState } from '../lib/xr'
+import { trackEvent } from '../lib/analytics'
+import { attachVideoTelemetry } from '../lib/videoTelemetry'
 
 const props = defineProps<{ state: VRState }>()
 const host = ref<HTMLDivElement | null>(null)
@@ -149,6 +151,8 @@ async function showPhoto() {
 
 // ---------------------------------------------------------------- video + playlist
 let cur: HTMLVideoElement | null = isVideo ? props.state.video : null
+let disposeTelemetry: (() => void) | undefined
+const vrOpened = performance.now()
 let idx = source.index ?? 0
 let curTitle = source.title || '360°'
 /** preloaded next item (the only other <video> allowed to exist) */
@@ -166,6 +170,12 @@ function disposeVideo(v: HTMLVideoElement) {
 }
 
 function attachVideo(v: HTMLVideoElement, poster?: string) {
+  disposeTelemetry?.()
+  const context = playlist?.[idx]?.analytics || source.analytics
+  disposeTelemetry = attachVideoTelemetry(v, {
+    content: (context?.content || '360').replace(/:360$/, session ? ':vr' : ':360-preview'),
+    mode: session ? 'headset' : 'preview', headset: !!session,
+  }, trackEvent)
   panelStatus = 'Loading video…'
   videoTex = null
   lastVideoT = -1
@@ -213,6 +223,7 @@ function goTo(i: number) {
     pre = null
     el = makeVideo(it.src)
   }
+  disposeTelemetry?.(); disposeTelemetry = undefined
   const old = cur
   cur = el
   idx = i
@@ -818,16 +829,20 @@ onMounted(async () => {
       showPhoto().catch((e) => {
         console.warn('[vr] photo failed', e)
         panelStatus = 'This 360 photo could not be loaded.'
+        trackEvent('vr_error', { reason: 'image_load' })
       })
   } catch (e) {
     console.warn('[vr] could not start', e)
     pageStatus.value = 'VR could not start on this device.'
+    trackEvent('vr_error', { reason: 'renderer' })
     session?.end().catch(() => {})
     if (!session) setTimeout(() => (vrState.value = null), 2500)
   }
 })
 
 onBeforeUnmount(() => {
+  disposeTelemetry?.(); disposeTelemetry = undefined
+  trackEvent('vr_exit', { mode: session ? 'headset' : 'preview', seconds: Math.round((performance.now() - vrOpened) / 1000) })
   disposed = true
   window.removeEventListener('keydown', onKey, true)
   window.removeEventListener('resize', onResize)

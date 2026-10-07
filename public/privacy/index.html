@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101b23"><title>Privacy · Sonny’s Roadtrip 2025</title><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>body{margin:0;background:#101b23;color:#f5f1e7;font:18px/1.6 system-ui,sans-serif}main{max-width:740px;margin:auto;padding:36px 24px}a{color:#e6b56a}h1{line-height:1.2}button{font:inherit;cursor:pointer;padding:12px 18px;border:1px solid #e6b56a;color:#101b23;background:#e6b56a;border-radius:8px;min-height:48px}button:focus-visible{outline:3px solid white;outline-offset:4px}small{color:#b9c4c6}</style>
+</head><body><main><a href="/">← Back to the journey</a><h1>Privacy &amp; site analytics</h1>
+<p>This site uses Vercel Web Analytics to understand which parts of the journey people enjoy and to find playback problems. It measures visits, referring sites, approximate country, browser and device type, public campaign tags, map interactions, video formats, viewing progress, buffering, playback errors and page performance.</p>
+<p>Our analytics sends public media identifiers and numerical measurements. It does not record your screen, microphone, camera, messages, voice recordings or private review feedback. Private review pages are excluded. We do not add advertising trackers or analytics cookies.</p>
+<p>Viewing time is approximate. Seeking past a scene does not count as watching it. The site honors Do Not Track and Global Privacy Control. You can also turn analytics off in this browser below; this preference is saved locally and does not affect video playback.</p>
+<button id="toggle" type="button">Turn analytics off</button><p id="status" role="status"></p>
+<p><a href="https://vercel.com/docs/analytics/privacy-policy">How Vercel processes analytics data</a></p>
+<small>Updated October 7, 2026. This preference applies to this browser and site domain.</small>
+</main><script>
+const key='roadtrip-analytics-disabled';const button=document.getElementById('toggle');const status=document.getElementById('status');
+function render(){try{const off=localStorage.getItem(key)==='1';button.textContent=off?'Allow analytics':'Turn analytics off';status.textContent=(navigator.doNotTrack==='1'||navigator.globalPrivacyControl)?'Analytics is off because your browser requests privacy.':off?'Analytics is off in this browser.':'Analytics is allowed in this browser.';}catch{button.disabled=true;status.textContent='Your browser blocks local preferences. Do Not Track and Global Privacy Control are still honored.';}}
+button.addEventListener('click',()=>{try{localStorage.getItem(key)==='1'?localStorage.removeItem(key):localStorage.setItem(key,'1');render();}catch{status.textContent='This browser could not save the preference.';}});render();
+</script></body></html>

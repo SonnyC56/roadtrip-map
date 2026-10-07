@@ -6,6 +6,7 @@ import BrandHeader from './BrandHeader.vue'
 import EpisodeList from './EpisodeList.vue'
 import ExploreFilters from './ExploreFilters.vue'
 
+import { trackEvent } from '../lib/analytics'
 const store = useTripStore()
 const { isMobile } = useViewport()
 const tab = ref<'episodes' | 'explore'>('episodes')
@@ -74,6 +75,7 @@ function tapHandle(e: MouseEvent) {
   dragged = false
 }
 function pickTab(t: 'episodes' | 'explore') {
+  if (t !== tab.value) trackEvent('navigation', { destination: t })
   tab.value = t
   if (isMobile.value && snap.value === 'peek') snap.value = 'half'
 }

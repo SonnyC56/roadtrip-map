@@ -5,6 +5,8 @@ import { mediaUrl, type Media } from '../lib/manifest'
 import { useTripStore } from '../stores/trip'
 import legacyChapters from '../lib/film-chapters.json'
 const Media360Viewer = defineAsyncComponent(() => import('./Media360Viewer.vue'))
+import { trackEvent } from '../lib/analytics'
+import { useVideoAnalytics } from '../composables/useVideoAnalytics'
 const store = useTripStore()
 const master = uninterrupted.value!
 const chapters = master.version === 'v08' ? master.chapters! : legacyChapters
@@ -13,6 +15,9 @@ const video = ref<HTMLVideoElement | null>(null)
 const sphere = ref<{ seek: (seconds: number) => void } | null>(null)
 const time = ref(0)
 const error = ref('')
+useVideoAnalytics(video, computed(() => ({
+  content: `film:${master.collection || 'whole-journey'}:${master.version}:${master.format}`, mode: 'single-file',
+})))
 const previousFocus = document.activeElement as HTMLElement | null
 const chapter = computed(() => Math.max(0, chapters.reduce((found, c, i) => c.start <= time.value ? i : found, 0)))
 const title = master.title || 'Whole journey'
@@ -22,6 +27,7 @@ const item: Media = { id: `${master.collection || 'whole-journey'}-${master.vers
   lat: 0, lon: 0, t: 0, day: '2025-08-13' }
 function seek(index: number) {
   const c = chapters[index]; if (!c) return
+  trackEvent('chapter_jump', { episode: c.ep, format: master.format === 'vr' ? '360' : master.format })
   if (master.format === 'vr') sphere.value?.seek(c.start)
   else if (video.value) video.value.currentTime = c.start
   time.value = c.start

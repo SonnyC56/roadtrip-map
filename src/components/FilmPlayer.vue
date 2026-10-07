@@ -7,11 +7,16 @@ function title(e: Episode) {
   const name = epLabel(e).toUpperCase() === e.title.toUpperCase() ? e.title : `${epLabel(e)} · ${e.title}`
   return episodeVersionLabel(e, filmState.value?.format || '16x9') ? `${name} · V8` : name
 }
+import { trackEvent, episodeContent } from '../lib/analytics'
+import { useVideoAnalytics } from '../composables/useVideoAnalytics'
 const store = useTripStore()
 const video = ref<HTMLVideoElement | null>(null)
 const episode = computed(() => filmState.value?.episodes[filmState.value.index])
 const source = computed(() => playableFormat(episode.value, filmState.value?.format || '16x9'))
 const next = computed(() => { const s = filmState.value; return s?.episodes[s.index + 1] })
+useVideoAnalytics(video, computed(() => episode.value && source.value && filmState.value ? {
+  content: episodeContent(episode.value.ep, filmState.value.format, source.value.version), mode: 'film-queue',
+} : null))
 const failed = ref(false)
 const needsPlay = ref(false)
 const finished = ref(false)
@@ -19,7 +24,7 @@ let seekTo = 0
 let shouldPlay = true
 async function play() {
   try { await video.value?.play(); needsPlay.value = false }
-  catch { needsPlay.value = true }
+  catch { needsPlay.value = true; trackEvent('playback_blocked', { player: 'film-queue' }) }
 }
 function metadata() {
   if (video.value && seekTo) video.value.currentTime = Math.min(seekTo, Math.max(0, video.value.duration - .05))
@@ -39,6 +44,7 @@ function ended() {
 function format(fmt: FlatFormat) {
   const s = filmState.value
   if (!s || s.format === fmt || !s.episodes.every(e => playableFormat(e, fmt))) return
+  trackEvent('format_change', { from: s.format, to: fmt })
   seekTo = video.value?.currentTime || 0
   shouldPlay = !!video.value && !video.value.paused
   failed.value = false; needsPlay.value = false

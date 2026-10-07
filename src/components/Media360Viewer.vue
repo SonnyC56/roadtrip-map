@@ -11,6 +11,9 @@ import { mediaUrl, type Media } from '../lib/manifest'
 import { textureUrl } from '../lib/textureUrl'
 import { enterVR, enterVRPlaylist, episodePlaylist, xrSupported, type VRItem } from '../lib/xr'
 import { useTripStore } from '../stores/trip'
+import { trackEvent } from '../lib/analytics'
+import { attachVideoTelemetry } from '../lib/videoTelemetry'
+import { mediaContext } from '../lib/mediaAnalytics'
 const store = useTripStore()
 
 const props = defineProps<{ item: Media; continuous?: boolean; singleFile?: boolean }>()
@@ -23,6 +26,8 @@ const failed = ref('')
 let VideoPluginClass: typeof VideoPluginT | null = null
 let generation = 0
 let mediaVideo: HTMLVideoElement | null = null
+let disposeTelemetry: (() => void) | undefined
+const telemetryContext = () => mediaContext(props.item, store.episodes, props.continuous, props.singleFile)
 let watchdog: ReturnType<typeof setTimeout> | undefined
 let videoEvents: AbortController | null = null
 let playAttempt = 0
@@ -44,6 +49,7 @@ function play(unmute = true) {
     if (video !== mediaVideo || attempt !== playAttempt) return
     needsPlay.value = true
     playMessage.value = 'Tap Play to start this video.'
+    trackEvent('playback_blocked', { content: telemetryContext().content, player: '360' })
   })
 }
 
@@ -58,7 +64,7 @@ function onEnterVR() {
   const video = m.type === 'pano-video' && v && VideoPluginClass ? v.getPlugin<VideoPluginT>(VideoPluginClass) : null
   const title = titleOf(m)
   if (props.singleFile) {
-    void enterVR({ kind: 'video', title, src: mediaUrl(m.src), poster: mediaUrl(m.poster), startAt: video?.getTime() || 0, yaw: v?.getPosition().yaw })
+    void enterVR({ analytics: telemetryContext(), kind: 'video', title, src: mediaUrl(m.src), poster: mediaUrl(m.poster), startAt: video?.getTime() || 0, yaw: v?.getPosition().yaw })
       .then(() => video?.pause()).catch(() => { vrError.value = 'VR could not start.' })
     return
   }
@@ -68,6 +74,7 @@ function onEnterVR() {
   if (!clips.includes(m)) clips.splice(0, clips.length, m)
   const items: VRItem[] = props.continuous ? episodePlaylist(store.episodes) : clips.map((x) => ({
     id: x.id,
+    analytics: mediaContext(x, store.episodes),
     label: new Date(`${x.day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase(),
     title: titleOf(x),
     src: textureUrl(x.src),
@@ -79,6 +86,7 @@ function onEnterVR() {
     ? enterVRPlaylist(items, props.continuous ? items.findIndex(x => x.id === `ep${m.episode}`) : clips.indexOf(m), props.continuous ? 'Episodes' : '360 clips', video?.getTime() || 0, v?.getPosition().yaw)
     : enterVR({
         kind: 'image',
+        analytics: telemetryContext(),
         title,
         src: textureUrl(p?.preview || m.src),
         yaw: v?.getPosition().yaw,
@@ -112,6 +120,7 @@ async function build() {
     failed.value = message
     loading.value = false
     emit('error', message)
+    trackEvent('viewer_error', { content: telemetryContext().content, reason: 'load' })
   }
   try {
     const { GyroscopePlugin } = await import('@photo-sphere-viewer/gyroscope-plugin')
@@ -175,6 +184,7 @@ async function build() {
         ],
       })
       // Set the source after the adapter has installed its metadata listener.
+      disposeTelemetry = attachVideoTelemetry(video, telemetryContext(), trackEvent)
       video.src = textureUrl(m.src)
     } else {
       const { EquirectangularTilesAdapter } = await import('@photo-sphere-viewer/equirectangular-tiles-adapter')
@@ -223,6 +233,7 @@ async function build() {
 }
 
 function destroy() {
+  disposeTelemetry?.(); disposeTelemetry = undefined
   generation++
   playAttempt++
   videoEvents?.abort()
@@ -245,6 +256,7 @@ function changeItem() {
     return
   }
   // Keep the viewer and video across chapters: volume, autoplay permission and fullscreen survive.
+  disposeTelemetry?.(); disposeTelemetry = undefined
   const video = mediaVideo
   playAttempt++
   video.pause()
@@ -254,12 +266,14 @@ function changeItem() {
   loading.value = true
   clearTimeout(watchdog)
   viewer.value.rotate({ yaw: 0, pitch: 0 })
+  disposeTelemetry = attachVideoTelemetry(video, telemetryContext(), trackEvent)
   video.src = textureUrl(props.item.src)
   video.load()
   play(false)
   watchdog = setTimeout(() => {
     loading.value = false
     failed.value = 'This chapter is taking too long to load. Please retry.'
+    trackEvent('viewer_error', { content: telemetryContext().content, reason: 'timeout' })
   }, 45000)
 }
 

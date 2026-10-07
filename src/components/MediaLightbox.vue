@@ -13,12 +13,16 @@ import { hasWebGL2 } from '../lib/webgl'
 const StorySplatViewer = defineAsyncComponent(() => import('./StorySplatViewer.vue'))
 const XRGalleryViewer = defineAsyncComponent(() => import('./XRGalleryViewer.vue'))
 
+import { trackEvent, mediaContent } from '../lib/analytics'
+import { useVideoAnalytics } from '../composables/useVideoAnalytics'
 const store = useTripStore()
 const lb = computed(() => store.lightbox)
 const lightboxRoot = ref<HTMLElement | null>(null)
 const finished = ref(false)
 const fullscreenError = ref('')
 const item = computed(() => (lb.value ? lb.value.list[lb.value.index] || null : null))
+const video = ref<HTMLVideoElement | null>(null)
+useVideoAnalytics(video, computed(() => item.value?.type === 'video' ? { content: mediaContent(item.value), mode: 'gallery' } : null))
 const meta = computed(() => (item.value ? TYPE_META[item.value.type] : null))
 const hasPrev = computed(() => !!lb.value && lb.value.index > 0)
 const hasNext = computed(() => !!lb.value && lb.value.index < lb.value.list.length - 1)
@@ -35,11 +39,13 @@ const legacyList = computed(() => (legacy.value ? [legacy.value] : []))
 const flat360 = ref(false)
 function on360Unsupported() {
   flat360.value = true
+  trackEvent('viewer_fallback', { reason: 'webgl', content: item.value ? mediaContent(item.value) : 'unknown' })
 }
 
 const imgLoaded = ref(false)
 const imgFailed = ref(false)
 watch(item, () => {
+  if (item.value && !lb.value?.film) trackEvent('media_open', { content: mediaContent(item.value), type: item.value.type })
   finished.value = false
   fullscreenError.value = ''
   flat360.value = false
@@ -181,13 +187,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
             :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
             decoding="async"
             @load="imgLoaded = true"
-            @error="imgFailed = true"
+            @error="imgFailed = true; trackEvent('image_error', { content: mediaContent(item), reason: 'load' })"
           />
           <p v-if="imgFailed" class="absolute inset-0 grid place-items-center text-muted">This photo couldn't be loaded.</p>
         </template>
 
         <video
           v-else-if="item.type === 'video'"
+          ref="video"
           :key="item.id"
           class="absolute inset-0 w-full h-full object-contain bg-black"
           :src="mediaUrl(item.src)"
