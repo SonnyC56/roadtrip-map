@@ -5,13 +5,15 @@ import { startFilm, type FlatFormat } from '../lib/film'
 import { playableFormat, epKind, type EpisodeFormatKey } from '../lib/manifest'
 import { mediaUrl } from '../lib/manifest'
 import { uninterrupted, type Master, type MasterFormat } from '../lib/uninterrupted'
-import { readyMasters, readyCollections, verifiedPending360 } from '../lib/readyV8'
+import { readyMasters, readyCollections } from '../lib/readyV8'
+import { loadPublishedV8 } from '../lib/publishedV8'
 import { fmtDuration } from '../lib/format'
 import { trackEvent } from '../lib/analytics'
 const store = useTripStore()
 const masters = ref<Partial<Record<MasterFormat, Master>>>({ ...readyMasters })
-const collectionId = ref(readyCollections[0]!.id)
-const selectedCollection = computed(() => readyCollections.find(c => c.id === collectionId.value)!)
+const collections = ref(structuredClone(readyCollections))
+const collectionId = ref(collections.value[0]!.id)
+const selectedCollection = computed(() => collections.value.find(c => c.id === collectionId.value)!)
 let timer: ReturnType<typeof setTimeout> | undefined
 let disposed = false
 let request: AbortController | undefined
@@ -19,10 +21,23 @@ async function refreshMasters() {
   request = new AbortController()
   const timeout = setTimeout(() => request?.abort(), 12000)
   try {
-    const response = await fetch(mediaUrl('masters/vr-v08/index.json'), { cache: 'no-cache', signal: request.signal })
-    const master = response.ok ? verifiedPending360(await response.json()) : null
-    if (!disposed && master) masters.value.vr = master
-  } catch { /* Full 360 stays Coming soon until the final corrected upload is verified. */ }
+    const signal = request.signal
+    const published = await loadPublishedV8(async key => {
+      const response = await fetch(mediaUrl(key), { cache: 'no-cache', signal })
+      if (!response.ok) throw new Error(`Published index unavailable: ${response.status}`)
+      return response.json()
+    })
+    if (!disposed) {
+      masters.value = { ...masters.value, ...published.masters }
+      for (const collection of collections.value) {
+        const updates = published.collections[collection.id as keyof typeof published.collections]
+        for (const format of ['16x9', '9x16', 'vr'] as const) {
+          const movie = updates?.[format]
+          if (movie) collection.formats[format] = { ...movie, title: collection.title }
+        }
+      }
+    }
+  } catch { /* Keep verified playback available while publication or networking is pending. */ }
   clearTimeout(timeout)
   if (!disposed) timer = setTimeout(refreshMasters, 60000)
 }
@@ -80,7 +95,7 @@ function watch360() {
       <p class="text-sm text-muted mb-2">Choose a shorter, uninterrupted part of the journey.</p>
       <label for="film-collection" class="text-sm text-muted">Chapter collection</label>
       <select id="film-collection" v-model="collectionId" class="collection-select">
-        <option v-for="collection in readyCollections" :key="collection.id" :value="collection.id">{{ collection.title }}</option>
+        <option v-for="collection in collections" :key="collection.id" :value="collection.id">{{ collection.title }}</option>
       </select>
       <p class="text-xs text-muted mb-2">{{ fmtDuration(selectedCollection.formats['16x9']?.duration || 0) }} · Single-file playback</p>
       <div class="grid grid-cols-3 gap-2">
