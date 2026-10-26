@@ -1,5 +1,5 @@
 {
-  "release": "v08-ready-2026-10-07",
+  "release": "v08-titlecard-ready-2026-10-26",
   "intro": {
     "previous": {
       "ep": 0,
@@ -102,12 +102,12 @@
       "version": "v08",
       "status": "ready",
       "format": "16x9",
-      "src": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_Opening-v01_Clock-v18-ff1137078117.mp4",
-      "captions": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_Opening-v01_Clock-v18-ff1137078117.srt",
-      "vtt": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_Opening-v01_Clock-v18-ff1137078117.vtt",
+      "src": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_TitleCard-v01_Clock-v18-1bc3cd2d947a.mp4",
+      "captions": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_TitleCard-v01_Clock-v18-1bc3cd2d947a.srt",
+      "vtt": "masters/v08/Sonnys_Roadtrip_2025_01-35-With-Intro_16x9_V08_TitleCard-v01_Clock-v18-1bc3cd2d947a.vtt",
       "duration": 10799.366666666667,
-      "bytes": 81418465164,
-      "sha256": "ff11370781177e8f53f2a4fca9314290e16d47fddefe30541e75f0fb5fecf175",
+      "bytes": 81427223662,
+      "sha256": "1bc3cd2d947a78b88b0e785ac5899c20eb9b8f5346b7f96f0542e1871d10a56e",
       "frames": 323981,
       "width": 3840,
       "height": 2160,
@@ -442,18 +442,19 @@
         }
       ],
       "main_film_ends_on_E35_fridge": true,
-      "E36_separate": true
+      "E36_separate": true,
+      "correction": "title-card-v01"
     },
     "9x16": {
       "version": "v08",
       "status": "ready",
       "format": "9x16",
-      "src": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_Opening-v01_Clock-v18-7b3c5f7dbd2d.mp4",
-      "captions": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_Opening-v01_Clock-v18-7b3c5f7dbd2d.srt",
-      "vtt": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_Opening-v01_Clock-v18-7b3c5f7dbd2d.vtt",
+      "src": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_TitleCard-v01_Clock-v18-ac75d5f73aae.mp4",
+      "captions": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_TitleCard-v01_Clock-v18-ac75d5f73aae.srt",
+      "vtt": "masters/portrait-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_9x16_V08_TitleCard-v01_Clock-v18-ac75d5f73aae.vtt",
       "duration": 10799.366666666667,
-      "bytes": 81832149393,
-      "sha256": "7b3c5f7dbd2dbfdc5e7c3563af8596ef54f513022d0ebc315a191900dc80e8ba",
+      "bytes": 81840717327,
+      "sha256": "ac75d5f73aae2b96b55fa17fbd50252e9486a84c273f4cde734d8fc6cf6902d0",
       "frames": 323981,
       "width": 2160,
       "height": 3840,
@@ -787,7 +788,8 @@
         }
       ],
       "main_film_ends_on_E35_fridge": true,
-      "E36_separate": true
+      "E36_separate": true,
+      "correction": "title-card-v01"
     }
   },
   "collections": [
@@ -810,12 +812,12 @@
           "version": "v08",
           "status": "ready",
           "format": "16x9",
-          "src": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_Opening-v01_Clock-v18-0c08b9f2ce30.mp4",
-          "captions": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_Opening-v01_Clock-v18-0c08b9f2ce30.srt",
-          "vtt": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_Opening-v01_Clock-v18-0c08b9f2ce30.vtt",
+          "src": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_TitleCard-v01_Clock-v18-70b2526abb67.mp4",
+          "captions": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_TitleCard-v01_Clock-v18-70b2526abb67.srt",
+          "vtt": "supercuts/v08/01-08-With-Intro/16x9/Sonnys_Roadtrip_2025_01-08-With-Intro_16x9_V08_TitleCard-v01_Clock-v18-70b2526abb67.vtt",
           "duration": 2483.633333333333,
-          "bytes": 20860612895,
-          "sha256": "0c08b9f2ce30a6b2d2442368f6f60365545a77f39d05318ccc3e81742af249e9",
+          "bytes": 20863436901,
+          "sha256": "70b2526abb670f8855e588df9366a36170d4c5e1cffd4d3bf4bb391a682daba9",
           "frames": 74509,
           "width": 3840,
           "height": 2160,
@@ -907,18 +909,19 @@
             }
           ],
           "main_film_ends_on_E35_fridge": false,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         },
         "9x16": {
           "version": "v08",
           "status": "ready",
           "format": "9x16",
-          "src": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_Opening-v01_Clock-v18-523705af9b71.mp4",
-          "captions": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_Opening-v01_Clock-v18-523705af9b71.srt",
-          "vtt": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_Opening-v01_Clock-v18-523705af9b71.vtt",
+          "src": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_TitleCard-v01_Clock-v18-3465c94f6f33.mp4",
+          "captions": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_TitleCard-v01_Clock-v18-3465c94f6f33.srt",
+          "vtt": "supercuts/v08/01-08-With-Intro/9x16/Sonnys_Roadtrip_2025_01-08-With-Intro_9x16_V08_TitleCard-v01_Clock-v18-3465c94f6f33.vtt",
           "duration": 2483.633333333333,
-          "bytes": 19542787518,
-          "sha256": "523705af9b71c939fb21157a2ee09116020f9599f061e7ba27f0f6356a304d0d",
+          "bytes": 19546747290,
+          "sha256": "3465c94f6f33382f7cd4caf28abad4fd2c29a2b3b39355be1c386c691994d658",
           "frames": 74509,
           "width": 2160,
           "height": 3840,
@@ -1009,18 +1012,19 @@
             }
           ],
           "main_film_ends_on_E35_fridge": false,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         },
         "vr": {
           "version": "v08",
           "status": "ready",
           "format": "vr",
-          "src": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_Opening-v01_Clock-v18-4245c6ef825a.mp4",
-          "captions": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_Opening-v01_Clock-v18-4245c6ef825a.srt",
-          "vtt": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_Opening-v01_Clock-v18-4245c6ef825a.vtt",
+          "src": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_TitleCard-v01_Clock-v18-33253391961f.mp4",
+          "captions": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_TitleCard-v01_Clock-v18-33253391961f.srt",
+          "vtt": "supercuts/v08/01-08-With-Intro/vr/Sonnys_Roadtrip_2025_01-08-With-Intro_vr_V08_TitleCard-v01_Clock-v18-33253391961f.vtt",
           "duration": 2483.633333333333,
-          "bytes": 10178863422,
-          "sha256": "4245c6ef825a876b6dbb25265dddc2ff2478fe7b782d54df679c05dd3d2e9bf3",
+          "bytes": 10183433735,
+          "sha256": "33253391961f9bda97a4151e1cb43362f152ff5806ee4feb7e07597bdea99ae9",
           "frames": 74509,
           "width": 3840,
           "height": 1920,
@@ -1111,7 +1115,8 @@
             }
           ],
           "main_film_ends_on_E35_fridge": false,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         }
       }
     },
@@ -1403,12 +1408,12 @@
           "version": "v08",
           "status": "ready",
           "format": "16x9",
-          "src": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_Collection-v06_Clock-v18-84648e0f564c.mp4",
-          "captions": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_Collection-v06_Clock-v18-84648e0f564c.srt",
-          "vtt": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_Collection-v06_Clock-v18-84648e0f564c.vtt",
+          "src": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_TitleCard-v01_Clock-v18-d46e245216e0.mp4",
+          "captions": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_TitleCard-v01_Clock-v18-d46e245216e0.srt",
+          "vtt": "supercuts/v08/16-25/16x9/Sonnys_Roadtrip_2025_16-25_16x9_V08_TitleCard-v01_Clock-v18-d46e245216e0.vtt",
           "duration": 3356.6,
-          "bytes": 25569734104,
-          "sha256": "84648e0f564cfeadf839107c5b15ac74945a394a76d0d08e8d7a4e7d7b1941b8",
+          "bytes": 25576642242,
+          "sha256": "d46e245216e0be701552a69110fabe70fdb9aa8e2719b212401192e735f258fb",
           "frames": 100698,
           "width": 3840,
           "height": 2160,
@@ -1509,18 +1514,19 @@
             }
           ],
           "main_film_ends_on_E35_fridge": false,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         },
         "9x16": {
           "version": "v08",
           "status": "ready",
           "format": "9x16",
-          "src": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_Collection-v06_Clock-v18-b9849411f7d6.mp4",
-          "captions": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_Collection-v06_Clock-v18-b9849411f7d6.srt",
-          "vtt": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_Collection-v06_Clock-v18-b9849411f7d6.vtt",
+          "src": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_TitleCard-v01_Clock-v18-110e86b2b6cd.mp4",
+          "captions": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_TitleCard-v01_Clock-v18-110e86b2b6cd.srt",
+          "vtt": "supercuts/v08/16-25/9x16/Sonnys_Roadtrip_2025_16-25_9x16_V08_TitleCard-v01_Clock-v18-110e86b2b6cd.vtt",
           "duration": 3356.6,
-          "bytes": 26133440162,
-          "sha256": "b9849411f7d627c9914295517af18fd90737c33b909994ee16751af27f5d539d",
+          "bytes": 26139777201,
+          "sha256": "110e86b2b6cd7d182fbb550d89347c691e7e2803eb0ecd03b21270e831825039",
           "frames": 100698,
           "width": 2160,
           "height": 3840,
@@ -1620,18 +1626,19 @@
             }
           ],
           "main_film_ends_on_E35_fridge": false,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         },
         "vr": {
           "version": "v08",
           "status": "ready",
           "format": "vr",
-          "src": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_Collection-v06_Clock-v18-b13ff5a32353.mp4",
-          "captions": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_Collection-v06_Clock-v18-b13ff5a32353.srt",
-          "vtt": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_Collection-v06_Clock-v18-b13ff5a32353.vtt",
+          "src": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_TitleCard-v01_Clock-v18-42b7a391b982.mp4",
+          "captions": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_TitleCard-v01_Clock-v18-42b7a391b982.srt",
+          "vtt": "supercuts/v08/16-25/vr/Sonnys_Roadtrip_2025_16-25_vr_V08_TitleCard-v01_Clock-v18-42b7a391b982.vtt",
           "duration": 3356.6,
-          "bytes": 23068203716,
-          "sha256": "b13ff5a32353803ccb45066c63678dabebcdb73b8ef64712827ce3660839f309",
+          "bytes": 23068246867,
+          "sha256": "42b7a391b98276ea89e5e7469ea698fd0df778c9b3b89478da2643d0ebd3822b",
           "frames": 100698,
           "width": 3840,
           "height": 1920,
@@ -1731,7 +1738,8 @@
             }
           ],
           "main_film_ends_on_E35_fridge": false,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         }
       }
     },
@@ -1755,12 +1763,12 @@
           "version": "v08",
           "status": "ready",
           "format": "16x9",
-          "src": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_Collection-v06_Clock-v18-64a0f010f7fa.mp4",
-          "captions": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_Collection-v06_Clock-v18-64a0f010f7fa.srt",
-          "vtt": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_Collection-v06_Clock-v18-64a0f010f7fa.vtt",
+          "src": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_TitleCard-v01_Clock-v18-85cf0d29934d.mp4",
+          "captions": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_TitleCard-v01_Clock-v18-85cf0d29934d.srt",
+          "vtt": "supercuts/v08/26-35/16x9/Sonnys_Roadtrip_2025_26-35_16x9_V08_TitleCard-v01_Clock-v18-85cf0d29934d.vtt",
           "duration": 3101.8333333333335,
-          "bytes": 21155539556,
-          "sha256": "64a0f010f7fa135b41d124cb6ef2b003fffcd7f006dac1bcc80e60e4e8ca070e",
+          "bytes": 21154565910,
+          "sha256": "85cf0d29934d82dc88318c921ff1ce1e2089b6c46f4f2a8d6e4cf4e7560930bf",
           "frames": 93055,
           "width": 3840,
           "height": 2160,
@@ -1861,18 +1869,19 @@
             }
           ],
           "main_film_ends_on_E35_fridge": true,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         },
         "9x16": {
           "version": "v08",
           "status": "ready",
           "format": "9x16",
-          "src": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_Collection-v06_Clock-v18-1425b3ff616b.mp4",
-          "captions": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_Collection-v06_Clock-v18-1425b3ff616b.srt",
-          "vtt": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_Collection-v06_Clock-v18-1425b3ff616b.vtt",
+          "src": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_TitleCard-v01_Clock-v18-5c1cd13a5d1b.mp4",
+          "captions": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_TitleCard-v01_Clock-v18-5c1cd13a5d1b.srt",
+          "vtt": "supercuts/v08/26-35/9x16/Sonnys_Roadtrip_2025_26-35_9x16_V08_TitleCard-v01_Clock-v18-5c1cd13a5d1b.vtt",
           "duration": 3101.8333333333335,
-          "bytes": 22034020087,
-          "sha256": "1425b3ff616b036dcd01451055109fb0de5cf2db7eaf0b01ed3ddd6ffd35e4d8",
+          "bytes": 22032291210,
+          "sha256": "5c1cd13a5d1bbfb29803fa888cf942b749e4957b7a2732720953f7b6a9d144c0",
           "frames": 93055,
           "width": 2160,
           "height": 3840,
@@ -1972,18 +1981,19 @@
             }
           ],
           "main_film_ends_on_E35_fridge": true,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         },
         "vr": {
           "version": "v08",
           "status": "ready",
           "format": "vr",
-          "src": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_Collection-v06_Clock-v18-9e345e705654.mp4",
-          "captions": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_Collection-v06_Clock-v18-9e345e705654.srt",
-          "vtt": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_Collection-v06_Clock-v18-9e345e705654.vtt",
+          "src": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_TitleCard-v01_Clock-v18-7d097b5a7385.mp4",
+          "captions": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_TitleCard-v01_Clock-v18-7d097b5a7385.srt",
+          "vtt": "supercuts/v08/26-35/vr/Sonnys_Roadtrip_2025_26-35_vr_V08_TitleCard-v01_Clock-v18-7d097b5a7385.vtt",
           "duration": 3101.8333333333335,
-          "bytes": 19218003307,
-          "sha256": "9e345e705654615406f94e828f6b0c3d702a1561ecb264b7b6afebe4aaeac787",
+          "bytes": 19216226940,
+          "sha256": "7d097b5a73851b2acd5fcb11170b822b94ae6756505bace41175a27f12a309f1",
           "frames": 93055,
           "width": 3840,
           "height": 1920,
@@ -2083,15 +2093,16 @@
             }
           ],
           "main_film_ends_on_E35_fridge": true,
-          "E36_separate": true
+          "E36_separate": true,
+          "correction": "title-card-v01"
         }
       }
     }
   ],
   "pending360": {
-    "src": "masters/vr-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_vr_V08_Opening-v01_Clock-v18-fa9303344feb.mp4",
-    "sha256": "fa9303344feb51a77688e05dabd42e9e8f5ba4caf07996d1e15fac8b2be976f2",
-    "bytes": 64648135273,
+    "src": "masters/vr-v08/Sonnys_Roadtrip_2025_01-35-With-Intro_vr_V08_TitleCard-v01_Clock-v18-0abda7e178e4.mp4",
+    "sha256": "0abda7e178e4fca24bd104fbcf9cfdf5cc998ab9b7d9b9341ee30e5268041c77",
+    "bytes": 64650972370,
     "frames": 323981,
     "duration": 10799.366666666667
   }
